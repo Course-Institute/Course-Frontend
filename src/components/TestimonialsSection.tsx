@@ -10,6 +10,7 @@ import {
   useTheme,
   useMediaQuery,
   Button,
+  Grid,
 } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 
@@ -329,45 +330,42 @@ const TestimonialsSection = () => {
 
         {/* Mobile Navigation */}
         {isMobile && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 2,
-              mt: 4,
-            }}
-          >
-            <Button
-              variant="outlined"
-              onClick={prevTestimonial}
-              startIcon={<KeyboardArrowLeft />}
-              sx={{
-                color: 'white',
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={nextTestimonial}
-              endIcon={<KeyboardArrowRight />}
-              sx={{
-                color: 'white',
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
-            >
-              Next
-            </Button>
-          </Box>
+          <Grid container spacing={2} justifyContent="center" sx={{ mt: 4 }}>
+            <Grid size="auto">
+              <Button
+                variant="outlined"
+                onClick={prevTestimonial}
+                startIcon={<KeyboardArrowLeft />}
+                sx={{
+                  color: 'white',
+                  borderColor: 'rgba(255, 255, 255, 0.5)',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                Previous
+              </Button>
+            </Grid>
+            <Grid size="auto">
+              <Button
+                variant="outlined"
+                onClick={nextTestimonial}
+                endIcon={<KeyboardArrowRight />}
+                sx={{
+                  color: 'white',
+                  borderColor: 'rgba(255, 255, 255, 0.5)',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                Next
+              </Button>
+            </Grid>
+          </Grid>
         )}
       </Container>
     </Box>

@@ -92,39 +92,26 @@ const AboutSection = () => {
           </Typography>
         </Box>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-            },
-            gap: 4,
-            justifyContent: 'center',
-            maxWidth: '1000px',
-            mx: 'auto',
-          }}
-        >
+        <Grid container spacing={4} sx={{ maxWidth: '1000px', mx: 'auto' }}>
           {features.map((feature, index) => (
-            <Card
-              key={index}
-              sx={{
-                height: 300, // Fixed height for all cards
-                width: '100%', // Full width within grid
-                textAlign: 'center',
-                p: 3,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: theme.shadows[8],
-                },
-              }}
-            >
+            <Grid key={index} size={{ xs: 12, sm: 6 }}>
+              <Card
+                sx={{
+                  height: 300, // Fixed height for all cards
+                  textAlign: 'center',
+                  p: 3,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(10px)',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: theme.shadows[8],
+                  },
+                }}
+              >
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Box sx={{ mb: 3 }}>
                     {feature.icon}
@@ -153,62 +140,61 @@ const AboutSection = () => {
                   </Typography>
                 </CardContent>
               </Card>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
 
         <Box sx={{ mt: 8, textAlign: 'center' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 4,
-              flexWrap: 'wrap',
-            }}
-          >
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 'bold',
-                  color: theme.palette.primary.main,
-                }}
-              >
-                10,000+
-              </Typography>
-              <Typography variant="h6" color="text.secondary">
-                Students Enrolled
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 'bold',
-                  color: theme.palette.primary.main,
-                }}
-              >
-                500+
-              </Typography>
-              <Typography variant="h6" color="text.secondary">
-                Expert Instructors
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 'bold',
-                  color: theme.palette.primary.main,
-                }}
-              >
-                95%
-              </Typography>
-              <Typography variant="h6" color="text.secondary">
-                Success Rate
-              </Typography>
-            </Box>
-          </Box>
+          <Grid container spacing={4} justifyContent="center">
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  10,000+
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
+                  Students Enrolled
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  500+
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
+                  Expert Instructors
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  95%
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
+                  Success Rate
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
       </Container>
     </Box>
