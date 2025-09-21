@@ -129,7 +129,7 @@ const CoursesShowcase = () => {
 
         <Grid container spacing={4}>
           {courses.map((course) => (
-            <Grid item xs={12} sm={6} md={4} key={course.id}>
+            <Grid size={{xs:12, sm:6, md:4}}  key={course.id}>
               <Card
                 sx={{
                   height: '100%',

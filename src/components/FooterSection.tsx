@@ -4,7 +4,9 @@ import {
   Typography,
   Button,
   useTheme,
+  Grid,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import {
   School,
   Email,
@@ -18,12 +20,11 @@ import {
 
 const FooterSection = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const handleLoginClick = (loginType: string) => {
-    // This will be implemented later when we create login pages
-    console.log(`${loginType} login clicked`);
-    // For now, we'll just show an alert
-    alert(`${loginType} login page will be implemented soon!`);
+    // Navigate to login page with role parameter
+    navigate(`/login?role=${loginType.toLowerCase()}`);
   };
 
   return (
@@ -47,9 +48,9 @@ const FooterSection = () => {
     >
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
         {/* Main Footer Content */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        <Grid container spacing={4}>
           {/* Company Info - Wider */}
-          <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 15%' }, minWidth: 0 }}>
+          <Grid size={{ xs: 12, lg: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, justifyContent: 'center', textAlign: 'center' }}>
               <Box
                 sx={{
@@ -95,23 +96,10 @@ const FooterSection = () => {
               Empowering students with world-class education and practical skills to succeed in their chosen careers.
             </Typography>
             
-          </Box>
-
-          {/* Vertical Divider */}
-          <Box sx={{ flex: { xs: '0 0 100%', lg: '0 0 3%' }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 4,
-                height: '90%',
-                background: `linear-gradient(to bottom, transparent, ${theme.palette.primary.main}, ${theme.palette.primary.light}, transparent)`,
-                borderRadius: 2,
-                boxShadow: `0 0 20px ${theme.palette.primary.main}40`,
-              }}
-            />
-          </Box>
+          </Grid>
 
           {/* Quick Links */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', lg: '1 1 15%' }, minWidth: 0 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
             <Typography
               variant="h5"
               sx={{
@@ -168,23 +156,10 @@ const FooterSection = () => {
                 </Box>
               ))}
             </Box>
-          </Box>
-
-          {/* Vertical Divider */}
-          <Box sx={{ flex: { xs: '0 0 100%', lg: '0 0 3%' }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 4,
-                height: '90%',
-                background: `linear-gradient(to bottom, transparent, ${theme.palette.primary.main}, ${theme.palette.primary.light}, transparent)`,
-                borderRadius: 2,
-                boxShadow: `0 0 20px ${theme.palette.primary.main}40`,
-              }}
-            />
-          </Box>
+          </Grid>
 
           {/* Contact Info */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', lg: '1 1 15%' }, minWidth: 0 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
             <Typography
               variant="h5"
               sx={{
@@ -265,23 +240,10 @@ const FooterSection = () => {
                 </Typography>
               </Box>
             </Box>
-          </Box>
-
-          {/* Vertical Divider */}
-          <Box sx={{ flex: { xs: '0 0 100%', lg: '0 0 3%' }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 4,
-                height: '90%',
-                background: `linear-gradient(to bottom, transparent, ${theme.palette.primary.main}, ${theme.palette.primary.light}, transparent)`,
-                borderRadius: 2,
-                boxShadow: `0 0 20px ${theme.palette.primary.main}40`,
-              }}
-            />
-          </Box>
+          </Grid>
 
           {/* Follow Us */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', lg: '1 1 10%' }, minWidth: 0 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
             <Typography
               variant="h5"
@@ -334,24 +296,10 @@ const FooterSection = () => {
               </Box>
             ))}
           </Box>
-        </Box>
-
-
-          {/* Vertical Divider */}
-          <Box sx={{ flex: { xs: '0 0 100%', lg: '0 0 3%' }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 4,
-                height: '90%',
-                background: `linear-gradient(to bottom, transparent, ${theme.palette.primary.main}, ${theme.palette.primary.light}, transparent)`,
-                borderRadius: 2,
-                boxShadow: `0 0 20px ${theme.palette.primary.main}40`,
-              }}
-            />
-          </Box>
+        </Grid>
 
           {/* Access Portal */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', lg: '1 1 10%' }, minWidth: 0 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
             <Typography
               variant="h5"
@@ -435,10 +383,9 @@ const FooterSection = () => {
               App Login
             </Button>
           </Box>
-        </Box>
+        </Grid>
 
-
-        </Box>
+        </Grid>
 
         {/* Bottom Section */}
         <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

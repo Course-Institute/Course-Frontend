@@ -15,20 +15,23 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import { School } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
   const handleLoginClick = (loginType: string) => {
-    console.log(`${loginType} login clicked`);
-    alert(`${loginType} login page will be implemented soon!`);
+    // Navigate to login page with role parameter
+    navigate(`/login?role=${loginType.toLowerCase()}`);
+    setMobileOpen(false); // Close mobile drawer if open
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -38,6 +41,19 @@ const Navbar = () => {
         behavior: 'smooth',
         block: 'start',
       });
+    }
+    setMobileOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    // Navigate to homepage unless we're in an admin panel
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/admin') || currentPath.includes('/dashboard')) {
+      // If in admin panel, stay there or navigate to admin dashboard
+      navigate('/admin-dashboard');
+    } else {
+      // Otherwise, navigate to homepage
+      navigate('/');
     }
     setMobileOpen(false);
   };
@@ -73,7 +89,21 @@ const Navbar = () => {
 
   const drawer = (
     <Box sx={{ width: 250 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          p: 2, 
+          borderBottom: 1, 
+          borderColor: 'divider',
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: theme.palette.grey[50],
+          },
+          transition: 'background-color 0.2s ease',
+        }}
+        onClick={handleLogoClick}
+      >
         <School sx={{ fontSize: 30, color: theme.palette.primary.main, mr: 1 }} />
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
           Course Institute
@@ -83,11 +113,11 @@ const Navbar = () => {
         {navItems.map((item) => (
           <ListItem
             key={item.id}
-            button
             onClick={() => scrollToSection(item.id)}
             sx={{
               borderBottom: 1,
               borderColor: 'divider',
+              cursor: 'pointer',
               '&:hover': {
                 backgroundColor: theme.palette.primary.light,
                 color: 'white',
@@ -160,7 +190,19 @@ const Navbar = () => {
       >
         <Toolbar>
           {/* Logo */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mr: 4, 
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
+              transition: 'opacity 0.2s ease',
+            }}
+            onClick={handleLogoClick}
+          >
             <School sx={{ fontSize: 30, color: theme.palette.primary.main, mr: 1 }} />
             <Typography
               variant="h6"
