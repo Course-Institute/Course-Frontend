@@ -180,7 +180,7 @@ const Navbar = () => {
   return (
     <>
       <AppBar
-        position="static"
+        position="fixed"
         sx={{
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',

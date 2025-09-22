@@ -52,6 +52,7 @@ const HeroSection = () => {
         backgroundImage: `url(${slides[currentSlide].image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        pt: 8,
         '&::before': {
           content: '""',
           position: 'absolute',
