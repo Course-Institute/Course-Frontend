@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import AdminLayout from './components/admin/AdminLayout';
 import DashboardPage from './pages/admin/DashboardPage';
 import ManageStudentsPage from './pages/admin/ManageStudentsPage';
+import IdCardManagementPage from './pages/admin/IdCardManagementPage';
 import { SessionProvider } from './contexts/SessionContext';
 
 function App() {
@@ -25,6 +26,11 @@ function App() {
           <Route path="/admin/students" element={
             <AdminLayout title="MANAGE STUDENTS">
               <ManageStudentsPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/id-cards" element={
+            <AdminLayout title="ID CARD MANAGEMENT">
+              <IdCardManagementPage />
             </AdminLayout>
           } />
         </Routes>

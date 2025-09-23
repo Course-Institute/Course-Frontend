@@ -226,6 +226,7 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
+            height: '100vh',
             borderRight: '1px solid #e2e8f0',
           },
         }}
@@ -244,6 +245,7 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
+              height: '100vh',
               borderRight: '1px solid #e2e8f0',
               backgroundColor: 'white',
             },

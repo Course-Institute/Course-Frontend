@@ -174,7 +174,13 @@ const ManageStudentsPage = () => {
   ];
 
   return (
-    <Box sx={{ width: 'auto', marginTop:"20px"}}>
+    <Box sx={{ 
+      width: '100%', 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3,
+    }}>
 
       {/* Error Alert */}
       {isError && (
@@ -184,7 +190,7 @@ const ManageStudentsPage = () => {
       )}
 
       {/* Three Action Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ flexShrink: 0 }}>
         {/* Student Status Update */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Card
@@ -383,63 +389,72 @@ const ManageStudentsPage = () => {
         </Grid>
       </Grid>
 
-      {/* Students Data Table */}
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-          <CircularProgress size={40} />
-        </Box>
-      ) : (
-        <Table
-          columns={columns}
-
-          rows={studentsData?.data || []}
-          stickyHeader={true}
-          tableContainerSx={{
-            height: '450px',
-            borderRadius: 3,
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #f1f5f9',
-            overflow: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#c1c1c1',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: '#a8a8a8',
-            },
-            '& .MuiTable-root': {
-              '& .MuiTableHead-root': {
-                '& .MuiTableCell-root': {
-                  backgroundColor: '#f5f5f5',
-                  color: '#333',
-                  fontWeight: 'bold',
-                  borderBottom: '2px solid #e0e0e0',
-                  position: 'sticky',
-                  top: 0,
-                  zIndex: 1,
-                },
+      {/* Students Data Table - Takes remaining space */}
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {isLoading ? (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            flexGrow: 1,
+            p: 4 
+          }}>
+            <CircularProgress size={40} />
+          </Box>
+        ) : (
+          <Table
+            columns={columns}
+            rows={studentsData?.data || []}
+            stickyHeader={true}
+            tableContainerSx={{
+              height: '100%',
+              minHeight: '400px',
+              borderRadius: 3,
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #f1f5f9',
+              overflow: 'auto',
+              flexGrow: 1,
+              '&::-webkit-scrollbar': {
+                width: '8px',
               },
-              '& .MuiTableBody-root': {
-                '& .MuiTableRow-root': {
-                  '&:hover': {
-                    backgroundColor: '#e3f2fd !important',
-                  },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#c1c1c1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#a8a8a8',
+              },
+              '& .MuiTable-root': {
+                '& .MuiTableHead-root': {
                   '& .MuiTableCell-root': {
-                    borderBottom: '1px solid #f0f0f0',
+                    backgroundColor: '#f5f5f5',
+                    color: '#333',
+                    fontWeight: 'bold',
+                    borderBottom: '2px solid #e0e0e0',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                  },
+                },
+                '& .MuiTableBody-root': {
+                  '& .MuiTableRow-root': {
+                    '&:hover': {
+                      backgroundColor: '#e3f2fd !important',
+                    },
+                    '& .MuiTableCell-root': {
+                      borderBottom: '1px solid #f0f0f0',
+                    },
                   },
                 },
               },
-            },
-          }}
-        />
-      )}
+            }}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

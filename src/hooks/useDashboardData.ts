@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAdminDashboardData, type DashboardStats } from '../api/dashboardApi';
+import { type DashboardStats } from '../api/dashboardApi';
 
 interface UseDashboardDataReturn {
   data: DashboardStats;
@@ -8,6 +8,23 @@ interface UseDashboardDataReturn {
   error: Error | null;
   refetch: () => void;
 }
+
+// Mock data for dashboard
+const mockDashboardData: DashboardStats = {
+  studentCount: 1247,
+  totalPayments: 2450000,
+  pendingApprovals: 23,
+  activeCenters: 8,
+};
+
+const fetchDashboardData = async (): Promise<{ data: DashboardStats }> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return {
+    data: mockDashboardData
+  };
+};
 
 export const useDashboardData = (): UseDashboardDataReturn => {
   const {
@@ -18,7 +35,7 @@ export const useDashboardData = (): UseDashboardDataReturn => {
     refetch,
   } = useQuery({
     queryKey: ['adminDashboard'],
-    queryFn: getAdminDashboardData,
+    queryFn: fetchDashboardData,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
     refetchOnWindowFocus: false,
