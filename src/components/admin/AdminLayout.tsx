@@ -39,7 +39,13 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
   const showWarning = timeRemaining < 60000 && timeRemaining > 0;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      height: '100vh',
+      width: '100vw',
+      overflow: 'hidden',
+      backgroundColor: '#f8fafc'
+    }}>
       <Sidebar 
         open={sidebarOpen} 
         onClose={handleDrawerToggle} 
@@ -51,6 +57,7 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
         component="main"
         sx={{
           flexGrow: 1,
+          height: '100vh',
           width: '100%',
           ml: { 
             xs: 0,
@@ -60,6 +67,9 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
         {/* Header */}
@@ -72,6 +82,8 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexShrink: 0,
+            zIndex: 1000,
           }}
         >
           {/* Toggle Button - Only show on desktop when sidebar is closed or on mobile */}
@@ -107,11 +119,13 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
           <Box sx={{ width: { xs: 'auto', md: sidebarOpen ? 'auto' : '48px' } }} />
         </Box>
 
-        {/* Page Content */}
+        {/* Page Content - Takes remaining space */}
         <Box sx={{ 
           flexGrow: 1,
           width: '100%',
-          minHeight: 'calc(100vh - 80px)', // Subtract header height
+          height: 'calc(100vh - 80px)', // Subtract header height
+          overflow: 'auto',
+          p: 3,
         }}>
           {children}
         </Box>
