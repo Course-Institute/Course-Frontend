@@ -6,6 +6,10 @@ import AdminLayout from './components/admin/AdminLayout';
 import DashboardPage from './pages/admin/DashboardPage';
 import ManageStudentsPage from './pages/admin/ManageStudentsPage';
 import IdCardManagementPage from './pages/admin/IdCardManagementPage';
+import PaymentTrackingPage from './pages/admin/PaymentTrackingPage';
+import UploadResultsPage from './pages/admin/UploadResultsPage';
+import CenterManagementPage from './pages/admin/CenterManagementPage';
+import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import { SessionProvider } from './contexts/SessionContext';
 
 function App() {
@@ -31,6 +35,26 @@ function App() {
           <Route path="/admin/id-cards" element={
             <AdminLayout title="ID CARD MANAGEMENT">
               <IdCardManagementPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/payments" element={
+            <AdminLayout title="PAYMENT TRACKING">
+              <PaymentTrackingPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/upload-results" element={
+            <AdminLayout title="UPLOAD RESULTS">
+              <UploadResultsPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/centers" element={
+            <AdminLayout title="CENTER MANAGEMENT">
+              <CenterManagementPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/reports" element={
+            <AdminLayout title="REPORTS DASHBOARD">
+              <ReportsDashboardPage />
             </AdminLayout>
           } />
         </Routes>

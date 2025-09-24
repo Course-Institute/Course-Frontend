@@ -65,10 +65,11 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
     <Box
       sx={{
         width: '100%',
-        height: '100%',
+        minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
+        boxSizing: 'border-box',
       }}
     >
       {/* Page Title */}
@@ -136,12 +137,25 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
         ))}
       </Grid>
 
-      {/* Main Content - Takes remaining space */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Grid container spacing={3} sx={{ flexGrow: 1 }}>
+        {/* Main Content - Takes remaining space */}
+        <Box sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 500,
+        }}>
+        <Grid container spacing={3} sx={{ 
+          flexGrow: 1,
+          minHeight: 400,
+        }}>
           {/* Student Table */}
           <Grid size={{ xs: 12, lg: selectedStudentId ? 8 : 12 }}>
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              minHeight: 400,
+            }}>
               <StudentTable
                 onStudentSelect={handleStudentSelect}
                 selectedStudentId={selectedStudentId}
@@ -153,13 +167,18 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
           {/* ID Card Preview */}
           {selectedStudentId && (
             <Grid size={{ xs: 12, lg: 4 }}>
-              <Box sx={{ 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: 2 
-              }}>
-                <Box >
+            <Box sx={{ 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              gap: 2,
+              minHeight: 400,
+            }}>
+                <Box sx={{ 
+                  flexGrow: 1,
+                  minHeight: 0,
+                  overflow: 'auto',
+                }}>
                   <IdCardPreview selectedStudentId={selectedStudentId} />
                 </Box>
                 

@@ -176,7 +176,7 @@ const ManageStudentsPage = () => {
   return (
     <Box sx={{ 
       width: '100%', 
-      height: '100%',
+      minHeight: '100%',
       display: 'flex',
       flexDirection: 'column',
       gap: 3,
@@ -390,7 +390,7 @@ const ManageStudentsPage = () => {
       </Grid>
 
       {/* Students Data Table - Takes remaining space */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 400 }}>
         {isLoading ? (
           <Box sx={{ 
             display: 'flex', 
