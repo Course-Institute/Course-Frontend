@@ -70,7 +70,15 @@ const DashboardContent = () => {
   ];
 
   return (
-    <Box sx={{ width: '100%', marginTop:"20px" }}>
+    <Box sx={{ 
+      width: '100%', 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3,
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+    }}>
       {/* Error Alert */}
       {isError && (
         <Alert severity="warning" sx={{ mb: 3 }}>

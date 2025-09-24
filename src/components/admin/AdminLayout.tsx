@@ -125,7 +125,23 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
           width: '100%',
           height: 'calc(100vh - 80px)', // Subtract header height
           overflow: 'auto',
-          p: 3,
+          p: { xs: 2, sm: 3 },
+          pr: { xs: 2, sm: 3, md: 4 }, // Extra right padding
+          boxSizing: 'border-box',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#c1c1c1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#a8a8a8',
+          },
         }}>
           {children}
         </Box>
