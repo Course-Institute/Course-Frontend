@@ -1,3 +1,5 @@
+import axiosInstance from './axiosInstance';
+
 export interface Student {
   id: string;
   studentId: string;
@@ -204,22 +206,24 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
   });
 };
 
-// Mock API function to simulate adding a student
-export const addStudent = async (_data: AddStudentData): Promise<AddStudentResponse> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate API failure 10% of the time
-      if (Math.random() < 0.1) {
-        reject(new Error('Failed to add student. Please try again.'));
-        return;
-      }
-
-      // Simulate successful response
-      resolve({
-        success: true,
-        message: 'Student added successfully',
-        studentId: `STU-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
-      });
-    }, Math.random() * 2000 + 1000); // Random delay between 1-3 seconds
-  });
+// Real API function to add a student
+export const addStudent = async (formData: FormData): Promise<AddStudentResponse> => {
+  try {
+    const response = await axiosInstance.post('/addStudent', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to add student. Please try again.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
 };

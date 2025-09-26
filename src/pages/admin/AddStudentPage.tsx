@@ -49,13 +49,35 @@ const AddStudentPage = () => {
     if (!personalData) return;
 
     try {
-      // Combine personal and academic data
-      const combinedData = {
-        ...personalData,
-        academicQualifications: academicData,
-      };
+      // Create FormData and filter out empty values
+      const formDataToSend = new FormData();
+      
+      // Add personal data (excluding empty values)
+      Object.keys(personalData).forEach(key => {
+        const value = personalData[key as keyof AddStudentData];
+        if (value && typeof value === 'string' && value.trim() !== '') {
+          formDataToSend.append(key, value);
+        } else if (value instanceof File) {
+          formDataToSend.append(key, value);
+        }
+      });
+      
+      // Add academic qualifications (excluding empty values)
+      Object.keys(academicData).forEach(level => {
+        const qualification = academicData[level as keyof AcademicData];
+        if (qualification) {
+          Object.keys(qualification).forEach(field => {
+            const value = qualification[field as keyof typeof qualification];
+            if (value && typeof value === 'string' && value.trim() !== '') {
+              formDataToSend.append(`academicQualifications[${level}][${field}]`, value);
+            } else if (value instanceof File) {
+              formDataToSend.append(`academicQualifications[${level}][${field}]`, value);
+            }
+          });
+        }
+      });
 
-      await addStudent(combinedData as any);
+      await addStudent(formDataToSend);
       
       // Reset form after successful submission
       setTimeout(() => {
