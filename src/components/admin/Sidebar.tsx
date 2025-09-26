@@ -18,12 +18,13 @@ import {
   Payment,
   Business,
   Assessment,
-  School,
   Logout as LogoutIcon,
   PersonAdd,
 } from '@mui/icons-material';
+import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useSession, formatTimeRemaining } from '../../contexts/SessionContext';
+import { useSession } from '../../contexts/SessionContext';
+import { formatTimeRemaining } from '../../utils/timeUtils';
 import { useNavigate, useLocation } from 'react-router-dom';
 interface SidebarProps {
   open: boolean;
@@ -92,7 +93,7 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
               justifyContent: 'center',
             }}
           >
-            <School sx={{ color: 'white', fontSize: 24 }} />
+            <InstituteLogo width={24} height={24} />
           </Box>
           <Typography
             variant="h6"
@@ -207,7 +208,7 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
             mt: 1,
           }}
         >
-          © 2024 Course Institute
+          © 2024 MIVPS
         </Typography>
       </Box>
     </Box>

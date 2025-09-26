@@ -228,6 +228,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               {/* Photo */}
               <Grid size={12}>
                 <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                    Photo *
+                  </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
@@ -237,7 +240,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   />
                   <label htmlFor="photo-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.photo ? formData.photo.name : 'Choose File'}
+                      {formData.photo ? formData.photo.name : 'Choose Photo'}
                     </Button>
                   </label>
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
@@ -283,6 +286,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               {/* Adhar Card Back */}
               <Grid size={12}>
                 <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                    Aadhar Card Back *
+                  </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
@@ -292,7 +298,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   />
                   <label htmlFor="adhar-back-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.adharCardBack ? formData.adharCardBack.name : 'Choose File'}
+                      {formData.adharCardBack ? formData.adharCardBack.name : 'Choose Aadhar Back'}
                     </Button>
                   </label>
                 </Box>
@@ -491,6 +497,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               {/* Signature */}
               <Grid size={12}>
                 <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                    Signature *
+                  </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
@@ -500,7 +509,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   />
                   <label htmlFor="signature-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.signature ? formData.signature.name : 'Choose File'}
+                      {formData.signature ? formData.signature.name : 'Choose Signature'}
                     </Button>
                   </label>
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
@@ -537,6 +546,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               {/* Adhar Card Front */}
               <Grid size={12}>
                 <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                    Aadhar Card Front *
+                  </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
@@ -546,7 +558,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   />
                   <label htmlFor="adhar-front-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.adharCardFront ? formData.adharCardFront.name : 'Choose File'}
+                      {formData.adharCardFront ? formData.adharCardFront.name : 'Choose Aadhar Front'}
                     </Button>
                   </label>
                 </Box>

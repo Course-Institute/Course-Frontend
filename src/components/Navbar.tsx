@@ -14,7 +14,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
-import { School } from '@mui/icons-material';
+import InstituteLogo from './InstituteLogo';
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
@@ -104,9 +104,9 @@ const Navbar = () => {
         }}
         onClick={handleLogoClick}
       >
-        <School sx={{ fontSize: 30, color: theme.palette.primary.main, mr: 1 }} />
+        <InstituteLogo width={30} height={30} sx={{ mr: 1 }} />
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
-          Course Institute
+          MIVPS
         </Typography>
       </Box>
       <List>
@@ -203,7 +203,7 @@ const Navbar = () => {
             }}
             onClick={handleLogoClick}
           >
-            <School sx={{ fontSize: 30, color: theme.palette.primary.main, mr: 1 }} />
+            <InstituteLogo width={30} height={30} sx={{ mr: 1 }} />
             <Typography
               variant="h6"
               sx={{
@@ -212,7 +212,7 @@ const Navbar = () => {
                 display: { xs: 'none', sm: 'block' },
               }}
             >
-              Course Institute
+              MIVPS
             </Typography>
           </Box>
 

@@ -26,7 +26,7 @@ const TestimonialsSection = () => {
       initials: "PS",
       bgColor: "#FF6B6B",
       rating: 5,
-      text: "The Web Development Bootcamp completely transformed my career. The instructors were amazing, and the hands-on projects gave me the confidence to land my dream job at TCS. I couldn't have done it without Course Institute!"
+      text: "The Web Development Bootcamp completely transformed my career. The instructors were amazing, and the hands-on projects gave me the confidence to land my dream job at TCS. I couldn't have done it without MIVPS!"
     },
     {
       name: "Arjun Patel",
