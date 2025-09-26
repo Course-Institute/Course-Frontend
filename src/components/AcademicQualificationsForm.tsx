@@ -98,10 +98,23 @@ const AcademicQualificationsForm = ({ onNext, onBack }: AcademicQualificationsFo
   };
 
   const handleFileChange = (level: keyof AcademicData, file: File | null) => {
-    if (file && file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf') {
-      setErrors(prev => ({ ...prev, [`${level}_document`]: 'Only JPG and PDF files are allowed' }));
-      return;
+    if (file) {
+      // Check file type
+      if (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf') {
+        setErrors(prev => ({ ...prev, [`${level}_document`]: 'Only JPG and PDF files are allowed' }));
+        return;
+      }
+      
+      // Check file size (2MB = 2 * 1024 * 1024 bytes)
+      const maxSize = 2 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setErrors(prev => ({ ...prev, [`${level}_document`]: 'File size cannot exceed 2MB' }));
+        return;
+      }
     }
+    
+    // Clear any existing errors for this field
+    setErrors(prev => ({ ...prev, [`${level}_document`]: '' }));
     handleInputChange(level, 'document', file);
   };
 
