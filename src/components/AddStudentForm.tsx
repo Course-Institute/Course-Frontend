@@ -115,41 +115,119 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-
-    // Required field validations
-    const requiredFields: (keyof FormData)[] = [
-      'candidateName', 'motherName', 'fatherName', 'dateOfBirth', 'gender',
-      'adharCardNo', 'category', 'contactNumber', 'emailAddress', 'permanentAddress',
-      'currentAddress', 'state', 'city', 'country', 'nationality', 'pincode',
-      'courseType', 'course', 'faculty', 'stream', 'year', 'session'
-    ];
-
-    requiredFields.forEach(field => {
-      if (!formData[field] || (typeof formData[field] === 'string' && formData[field].trim() === '')) {
-        newErrors[field] = 'This field is required';
+    
+    // Name validations (no character limit)
+    if (!formData.candidateName) {
+      newErrors.candidateName = 'Candidate Name is required';
+    }
+    
+    if (!formData.motherName) {
+      newErrors.motherName = 'Mother Name is required';
+    }
+    
+    if (!formData.fatherName) {
+      newErrors.fatherName = 'Father Name is required';
+    }
+    
+    // Date of birth validation (no future dates)
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = 'Date of Birth is required';
+    } else {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+      if (birthDate > today) {
+        newErrors.dateOfBirth = 'Date of Birth cannot be in the future';
+      }
+    }
+    
+    // Aadhar card validation (12 digits, numbers only)
+    if (!formData.adharCardNo) {
+      newErrors.adharCardNo = 'Aadhar Card Number is required';
+    } else if (!/^\d{12}$/.test(formData.adharCardNo)) {
+      newErrors.adharCardNo = 'Aadhar Card Number must be exactly 12 digits';
+    }
+    
+    // Contact number validation (10 digits, numbers only)
+    if (!formData.contactNumber) {
+      newErrors.contactNumber = 'Contact Number is required';
+    } else if (!/^\d{10}$/.test(formData.contactNumber)) {
+      newErrors.contactNumber = 'Contact Number must be exactly 10 digits';
+    }
+    
+    // Alternate number validation (10 digits, numbers only)
+    if (formData.alternateNumber && !/^\d{10}$/.test(formData.alternateNumber)) {
+      newErrors.alternateNumber = 'Alternate Number must be exactly 10 digits';
+    }
+    
+    // Email validation
+    if (!formData.emailAddress) {
+      newErrors.emailAddress = 'Email Address is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.emailAddress)) {
+      newErrors.emailAddress = 'Email is invalid';
+    }
+    
+    // Address validations (300 characters max)
+    if (!formData.permanentAddress) {
+      newErrors.permanentAddress = 'Permanent Address is required';
+    } else if (formData.permanentAddress.length > 300) {
+      newErrors.permanentAddress = 'Permanent Address cannot exceed 300 characters';
+    }
+    
+    if (!formData.currentAddress) {
+      newErrors.currentAddress = 'Current Address is required';
+    } else if (formData.currentAddress.length > 300) {
+      newErrors.currentAddress = 'Current Address cannot exceed 300 characters';
+    }
+    
+    // Pincode validation (6 digits)
+    if (!formData.pincode) {
+      newErrors.pincode = 'Pincode is required';
+    } else if (!/^\d{6}$/.test(formData.pincode)) {
+      newErrors.pincode = 'Pincode must be exactly 6 digits';
+    }
+    
+    // Course fee validation (numbers only)
+    if (!formData.courseFee) {
+      newErrors.courseFee = 'Course Fee is required';
+    } else if (!/^\d+$/.test(formData.courseFee)) {
+      newErrors.courseFee = 'Course Fee must contain only numbers';
+    }
+    
+    // Other required fields
+    const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'nationality', 'courseType', 'course', 'faculty', 'stream', 'year', 'session'];
+    otherRequiredFields.forEach(field => {
+      if (!formData[field as keyof FormData]) {
+        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
       }
     });
-
-    // Email validation
-    if (formData.emailAddress && !/\S+@\S+\.\S+/.test(formData.emailAddress)) {
-      newErrors.emailAddress = 'Please enter a valid email address';
+    
+    // File validations with size limits (2MB = 2 * 1024 * 1024 bytes)
+    const maxFileSize = 2 * 1024 * 1024; // 2MB
+    
+    if (!formData.photo) {
+      newErrors.photo = 'Photo is required';
+    } else if (formData.photo.size > maxFileSize) {
+      newErrors.photo = 'Photo size cannot exceed 2MB';
     }
-
-    // Phone number validation
-    if (formData.contactNumber && !/^[0-9]{10}$/.test(formData.contactNumber.replace(/\D/g, ''))) {
-      newErrors.contactNumber = 'Please enter a valid 10-digit phone number';
+    
+    if (!formData.adharCardFront) {
+      newErrors.adharCardFront = 'Aadhar Card Front is required';
+    } else if (formData.adharCardFront.size > maxFileSize) {
+      newErrors.adharCardFront = 'Aadhar Card Front size cannot exceed 2MB';
     }
-
-    // Adhar card validation
-    if (formData.adharCardNo && !/^[0-9]{12}$/.test(formData.adharCardNo.replace(/\D/g, ''))) {
-      newErrors.adharCardNo = 'Please enter a valid 12-digit Aadhar number';
+    
+    if (!formData.adharCardBack) {
+      newErrors.adharCardBack = 'Aadhar Card Back is required';
+    } else if (formData.adharCardBack.size > maxFileSize) {
+      newErrors.adharCardBack = 'Aadhar Card Back size cannot exceed 2MB';
     }
-
-    // Pincode validation
-    if (formData.pincode && !/^[0-9]{6}$/.test(formData.pincode.replace(/\D/g, ''))) {
-      newErrors.pincode = 'Please enter a valid 6-digit pincode';
+    
+    if (!formData.signature) {
+      newErrors.signature = 'Signature is required';
+    } else if (formData.signature.size > maxFileSize) {
+      newErrors.signature = 'Signature size cannot exceed 2MB';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -165,9 +243,33 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
       // In step mode, just pass data to next step
       onNext(formData as AddStudentData);
     } else {
-      // In dialog mode, submit directly
+      // In dialog mode, submit directly using FormData
       try {
-        await addStudent(formData as AddStudentData);
+        const formDataToSend = new FormData();
+        
+        // Add all text fields (excluding empty values)
+        Object.keys(formData).forEach(key => {
+          const value = formData[key as keyof FormData];
+          if (value && typeof value === 'string' && value.trim() !== '') {
+            formDataToSend.append(key, value);
+          }
+        });
+        
+        // Add file fields
+        if (formData.photo) {
+          formDataToSend.append('photo', formData.photo);
+        }
+        if (formData.adharCardFront) {
+          formDataToSend.append('adharCardFront', formData.adharCardFront);
+        }
+        if (formData.adharCardBack) {
+          formDataToSend.append('adharCardBack', formData.adharCardBack);
+        }
+        if (formData.signature) {
+          formDataToSend.append('signature', formData.signature);
+        }
+        
+        await addStudent(formDataToSend as any);
         
         // Success - close dialog after a short delay to show success state
         setTimeout(() => {
@@ -277,9 +379,12 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   fullWidth
                   label="Adharcard No. *"
                   value={formData.adharCardNo}
+                  type='number'
                   onChange={(e) => handleInputChange('adharCardNo', e.target.value)}
                   error={!!errors.adharCardNo}
                   helperText={errors.adharCardNo}
+                  placeholder="12-digit Aadhar Number"
+                  inputProps={{ maxLength: 12 }}
                 />
               </Grid>
 
@@ -320,11 +425,13 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                 <TextField
                   fullWidth
                   label="Contact Number *"
+                  type="number"
                   value={formData.contactNumber}
                   onChange={(e) => handleInputChange('contactNumber', e.target.value)}
                   error={!!errors.contactNumber}
                   helperText={errors.contactNumber}
-                  placeholder="Contact Number"
+                  placeholder="10-digit Contact Number"
+                  inputProps={{ maxLength: 10 }}
                 />
               </Grid>
 
@@ -350,7 +457,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   multiline
                   rows={3}
                   value={formData.permanentAddress}
-                  onChange={(e) => handleInputChange('permanentAddress', e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 300) {
+                      handleInputChange('permanentAddress', e.target.value);
+                    }
+                  }}
                   error={!!errors.permanentAddress}
                   helperText={errors.permanentAddress}
                   placeholder="Permanent Address"
@@ -457,10 +568,13 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               <Grid size={12}>
                 <TextField
                   fullWidth
-                  label="Course fee"
+                  label="Course Fee (in Rs.)"
+                  type="number"
                   value={formData.courseFee}
                   onChange={(e) => handleInputChange('courseFee', e.target.value)}
-                  placeholder="Course Fee"
+                  placeholder="Course Fee in Rs."
+                  error={!!errors.courseFee}
+                  helperText={errors.courseFee}
                 />
               </Grid>
             </Grid>
@@ -595,12 +709,14 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
               <Grid size={12}>
                 <TextField
                   fullWidth
-                  label="Alternate No. *"
+                  label="Alternate No."
+                  type="number"
                   value={formData.alternateNumber}
                   onChange={(e) => handleInputChange('alternateNumber', e.target.value)}
                   error={!!errors.alternateNumber}
                   helperText={errors.alternateNumber}
-                  placeholder="Alternate No."
+                  placeholder="10-digit Alternate Number"
+                  inputProps={{ maxLength: 10 }}
                 />
               </Grid>
 
@@ -612,7 +728,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                   multiline
                   rows={3}
                   value={formData.currentAddress}
-                  onChange={(e) => handleInputChange('currentAddress', e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 300) {
+                      handleInputChange('currentAddress', e.target.value);
+                    }
+                  }}
                   error={!!errors.currentAddress}
                   helperText={errors.currentAddress}
                   placeholder="Current Address"
@@ -650,11 +770,13 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                 <TextField
                   fullWidth
                   label="Pincode *"
+                  type="number"
                   value={formData.pincode}
                   onChange={(e) => handleInputChange('pincode', e.target.value)}
                   error={!!errors.pincode}
                   helperText={errors.pincode}
-                  placeholder="Pincode"
+                  placeholder="6-digit Pincode"
+                  inputProps={{ maxLength: 6 }}
                 />
               </Grid>
 

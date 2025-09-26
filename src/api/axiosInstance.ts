@@ -1,9 +1,47 @@
 import axios from 'axios';
 // import localStorageStore from '../store/localStorageStore';
 
-export const backendApi = import.meta.env.VITE_APP_ENDPOINT;
+export const backendApi = import.meta.env.VITE_APP_ENDPOINT || 'http://localhost:3001/api';
 
-export default function axiosInstance(history: any = null, passedHeaders: any = null) {
+// Simple axios instance for API calls
+const axiosInstance = axios.create({
+  baseURL: backendApi,
+  timeout: 30000, // 30 seconds timeout
+});
+
+// Add request interceptor for auth token
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for error handling
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear auth data and redirect to login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('sessionStart');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;
+
+// Legacy function for backward compatibility
+export function createAxiosInstance(history: any = null, passedHeaders: any = null) {
   let headers: Record<string, any> = passedHeaders ? passedHeaders : {};
 
   if (localStorage.getItem('token')) {
