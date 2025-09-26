@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -26,9 +26,41 @@ import { useStudentsData } from '../../hooks/useStudentsData';
 import Table, { type Column } from '../../components/core-components/Table';
 
 const ManageStudentsPage = () => {
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
   const [limit] = useState(10);
+  const [allStudents, setAllStudents] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  
   const { data: studentsData, isLoading, isError, error } = useStudentsData({ page, limit });
+
+  // Update allStudents when new data arrives
+  useEffect(() => {
+    if (studentsData?.data) {
+      if (page === 1) {
+        setAllStudents(studentsData.data);
+      } else {
+        setAllStudents(prev => [...prev, ...studentsData.data]);
+      }
+      setHasMore(studentsData.data.length === limit);
+    }
+  }, [studentsData, page, limit]);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight * 1.5 && hasMore && !loadingMore && !isLoading) {
+      setLoadingMore(true);
+      setPage(prev => prev + 1);
+    }
+  }, [hasMore, loadingMore, isLoading]);
+
+  // Reset loading more when new data arrives
+  useEffect(() => {
+    if (studentsData) {
+      setLoadingMore(false);
+    }
+  }, [studentsData]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -181,6 +213,7 @@ const ManageStudentsPage = () => {
       flexDirection: 'column',
       gap: 3,
     }}>
+
 
       {/* Error Alert */}
       {isError && (
@@ -391,7 +424,7 @@ const ManageStudentsPage = () => {
 
       {/* Students Data Table - Takes remaining space */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 400 }}>
-        {isLoading ? (
+        {isLoading && page === 1 ? (
           <Box sx={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -402,57 +435,82 @@ const ManageStudentsPage = () => {
             <CircularProgress size={40} />
           </Box>
         ) : (
-          <Table
-            columns={columns}
-            rows={studentsData?.data || []}
-            stickyHeader={true}
-            tableContainerSx={{
-              height: '100%',
-              minHeight: '400px',
-              borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #f1f5f9',
-              overflow: 'auto',
-              flexGrow: 1,
-              '&::-webkit-scrollbar': {
-                width: '8px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: '#f1f1f1',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: '#c1c1c1',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: '#a8a8a8',
-              },
-              '& .MuiTable-root': {
-                '& .MuiTableHead-root': {
-                  '& .MuiTableCell-root': {
-                    backgroundColor: '#f5f5f5',
-                    color: '#333',
-                    fontWeight: 'bold',
-                    borderBottom: '2px solid #e0e0e0',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1,
-                  },
+          <Box 
+            sx={{ position: 'relative', height: '100%' }}
+            onScroll={handleScroll}
+          >
+            <Table
+              columns={columns}
+              rows={allStudents}
+              stickyHeader={true}
+              tableContainerSx={{
+                height: '100%',
+                minHeight: '400px',
+                maxHeight: '600px',
+                borderRadius: 3,
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #f1f5f9',
+                overflow: 'auto',
+                flexGrow: 1,
+                '&::-webkit-scrollbar': {
+                  width: '8px',
                 },
-                '& .MuiTableBody-root': {
-                  '& .MuiTableRow-root': {
-                    '&:hover': {
-                      backgroundColor: '#e3f2fd !important',
-                    },
+                '&::-webkit-scrollbar-track': {
+                  background: '#f1f1f1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#c1c1c1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: '#a8a8a8',
+                },
+                '& .MuiTable-root': {
+                  '& .MuiTableHead-root': {
                     '& .MuiTableCell-root': {
-                      borderBottom: '1px solid #f0f0f0',
+                      backgroundColor: '#f5f5f5',
+                      color: '#333',
+                      fontWeight: 'bold',
+                      borderBottom: '2px solid #e0e0e0',
+                      position: 'sticky',
+                      top: 0,
+                      zIndex: 1,
+                    },
+                  },
+                  '& .MuiTableBody-root': {
+                    '& .MuiTableRow-root': {
+                      '&:hover': {
+                        backgroundColor: '#e3f2fd !important',
+                      },
+                      '& .MuiTableCell-root': {
+                        borderBottom: '1px solid #f0f0f0',
+                      },
                     },
                   },
                 },
-              },
-            }}
-          />
+              }}
+            />
+            {loadingMore && (
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                p: 2,
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(4px)',
+              }}>
+                <CircularProgress size={24} />
+                <Typography variant="body2" sx={{ ml: 1 }}>
+                  Loading more students...
+                </Typography>
+              </Box>
+            )}
+          </Box>
         )}
       </Box>
     </Box>

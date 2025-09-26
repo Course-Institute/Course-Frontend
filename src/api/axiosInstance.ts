@@ -37,7 +37,7 @@ export default function axiosInstance(history: any = null, passedHeaders: any = 
         error.request?.responseType === 'blob' &&
         error.response?.data?.type?.toLowerCase().includes('json')
       ) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (_, reject) => {
           const text = await error.response.data.text();
           const err = JSON.parse(text);
           reject({ open: true, type: 'error', message: err.error });
@@ -45,13 +45,13 @@ export default function axiosInstance(history: any = null, passedHeaders: any = 
       }
 
       if (error.message === 'Network Error') {
-        return new Promise((resolve, reject) => {
+        return new Promise((_, reject) => {
           reject({ open: true, type: 'error', status: error?.response?.status });
         });
       }
 
       if (!error.response) {
-        return new Promise((resolve, reject) => {
+        return new Promise((_, reject) => {
           reject({
             open: true,
             type: 'error',

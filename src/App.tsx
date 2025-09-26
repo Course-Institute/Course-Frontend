@@ -4,6 +4,7 @@ import CoursesPage from './pages/CoursesPage';
 import LoginPage from './pages/LoginPage';
 import AdminLayout from './components/admin/AdminLayout';
 import DashboardPage from './pages/admin/DashboardPage';
+import AddStudentPage from './pages/admin/AddStudentPage';
 import ManageStudentsPage from './pages/admin/ManageStudentsPage';
 import IdCardManagementPage from './pages/admin/IdCardManagementPage';
 import PaymentTrackingPage from './pages/admin/PaymentTrackingPage';
@@ -25,6 +26,11 @@ function App() {
           <Route path="/admin-dashboard" element={
             <AdminLayout title="Admin Dashboard">
               <DashboardPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/add-student" element={
+            <AdminLayout title="ADD STUDENT">
+              <AddStudentPage />
             </AdminLayout>
           } />
           <Route path="/admin/students" element={

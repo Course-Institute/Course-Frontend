@@ -17,7 +17,6 @@ interface SessionProviderProps {
 }
 
 const SESSION_DURATION = 50 * 60 * 1000; // 5 minutes in milliseconds
-const WARNING_TIME = 60 * 1000; // 1 minute warning
 
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
