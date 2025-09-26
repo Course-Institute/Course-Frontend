@@ -1,0 +1,773 @@
+import { useState } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+  Typography,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import { useAddStudent, type AddStudentData } from '../hooks/useAddStudent';
+import DateInput from './DateInput';
+
+interface AddStudentFormProps {
+  onClose: () => void;
+  onNext?: (data: AddStudentData) => void;
+  isStepMode?: boolean;
+}
+
+interface FormData {
+  candidateName: string;
+  motherName: string;
+  fatherName: string;
+  dateOfBirth: string;
+  gender: string;
+  adharCardNo: string;
+  category: string;
+  adharCardFront: File | null;
+  adharCardBack: File | null;
+  photo: File | null;
+  signature: File | null;
+  employerName: string;
+  isEmployed: string;
+  designation: string;
+  contactNumber: string;
+  alternateNumber: string;
+  emailAddress: string;
+  permanentAddress: string;
+  currentAddress: string;
+  state: string;
+  city: string;
+  country: string;
+  nationality: string;
+  pincode: string;
+  courseType: string;
+  course: string;
+  faculty: string;
+  stream: string;
+  year: string;
+  session: string;
+  monthSession: string;
+  courseFee: string;
+  hostelFacility: string;
+  duration: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
+const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormProps) => {
+  const { addStudent, isSubmitting, error: submitError } = useAddStudent();
+  
+  const [formData, setFormData] = useState<FormData>({
+    candidateName: '',
+    motherName: '',
+    fatherName: '',
+    dateOfBirth: '',
+    gender: 'Male',
+    adharCardNo: '',
+    category: '',
+    adharCardFront: null,
+    adharCardBack: null,
+    photo: null,
+    signature: null,
+    employerName: '',
+    isEmployed: 'No',
+    designation: '',
+    contactNumber: '',
+    alternateNumber: '',
+    emailAddress: '',
+    permanentAddress: '',
+    currentAddress: '',
+    state: '',
+    city: '',
+    country: '',
+    nationality: '',
+    pincode: '',
+    courseType: '',
+    course: '',
+    faculty: '',
+    stream: '',
+    year: '2025',
+    session: '2025',
+    monthSession: 'July',
+    courseFee: '',
+    hostelFacility: 'No',
+    duration: '',
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const handleInputChange = (field: keyof FormData, value: string | File | null) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Required field validations
+    const requiredFields: (keyof FormData)[] = [
+      'candidateName', 'motherName', 'fatherName', 'dateOfBirth', 'gender',
+      'adharCardNo', 'category', 'contactNumber', 'emailAddress', 'permanentAddress',
+      'currentAddress', 'state', 'city', 'country', 'nationality', 'pincode',
+      'courseType', 'course', 'faculty', 'stream', 'year', 'session'
+    ];
+
+    requiredFields.forEach(field => {
+      if (!formData[field] || (typeof formData[field] === 'string' && formData[field].trim() === '')) {
+        newErrors[field] = 'This field is required';
+      }
+    });
+
+    // Email validation
+    if (formData.emailAddress && !/\S+@\S+\.\S+/.test(formData.emailAddress)) {
+      newErrors.emailAddress = 'Please enter a valid email address';
+    }
+
+    // Phone number validation
+    if (formData.contactNumber && !/^[0-9]{10}$/.test(formData.contactNumber.replace(/\D/g, ''))) {
+      newErrors.contactNumber = 'Please enter a valid 10-digit phone number';
+    }
+
+    // Adhar card validation
+    if (formData.adharCardNo && !/^[0-9]{12}$/.test(formData.adharCardNo.replace(/\D/g, ''))) {
+      newErrors.adharCardNo = 'Please enter a valid 12-digit Aadhar number';
+    }
+
+    // Pincode validation
+    if (formData.pincode && !/^[0-9]{6}$/.test(formData.pincode.replace(/\D/g, ''))) {
+      newErrors.pincode = 'Please enter a valid 6-digit pincode';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    if (isStepMode && onNext) {
+      // In step mode, just pass data to next step
+      onNext(formData as AddStudentData);
+    } else {
+      // In dialog mode, submit directly
+      try {
+        await addStudent(formData as AddStudentData);
+        
+        // Success - close dialog after a short delay to show success state
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
+    }
+  };
+
+  const handleFileChange = (field: keyof FormData, file: File | null) => {
+    if (file && file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      setErrors(prev => ({ ...prev, [field]: 'Only JPG images are allowed' }));
+      return;
+    }
+    handleInputChange(field, file);
+  };
+
+  return (
+    <Box component="form" onSubmit={handleSubmit}>
+        {submitError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {submitError}
+          </Alert>
+        )}
+
+        <Grid container spacing={3}>
+          {/* Left Column */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Grid container spacing={3}>
+              {/* Candidate Name */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Candidate Name *"
+                  value={formData.candidateName}
+                  onChange={(e) => handleInputChange('candidateName', e.target.value)}
+                  error={!!errors.candidateName}
+                  helperText={errors.candidateName}
+                  placeholder="Candidate Name"
+                />
+              </Grid>
+
+              {/* Mother's Name */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Mother's Name *"
+                  value={formData.motherName}
+                  onChange={(e) => handleInputChange('motherName', e.target.value)}
+                  error={!!errors.motherName}
+                  helperText={errors.motherName}
+                  placeholder="Mother's Name"
+                />
+              </Grid>
+
+              {/* Photo */}
+              <Grid size={12}>
+                <Box>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg"
+                    onChange={(e) => handleFileChange('photo', e.target.files?.[0] || null)}
+                    style={{ display: 'none' }}
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload">
+                    <Button variant="outlined" component="span" fullWidth>
+                      {formData.photo ? formData.photo.name : 'Choose File'}
+                    </Button>
+                  </label>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Image only in jpg
+                  </Typography>
+                  {errors.photo && (
+                    <Typography variant="caption" color="error">
+                      {errors.photo}
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+
+              {/* Gender */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.gender}>
+                  <InputLabel>Gender *</InputLabel>
+                  <Select
+                    value={formData.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                    label="Gender *"
+                  >
+                    <MenuItem value="Male">Male</MenuItem>
+                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </Select>
+                  {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Adhar Card No */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Adharcard No. *"
+                  value={formData.adharCardNo}
+                  onChange={(e) => handleInputChange('adharCardNo', e.target.value)}
+                  error={!!errors.adharCardNo}
+                  helperText={errors.adharCardNo}
+                />
+              </Grid>
+
+              {/* Adhar Card Back */}
+              <Grid size={12}>
+                <Box>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg"
+                    onChange={(e) => handleFileChange('adharCardBack', e.target.files?.[0] || null)}
+                    style={{ display: 'none' }}
+                    id="adhar-back-upload"
+                  />
+                  <label htmlFor="adhar-back-upload">
+                    <Button variant="outlined" component="span" fullWidth>
+                      {formData.adharCardBack ? formData.adharCardBack.name : 'Choose File'}
+                    </Button>
+                  </label>
+                </Box>
+              </Grid>
+
+              {/* Employer Name */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Employer Name"
+                  value={formData.employerName}
+                  onChange={(e) => handleInputChange('employerName', e.target.value)}
+                  placeholder="Employer Name"
+                />
+              </Grid>
+
+              {/* Contact Number */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Contact Number *"
+                  value={formData.contactNumber}
+                  onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                  error={!!errors.contactNumber}
+                  helperText={errors.contactNumber}
+                  placeholder="Contact Number"
+                />
+              </Grid>
+
+              {/* Email Address */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Email Address *"
+                  type="email"
+                  value={formData.emailAddress}
+                  onChange={(e) => handleInputChange('emailAddress', e.target.value)}
+                  error={!!errors.emailAddress}
+                  helperText={errors.emailAddress}
+                  placeholder="Email Address"
+                />
+              </Grid>
+
+              {/* Permanent Address */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Permanent Address *"
+                  multiline
+                  rows={3}
+                  value={formData.permanentAddress}
+                  onChange={(e) => handleInputChange('permanentAddress', e.target.value)}
+                  error={!!errors.permanentAddress}
+                  helperText={errors.permanentAddress}
+                  placeholder="Permanent Address"
+                />
+              </Grid>
+
+              {/* State */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="State *"
+                  value={formData.state}
+                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  error={!!errors.state}
+                  helperText={errors.state}
+                  placeholder="State"
+                />
+              </Grid>
+
+              {/* Country */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.country}>
+                  <InputLabel>Country *</InputLabel>
+                  <Select
+                    value={formData.country}
+                    onChange={(e) => handleInputChange('country', e.target.value)}
+                    label="Country *"
+                  >
+                    <MenuItem value="">Select Country</MenuItem>
+                    <MenuItem value="India">India</MenuItem>
+                    <MenuItem value="USA">USA</MenuItem>
+                    <MenuItem value="UK">UK</MenuItem>
+                    <MenuItem value="Canada">Canada</MenuItem>
+                    <MenuItem value="Australia">Australia</MenuItem>
+                  </Select>
+                  {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Course Type */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.courseType}>
+                  <InputLabel>Course Type *</InputLabel>
+                  <Select
+                    value={formData.courseType}
+                    onChange={(e) => handleInputChange('courseType', e.target.value)}
+                    label="Course Type *"
+                  >
+                    <MenuItem value="">Select course Type</MenuItem>
+                    <MenuItem value="Undergraduate">Undergraduate</MenuItem>
+                    <MenuItem value="Postgraduate">Postgraduate</MenuItem>
+                    <MenuItem value="Diploma">Diploma</MenuItem>
+                    <MenuItem value="Certificate">Certificate</MenuItem>
+                  </Select>
+                  {errors.courseType && <FormHelperText>{errors.courseType}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Course */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.course}>
+                  <InputLabel>Course *</InputLabel>
+                  <Select
+                    value={formData.course}
+                    onChange={(e) => handleInputChange('course', e.target.value)}
+                    label="Course *"
+                  >
+                    <MenuItem value="">Select Course</MenuItem>
+                    <MenuItem value="B.Tech">B.Tech</MenuItem>
+                    <MenuItem value="B.Sc">B.Sc</MenuItem>
+                    <MenuItem value="MBA">MBA</MenuItem>
+                    <MenuItem value="MCA">MCA</MenuItem>
+                    <MenuItem value="BBA">BBA</MenuItem>
+                  </Select>
+                  {errors.course && <FormHelperText>{errors.course}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Year */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Year *"
+                  value={formData.year}
+                  onChange={(e) => handleInputChange('year', e.target.value)}
+                  error={!!errors.year}
+                  helperText={errors.year}
+                />
+              </Grid>
+
+              {/* Session */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Session *"
+                  value={formData.session}
+                  onChange={(e) => handleInputChange('session', e.target.value)}
+                  error={!!errors.session}
+                  helperText={errors.session}
+                />
+              </Grid>
+
+              {/* Course Fee */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Course fee"
+                  value={formData.courseFee}
+                  onChange={(e) => handleInputChange('courseFee', e.target.value)}
+                  placeholder="Course Fee"
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Right Column */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Grid container spacing={3}>
+              {/* Father's Name */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Father's Name *"
+                  value={formData.fatherName}
+                  onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                  error={!!errors.fatherName}
+                  helperText={errors.fatherName}
+                  placeholder="Father's Name"
+                />
+              </Grid>
+
+              {/* Date of Birth */}
+              <Grid size={12}>
+                <DateInput
+                  label="Date of Birth *"
+                  value={formData.dateOfBirth}
+                  onChange={(value) => handleInputChange('dateOfBirth', value)}
+                  error={!!errors.dateOfBirth}
+                  helperText={errors.dateOfBirth}
+                  required
+                />
+              </Grid>
+
+              {/* Signature */}
+              <Grid size={12}>
+                <Box>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg"
+                    onChange={(e) => handleFileChange('signature', e.target.files?.[0] || null)}
+                    style={{ display: 'none' }}
+                    id="signature-upload"
+                  />
+                  <label htmlFor="signature-upload">
+                    <Button variant="outlined" component="span" fullWidth>
+                      {formData.signature ? formData.signature.name : 'Choose File'}
+                    </Button>
+                  </label>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Image only in jpg
+                  </Typography>
+                  {errors.signature && (
+                    <Typography variant="caption" color="error">
+                      {errors.signature}
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+
+              {/* Category */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.category}>
+                  <InputLabel>Category *</InputLabel>
+                  <Select
+                    value={formData.category}
+                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    label="Category *"
+                  >
+                    <MenuItem value="">Select Category</MenuItem>
+                    <MenuItem value="General">General</MenuItem>
+                    <MenuItem value="OBC">OBC</MenuItem>
+                    <MenuItem value="SC">SC</MenuItem>
+                    <MenuItem value="ST">ST</MenuItem>
+                    <MenuItem value="EWS">EWS</MenuItem>
+                  </Select>
+                  {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Adhar Card Front */}
+              <Grid size={12}>
+                <Box>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg"
+                    onChange={(e) => handleFileChange('adharCardFront', e.target.files?.[0] || null)}
+                    style={{ display: 'none' }}
+                    id="adhar-front-upload"
+                  />
+                  <label htmlFor="adhar-front-upload">
+                    <Button variant="outlined" component="span" fullWidth>
+                      {formData.adharCardFront ? formData.adharCardFront.name : 'Choose File'}
+                    </Button>
+                  </label>
+                </Box>
+              </Grid>
+
+              {/* Are you employed? */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.isEmployed}>
+                  <InputLabel>Are you employed? *</InputLabel>
+                  <Select
+                    value={formData.isEmployed}
+                    onChange={(e) => handleInputChange('isEmployed', e.target.value)}
+                    label="Are you employed? *"
+                  >
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Yes">Yes</MenuItem>
+                  </Select>
+                  {errors.isEmployed && <FormHelperText>{errors.isEmployed}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Designation */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Designation"
+                  value={formData.designation}
+                  onChange={(e) => handleInputChange('designation', e.target.value)}
+                  placeholder="Designation"
+                />
+              </Grid>
+
+              {/* Alternate Number */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Alternate No. *"
+                  value={formData.alternateNumber}
+                  onChange={(e) => handleInputChange('alternateNumber', e.target.value)}
+                  error={!!errors.alternateNumber}
+                  helperText={errors.alternateNumber}
+                  placeholder="Alternate No."
+                />
+              </Grid>
+
+              {/* Current Address */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Current Address *"
+                  multiline
+                  rows={3}
+                  value={formData.currentAddress}
+                  onChange={(e) => handleInputChange('currentAddress', e.target.value)}
+                  error={!!errors.currentAddress}
+                  helperText={errors.currentAddress}
+                  placeholder="Current Address"
+                />
+              </Grid>
+
+              {/* City */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="City *"
+                  value={formData.city}
+                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  error={!!errors.city}
+                  helperText={errors.city}
+                  placeholder="City"
+                />
+              </Grid>
+
+              {/* Nationality */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Nationality *"
+                  value={formData.nationality}
+                  onChange={(e) => handleInputChange('nationality', e.target.value)}
+                  error={!!errors.nationality}
+                  helperText={errors.nationality}
+                  placeholder="Nationality"
+                />
+              </Grid>
+
+              {/* Pincode */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Pincode *"
+                  value={formData.pincode}
+                  onChange={(e) => handleInputChange('pincode', e.target.value)}
+                  error={!!errors.pincode}
+                  helperText={errors.pincode}
+                  placeholder="Pincode"
+                />
+              </Grid>
+
+              {/* Faculty */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.faculty}>
+                  <InputLabel>Faculty *</InputLabel>
+                  <Select
+                    value={formData.faculty}
+                    onChange={(e) => handleInputChange('faculty', e.target.value)}
+                    label="Faculty *"
+                  >
+                    <MenuItem value="">Select Faculty</MenuItem>
+                    <MenuItem value="Engineering">Engineering</MenuItem>
+                    <MenuItem value="Management">Management</MenuItem>
+                    <MenuItem value="Science">Science</MenuItem>
+                    <MenuItem value="Arts">Arts</MenuItem>
+                    <MenuItem value="Commerce">Commerce</MenuItem>
+                  </Select>
+                  {errors.faculty && <FormHelperText>{errors.faculty}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Stream */}
+              <Grid size={12}>
+                <FormControl fullWidth error={!!errors.stream}>
+                  <InputLabel>Stream *</InputLabel>
+                  <Select
+                    value={formData.stream}
+                    onChange={(e) => handleInputChange('stream', e.target.value)}
+                    label="Stream *"
+                  >
+                    <MenuItem value="">Select Stream</MenuItem>
+                    <MenuItem value="Computer Science">Computer Science</MenuItem>
+                    <MenuItem value="Electronics">Electronics</MenuItem>
+                    <MenuItem value="Mechanical">Mechanical</MenuItem>
+                    <MenuItem value="Civil">Civil</MenuItem>
+                    <MenuItem value="Electrical">Electrical</MenuItem>
+                  </Select>
+                  {errors.stream && <FormHelperText>{errors.stream}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Month Session */}
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Month Session</InputLabel>
+                  <Select
+                    value={formData.monthSession}
+                    onChange={(e) => handleInputChange('monthSession', e.target.value)}
+                    label="Month Session"
+                  >
+                    <MenuItem value="January">January</MenuItem>
+                    <MenuItem value="February">February</MenuItem>
+                    <MenuItem value="March">March</MenuItem>
+                    <MenuItem value="April">April</MenuItem>
+                    <MenuItem value="May">May</MenuItem>
+                    <MenuItem value="June">June</MenuItem>
+                    <MenuItem value="July">July</MenuItem>
+                    <MenuItem value="August">August</MenuItem>
+                    <MenuItem value="September">September</MenuItem>
+                    <MenuItem value="October">October</MenuItem>
+                    <MenuItem value="November">November</MenuItem>
+                    <MenuItem value="December">December</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Hostel Facility */}
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Hostel Facility</InputLabel>
+                  <Select
+                    value={formData.hostelFacility}
+                    onChange={(e) => handleInputChange('hostelFacility', e.target.value)}
+                    label="Hostel Facility"
+                  >
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Yes">Yes</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Duration */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Duration"
+                  value={formData.duration}
+                  onChange={(e) => handleInputChange('duration', e.target.value)}
+                  placeholder="Duration"
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        {/* Submit Button */}
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={isSubmitting}
+            sx={{
+              backgroundColor: '#3b82f6',
+              '&:hover': { backgroundColor: '#2563eb' },
+              textTransform: 'none',
+              borderRadius: 2,
+              px: 6,
+              py: 1.5,
+            }}
+          >
+            {isSubmitting ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Submitting...
+              </>
+            ) : (
+              isStepMode ? 'Next' : 'Submit'
+            )}
+          </Button>
+        </Box>
+      </Box>
+  );
+};
+
+export default AddStudentForm;

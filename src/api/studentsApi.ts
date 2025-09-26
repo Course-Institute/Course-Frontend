@@ -20,6 +20,49 @@ export interface StudentsResponse {
   limit: number;
 }
 
+export interface AddStudentData {
+  candidateName: string;
+  motherName: string;
+  fatherName: string;
+  dateOfBirth: string;
+  gender: string;
+  adharCardNo: string;
+  category: string;
+  adharCardFront?: File;
+  adharCardBack?: File;
+  photo?: File;
+  signature?: File;
+  employerName?: string;
+  isEmployed: string;
+  designation?: string;
+  contactNumber: string;
+  alternateNumber: string;
+  emailAddress: string;
+  permanentAddress: string;
+  currentAddress: string;
+  state: string;
+  city: string;
+  country: string;
+  nationality: string;
+  pincode: string;
+  courseType: string;
+  course: string;
+  faculty: string;
+  stream: string;
+  year: string;
+  session: string;
+  monthSession?: string;
+  courseFee?: string;
+  hostelFacility?: string;
+  duration?: string;
+}
+
+export interface AddStudentResponse {
+  success: boolean;
+  message: string;
+  studentId?: string;
+}
+
 // Mock API function to simulate fetching students data
 export const getStudentsData = async (page: number = 1, limit: number = 10): Promise<StudentsResponse> => {
   return new Promise((resolve, reject) => {
@@ -158,5 +201,25 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
         limit
       });
     }, Math.random() * 1000 + 500); // Random delay between 500ms and 1500ms
+  });
+};
+
+// Mock API function to simulate adding a student
+export const addStudent = async (_data: AddStudentData): Promise<AddStudentResponse> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simulate API failure 10% of the time
+      if (Math.random() < 0.1) {
+        reject(new Error('Failed to add student. Please try again.'));
+        return;
+      }
+
+      // Simulate successful response
+      resolve({
+        success: true,
+        message: 'Student added successfully',
+        studentId: `STU-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+      });
+    }, Math.random() * 2000 + 1000); // Random delay between 1-3 seconds
   });
 };

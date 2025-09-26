@@ -12,7 +12,6 @@ import {
   Button,
   IconButton,
   useTheme,
-  Skeleton,
 } from '@mui/material';
 import { 
   Download, 
@@ -31,22 +30,6 @@ interface PaymentTableProps {
 const PaymentTable = ({ payments, onExport }: PaymentTableProps) => {
   const theme = useTheme();
 
-  const getStatusColor = (status: Payment['paymentStatus']) => {
-    switch (status) {
-      case 'Completed':
-        return 'success';
-      case 'Pending':
-        return 'warning';
-      case 'Partial':
-        return 'info';
-      case 'Failed':
-        return 'error';
-      case 'Refunded':
-        return 'default';
-      default:
-        return 'default';
-    }
-  };
 
   const formatCurrency = (amount: number): string => {
     return `₹${amount.toLocaleString('en-IN')}`;

@@ -2,7 +2,6 @@ import {
   Box,
   Container,
   Typography,
-  Grid as Grid,
   Paper,
   useTheme,
   useMediaQuery,

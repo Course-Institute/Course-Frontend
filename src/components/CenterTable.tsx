@@ -10,23 +10,17 @@ import {
   Chip,
   Typography,
   Button,
-  IconButton,
   useTheme,
-  CircularProgress,
-  Menu,
-  MenuItem,
 } from '@mui/material';
 import { 
-  MoreVert, 
   Edit, 
   Delete, 
   CheckCircle, 
   Cancel,
   PowerSettingsNew,
-  PersonAdd
 } from '@mui/icons-material';
 import { type Center } from '../hooks/useCenterList';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 interface CenterTableProps {
   centers: Center[];
@@ -35,21 +29,21 @@ interface CenterTableProps {
 
 const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
+  // const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, centerId: string) => {
-    setAnchorEl(prev => ({
-      ...prev,
-      [centerId]: event.currentTarget
-    }));
-  };
+  // const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, centerId: string) => {
+  //   setAnchorEl(prev => ({
+  //     ...prev,
+  //     [centerId]: event.currentTarget
+  //   }));
+  // };
 
-  const handleMenuClose = (centerId: string) => {
-    setAnchorEl(prev => ({
-      ...prev,
-      [centerId]: null
-    }));
-  };
+  // const handleMenuClose = (centerId: string) => {
+  //   setAnchorEl(prev => ({
+  //     ...prev,
+  //     [centerId]: null
+  //   }));
+  // };
 
   const getStatusColor = (status: Center['status']) => {
     switch (status) {
@@ -240,10 +234,10 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
                               minWidth: 'auto',
                               px: 1,
                               py: 0.5,
-                              borderColor: theme.palette[action.color as keyof typeof theme.palette].main,
-                              color: theme.palette[action.color as keyof typeof theme.palette].main,
+                              borderColor: (theme.palette as any)[action.color]?.main || action.color,
+                              color: (theme.palette as any)[action.color]?.main || action.color,
                               '&:hover': {
-                                backgroundColor: theme.palette[action.color as keyof typeof theme.palette].light + '20',
+                                backgroundColor: (theme.palette as any)[action.color]?.light + '20' || action.color + '20',
                               },
                             }}
                           >

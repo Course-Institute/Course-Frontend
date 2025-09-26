@@ -20,6 +20,7 @@ import {
   Assessment,
   School,
   Logout as LogoutIcon,
+  PersonAdd,
 } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useSession, formatTimeRemaining } from '../../contexts/SessionContext';
@@ -46,12 +47,13 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
 
   const menuItems = [
     { id: 1, label: 'Dashboard', icon: <Dashboard />, path: '/admin-dashboard' },
-    { id: 2, label: 'Manage Students', icon: <People />, path: '/admin/students' },
-    { id: 3, label: 'ID Card Management', icon: <CreditCard />, path: '/admin/id-cards' },
-    { id: 4, label: 'Upload Results', icon: <Upload />, path: '/admin/upload-results' },
-    { id: 5, label: 'Payment Tracking', icon: <Payment />, path: '/admin/payments' },
-    { id: 6, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
-    { id: 7, label: 'Reports', icon: <Assessment />, path: '/admin/reports' },
+    { id: 2, label: 'Add Student', icon: <PersonAdd />, path: '/admin/add-student' },
+    { id: 3, label: 'Manage Students', icon: <People />, path: '/admin/students' },
+    { id: 4, label: 'ID Card Management', icon: <CreditCard />, path: '/admin/id-cards' },
+    { id: 5, label: 'Upload Results', icon: <Upload />, path: '/admin/upload-results' },
+    { id: 6, label: 'Payment Tracking', icon: <Payment />, path: '/admin/payments' },
+    { id: 7, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
+    { id: 8, label: 'Reports', icon: <Assessment />, path: '/admin/reports' },
   ];
 
   const drawer = (

@@ -11,7 +11,6 @@ import {
   Typography,
   Button,
   useTheme,
-  CircularProgress,
 } from '@mui/material';
 import { Upload } from '@mui/icons-material';
 import { type Result } from '../hooks/useResultList';
