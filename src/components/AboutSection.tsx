@@ -9,11 +9,11 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import {
-  School,
   Groups,
   EmojiEvents,
   SupportAgent,
 } from '@mui/icons-material';
+import InstituteLogo from './InstituteLogo';
 
 
 const AboutSection = () => {
@@ -22,7 +22,7 @@ const AboutSection = () => {
 
   const features = [
     {
-      icon: <School sx={{ fontSize: 60, color: theme.palette.primary.main }} />,
+      icon: <InstituteLogo width={60} height={60} />,
       title: "Quality Education",
       description: "Comprehensive curriculum designed by industry experts to provide practical, job-ready skills."
     },
@@ -77,7 +77,7 @@ const AboutSection = () => {
               mb: 2,
             }}
           >
-            About Course Institute
+            About MIVPS
           </Typography>
           <Typography
             variant="h6"

@@ -9,7 +9,8 @@ import {
   Box,
   LinearProgress,
 } from '@mui/material';
-import { useSession, formatTimeRemaining } from '../contexts/SessionContext';
+import { useSession } from '../contexts/SessionContext';
+import { formatTimeRemaining } from '../utils/timeUtils';
 
 interface SessionWarningProps {
   open: boolean;

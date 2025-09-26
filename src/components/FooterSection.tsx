@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {
-  School,
   Email,
   Phone,
   LocationOn,
@@ -17,6 +16,7 @@ import {
   LinkedIn,
   Instagram,
 } from '@mui/icons-material';
+import InstituteLogo from './InstituteLogo';
 
 const FooterSection = () => {
   const theme = useTheme();
@@ -60,7 +60,7 @@ const FooterSection = () => {
                   mr: 2,
                 }}
               >
-                <School sx={{ fontSize: 40, color: 'white' }} />
+                <InstituteLogo width={40} height={40} />
               </Box>
               <Box>
                 <Typography
@@ -71,7 +71,7 @@ const FooterSection = () => {
                     mb: 0.5,
                   }}
                 >
-                  Course Institute
+                  MIVPS
                 </Typography>
                 <Typography
                   variant="body2"
@@ -79,7 +79,7 @@ const FooterSection = () => {
                     color: 'rgba(255, 255, 255, 0.7)',
                   }}
                 >
-                  Excellence in Education
+                  Mahavir Institute of Vocational and Paramedical Science
                 </Typography>
               </Box>
             </Box>
@@ -93,7 +93,7 @@ const FooterSection = () => {
                 textAlign: 'center',
               }}
             >
-              Empowering students with world-class education and practical skills to succeed in their chosen careers.
+              Empowering students with world-class vocational and paramedical education to succeed in healthcare and technical careers.
             </Typography>
             
           </Grid>
@@ -236,7 +236,7 @@ const FooterSection = () => {
                   <Email sx={{ fontSize: 20, color: theme.palette.primary.main }} />
                 </Box>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                  info@courseinstitute.com
+                  info@mivps.com
                 </Typography>
               </Box>
             </Box>
@@ -398,7 +398,7 @@ const FooterSection = () => {
                   fontSize: '1.1rem',
                 }}
               >
-                © 2024 Course Institute. All rights reserved. | Empowering futures through education.
+                © 2024 MIVPS. All rights reserved. | Empowering futures through education.
               </Typography>
             </Box>
             <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 50%' } }}>
