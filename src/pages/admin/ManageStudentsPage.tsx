@@ -36,13 +36,13 @@ const ManageStudentsPage = () => {
 
   // Update allStudents when new data arrives
   useEffect(() => {
-    if (studentsData?.data) {
+    if (studentsData?.data?.students) {
       if (page === 1) {
-        setAllStudents(studentsData.data);
+        setAllStudents(studentsData.data.students);
       } else {
-        setAllStudents(prev => [...prev, ...studentsData.data]);
+        setAllStudents(prev => [...prev, ...studentsData.data.students]);
       }
-      setHasMore(studentsData.data.length === limit);
+      setHasMore(studentsData.data.pagination.hasNextPage);
     }
   }, [studentsData, page, limit]);
 

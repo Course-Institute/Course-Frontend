@@ -1,34 +1,47 @@
 import axiosInstance from './axiosInstance';
 
 export interface StudentProfile {
-  id: string;
-  studentRefNo: string;
-  studentName: string;
-  fathersName: string;
-  mothersName: string;
+  _id: string;
+  registrationNo: string;
+  candidateName: string;
+  motherName: string;
+  fatherName: string;
+  gender: string;
   dateOfBirth: string;
-  enrollmentNo: string;
-  rollNo?: string;
-  session: string;
-  mobileNo: string;
-  email?: string;
+  adharCardNo: string;
+  category: string;
+  contactNumber: string;
+  emailAddress: string;
+  currentAddress: string;
+  permanentAddress: string;
+  city: string;
+  state: string;
+  nationality: string;
+  country: string;
+  pincode: string;
+  courseType: string;
+  faculty: string;
   course: string;
-  courseCode?: string;
-  faculty?: string;
-  stream?: string;
-  year?: string;
-  semester?: string;
-  center?: string;
-  photo?: string;
-  address?: string;
-  status?: string;
-  admissionDate?: string;
+  stream: string;
+  year: string;
+  monthSession: string;
+  hostelFacility: string;
+  session: string;
+  duration: string;
+  courseFee: string;
+  aadharFront: string;
+  aadharBack: string;
+  photo: string;
+  signature: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface StudentProfileResponse {
-  success: boolean;
+  status: boolean;
+  message: string;
   data: StudentProfile;
-  message?: string;
 }
 
 // API function to fetch student profile
