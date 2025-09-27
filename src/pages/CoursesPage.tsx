@@ -16,7 +16,7 @@ const CoursesPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await axiosInstance().get('/courses');
+        const res = await axiosInstance.get('/courses');
         setCourses(res.data);
       } catch (err) {
         console.error(err);

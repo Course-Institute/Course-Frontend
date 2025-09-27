@@ -24,6 +24,7 @@ import { useMutation } from '@tanstack/react-query';
 import { loginUser, type LoginResponse } from '../api/authApi';
 import { useSession } from '../contexts/SessionContext';
 import Navbar from '../components/Navbar';
+import DateInput from '../components/DateInput';
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -55,6 +56,11 @@ const LoginPage = () => {
       // Store keep signed in preference
       localStorage.setItem('keepSignedIn', formData.keepSignedIn.toString());
       
+      // Store student registration number if student login
+      if (role.toLowerCase() === 'student' && formData.registrationNumber) {
+        localStorage.setItem('studentRegistrationNumber', formData.registrationNumber.toString());
+      }
+      
       // Navigate to appropriate dashboard based on role
       console.log('Navigating with role:', role.toLowerCase());
       switch (role.toLowerCase()) {
@@ -77,6 +83,7 @@ const LoginPage = () => {
       }
     },
     onError: (error: any) => {
+      console.log("error::", error)
       setError(error.response?.data?.message || 'Login failed. Please try again.');
     },
   });
@@ -95,7 +102,7 @@ const LoginPage = () => {
     
     // Validate based on role
     if (role.toLowerCase() === 'student') {
-      if (!formData.registrationNumber.trim() || !formData.dateOfBirth.trim()) {
+      if (!formData.registrationNumber || !formData.dateOfBirth) {
         setError('Please fill in all fields');
         return;
       }
@@ -109,7 +116,7 @@ const LoginPage = () => {
     // Prepare credentials based on role
     const credentials = role.toLowerCase() === 'student' 
       ? {
-          registrationNumber: formData.registrationNumber,
+          registrationNumber: formData.registrationNumber.toString(),
           dateOfBirth: formData.dateOfBirth,
           role: role,
         }
@@ -231,6 +238,7 @@ const LoginPage = () => {
                   <TextField
                     fullWidth
                     label="Registration Number"
+                    type="number"
                     value={formData.registrationNumber}
                     onChange={handleInputChange('registrationNumber')}
                     sx={{
@@ -242,13 +250,18 @@ const LoginPage = () => {
                     }}
                     disabled={loginMutation.isPending}
                     placeholder="Enter your registration number"
+                    inputProps={{
+                      inputMode: 'numeric',
+                      pattern: '[0-9]*',
+                    }}
                   />
 
-                  <TextField
-                    fullWidth
+                  <DateInput
                     label="Date of Birth"
                     value={formData.dateOfBirth}
-                    onChange={handleInputChange('dateOfBirth')}
+                    onChange={(value) => setFormData(prev => ({ ...prev, dateOfBirth: value }))}
+                    fullWidth
+                    disabled={loginMutation.isPending}
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
@@ -256,8 +269,6 @@ const LoginPage = () => {
                         backgroundColor: 'rgba(255, 255, 255, 0.8)',
                       },
                     }}
-                    disabled={loginMutation.isPending}
-                    placeholder="Enter your date of birth"
                   />
                 </>
               ) : (

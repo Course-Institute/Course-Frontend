@@ -99,6 +99,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     localStorage.removeItem('userRole');
     localStorage.removeItem('sessionStart');
     localStorage.removeItem('keepSignedIn');
+    localStorage.removeItem('studentRegistrationNumber');
     
     // Clear timeout
     if (sessionTimeout) {
@@ -123,6 +124,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     localStorage.removeItem('userRole');
     localStorage.removeItem('sessionStart');
     localStorage.removeItem('keepSignedIn');
+    localStorage.removeItem('studentRegistrationNumber');
     setIsAuthenticated(false);
     setUserRole(null);
     setTimeRemaining(0);
