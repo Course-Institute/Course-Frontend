@@ -8,7 +8,6 @@ import {
   Button,
   Switch,
   FormControlLabel,
-  Chip,
   IconButton,
   CircularProgress,
   Alert,
@@ -19,8 +18,6 @@ import {
   Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Check as ApproveIcon,
-  Close as RejectIcon,
 } from '@mui/icons-material';
 import { useStudentsData } from '../../hooks/useStudentsData';
 import Table, { type Column } from '../../components/core-components/Table';
@@ -62,42 +59,17 @@ const ManageStudentsPage = () => {
     }
   }, [studentsData]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Approved':
-        return 'success';
-      case 'Pending':
-        return 'warning';
-      case 'ID Generated':
-        return 'info';
-      default:
-        return 'default';
-    }
-  };
 
-  const getFeeStatusColor = (feeStatus: string) => {
-    switch (feeStatus) {
-      case 'Full Payment':
-        return 'success';
-      case 'Partial':
-        return 'warning';
-      case 'Pending':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  // Define table columns
+  // Define table columns matching backend data structure
   const columns: Column[] = [
     {
-      field: 'studentId',
-      headerName: 'Student ID',
-      width: '120px',
+      field: 'registrationNo',
+      headerName: 'Registration No.',
+      width: '140px',
     },
     {
-      field: 'name',
-      headerName: 'Name',
+      field: 'candidateName',
+      headerName: 'Student Name',
       minWidth: '150px',
     },
     {
@@ -106,105 +78,77 @@ const ManageStudentsPage = () => {
       minWidth: '120px',
     },
     {
-      field: 'semester',
-      headerName: 'Semester',
-      width: '100px',
-      align: 'center',
-    },
-    {
-      field: 'admissionYear',
-      headerName: 'Admission Year',
-      width: '120px',
-      align: 'center',
-    },
-    {
-      field: 'center',
-      headerName: 'Center',
+      field: 'faculty',
+      headerName: 'Faculty',
       minWidth: '120px',
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      width: '120px',
-      align: 'center',
-      renderCell: (value: string) => (
-        <Chip
-          label={value}
-          size="small"
-          color={getStatusColor(value) as any}
-          variant="outlined"
-        />
-      ),
+      field: 'stream',
+      headerName: 'Stream',
+      minWidth: '120px',
     },
     {
-      field: 'feeStatus',
-      headerName: 'Fee Status',
+      field: 'year',
+      headerName: 'Year',
+      width: '80px',
+      align: 'center',
+    },
+    {
+      field: 'session',
+      headerName: 'Session',
+      width: '80px',
+      align: 'center',
+    },
+    {
+      field: 'contactNumber',
+      headerName: 'Contact',
       width: '120px',
       align: 'center',
-      renderCell: (value: string) => (
-        <Chip
-          label={value}
-          size="small"
-          color={getFeeStatusColor(value) as any}
-          variant="outlined"
-        />
-      ),
+    },
+    {
+      field: 'emailAddress',
+      headerName: 'Email',
+      minWidth: '180px',
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Admission Date',
+      width: '120px',
+      align: 'center',
+      renderCell: (value: string) => {
+        const date = new Date(value);
+        return date.toLocaleDateString('en-GB');
+      },
     },
     {
       field: 'actions',
       headerName: 'Actions',
       width: '120px',
       align: 'center',
-      getActions: (row: any) => (
+      getActions: (_row: any) => (
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-          {row.status === 'Pending' ? (
-            <>
-              <IconButton
-                size="small"
-                sx={{
-                  color: '#10b981',
-                  '&:hover': { backgroundColor: '#dcfce7' },
-                }}
-              >
-                <ApproveIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: '#ef4444',
-                  '&:hover': { backgroundColor: '#fee2e2' },
-                }}
-              >
-                <RejectIcon fontSize="small" />
-              </IconButton>
-            </>
-          ) : (
-            <>
-              <IconButton
-                size="small"
-                sx={{
-                  color: '#3b82f6',
-                  '&:hover': { backgroundColor: '#eff6ff' },
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: '#ef4444',
-                  '&:hover': { backgroundColor: '#fee2e2' },
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
+          <IconButton
+            size="small"
+            sx={{
+              color: '#3b82f6',
+              '&:hover': { backgroundColor: '#eff6ff' },
+            }}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            sx={{
+              color: '#ef4444',
+              '&:hover': { backgroundColor: '#fee2e2' },
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
         </Box>
       ),
     },
   ];
-
   return (
     <Box sx={{ 
       width: '100%', 

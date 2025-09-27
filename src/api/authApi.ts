@@ -76,9 +76,13 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
 
 export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
   const { email, password, registrationNumber, dateOfBirth, role } = credentials;
-  
   switch (role.toLowerCase()) {
     case 'app':
+      if (!email || !password) {
+        throw new Error('Email and password are required for admin login');
+      }
+      return adminLogin({ email, password });
+    case 'admin':
       if (!email || !password) {
         throw new Error('Email and password are required for admin login');
       }
