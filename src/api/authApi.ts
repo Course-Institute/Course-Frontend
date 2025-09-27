@@ -4,6 +4,7 @@ export interface LoginRequest {
   email?: string;
   password?: string;
   registrationNumber?: string;
+  registrationNo?: string;
   dateOfBirth?: string;
   role: string;
 }
@@ -17,6 +18,8 @@ export interface LoginResponse {
       name: string;
       email: string;
       role: string;
+      registrationNo?: string;
+      dob?: string;
     };
     token: string;
   };
@@ -40,22 +43,28 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
   if (credentials.registrationNumber === '170926' && credentials.dateOfBirth === '2002-09-17') {
     return {
       status: true,
-      message: 'Student logged in successfully',
+      message: 'Student login successful',
       data: {
         user: {
           id: '1',
           name: 'Demo Student',
           email: 'student@demo.com',
           role: 'student',
+          registrationNo: '170926',
+          dob: '2002-09-17',
         },
         token: 'student-jwt-token-' + Date.now(),
       },
     };
   }
   
-  // Real credentials - make API call to backend
+  // Real credentials - make API call to backend with correct field names
   try {
-    const response = await axiosInstance.post('/api/user/student-login', credentials);
+    const backendCredentials = {
+      registrationNo: credentials.registrationNumber,
+      dateOfBirth: credentials.dateOfBirth,
+    };
+    const response = await axiosInstance.post('/api/user/student-login', backendCredentials);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.message) {
