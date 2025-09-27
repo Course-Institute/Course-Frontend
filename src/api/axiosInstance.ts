@@ -33,11 +33,23 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
+      // Get the current role before clearing
+      const userRole = localStorage.getItem('userRole');
+      
+      // Clear auth data
       localStorage.removeItem('authToken');
       localStorage.removeItem('userRole');
       localStorage.removeItem('sessionStart');
-      window.location.href = '/login';
+      localStorage.removeItem('studentRegistrationNumber');
+      
+      // Redirect to appropriate login page based on role
+      if (userRole && userRole.toLowerCase() === 'admin') {
+        window.location.href = '/login?role=admin';
+      } else if (userRole && userRole.toLowerCase() === 'student') {
+        window.location.href = '/login?role=student';
+      } else {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
