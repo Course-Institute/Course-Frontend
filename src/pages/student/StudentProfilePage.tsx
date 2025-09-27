@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Container,
@@ -11,42 +11,221 @@ import {
   Alert,
   CircularProgress,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
 } from '@mui/material';
 import {
   Download as DownloadIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
-  Close as CloseIcon,
-  CreditCard as IdCardIcon,
 } from '@mui/icons-material';
 import StudentLayout from '../../components/student/StudentLayout';
-import { useStudentProfile, useDownloadIdCard } from '../../hooks/useStudentProfile';
-import IdCardGenerator from '../../components/IdCardGenerator';
+import { useStudentProfile } from '../../hooks/useStudentProfile';
 
 const StudentProfilePage: React.FC = () => {
   const { data: profile, isLoading, isError, error } = useStudentProfile();
-  const { downloadIdCard } = useDownloadIdCard();
-  const [idCardDialogOpen, setIdCardDialogOpen] = useState(false);
 
   const handleDownloadIdCard = async () => {
+    if (!profile) return;
+    
     try {
-      await downloadIdCard();
+      // Create a canvas element for ID card generation
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas size (smaller width for better proportions)
+      const width = 450; // Reduced width
+      const height = 637;  // 2.125 * 300
+      canvas.width = width;
+      canvas.height = height;
+
+      // Clear canvas with white background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+
+      // Simple header background
+      ctx.fillStyle = '#1E3A8A';
+      ctx.fillRect(0, 0, width, 200);
+
+      // Draw institute logo using your actual icon
+      const logoX = width / 2;
+      const logoY = 60;
+      const logoSize = 50;
+
+      // Try to load and draw the institute logo
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.onload = () => {
+        ctx.drawImage(logoImg, logoX - logoSize/2, logoY - logoSize/2, logoSize, logoSize);
+      };
+      logoImg.onerror = () => {
+        // Fallback: simple text logo if image fails to load
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('MIVPS', logoX, logoY + 8);
+      };
+      logoImg.src = '/institute-logo.svg';
+
+      // Institute name (bold white letters)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 22px Arial';
+      ctx.textAlign = 'center';
+      
+      ctx.fillText('MAHAVIR INSTITUTE OF VOCATIONAL', logoX, logoY + 80);
+      ctx.fillText('& PARAMEDICAL SCIENCE', logoX, logoY + 105);
+
+      // Student photo placeholder
+      const photoX = logoX;
+      const photoY = 220;
+      const photoWidth = 120;
+      const photoHeight = 90;
+
+      // Photo border (dark blue)
+      ctx.strokeStyle = '#1E3A8A';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(photoX - photoWidth/2, photoY - photoHeight/2, photoWidth, photoHeight);
+
+      // Photo background (light gray)
+      ctx.fillStyle = '#F5F5F5';
+      ctx.fillRect(photoX - photoWidth/2 + 2, photoY - photoHeight/2 + 2, photoWidth - 4, photoHeight - 4);
+
+      // Try to load and draw student photo
+      if (profile.photo) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          ctx.drawImage(img, photoX - photoWidth/2 + 2, photoY - photoHeight/2 + 2, photoWidth - 4, photoHeight - 4);
+          drawTextElements();
+        };
+        img.onerror = () => {
+          drawTextElements();
+        };
+        // Fix photo URL - remove double slash and use correct base URL
+        const baseUrl = import.meta.env.VITE_APP_ENDPOINT || 'http://localhost:5000';
+        // Remove trailing slash from baseUrl and leading slash from photo path to avoid double slashes
+        const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        const cleanPhotoPath = profile.photo.startsWith('/') ? profile.photo : `/${profile.photo}`;
+        const photoUrl = `${cleanBaseUrl}${cleanPhotoPath}`;
+        img.src = photoUrl;
+      } else {
+        drawTextElements();
+      }
+
+      function drawTextElements() {
+        if (!ctx || !profile) return;
+        
+        // Student name
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Student Name :', photoX, photoY + 70);
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText(profile.candidateName || 'N/A', photoX, photoY + 95);
+
+        // Roll number
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText('Roll No. :', photoX, photoY + 120);
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText(profile.registrationNo || 'N/A', photoX, photoY + 145);
+
+        // Horizontal line
+        ctx.strokeStyle = '#1E3A8A';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(50, photoY + 170);
+        ctx.lineTo(width - 50, photoY + 170);
+        ctx.stroke();
+
+        // Course details (left side)
+        const leftX = 60;
+        let currentY = photoY + 200;
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Course :', leftX, currentY);
+        ctx.fillText(profile.course || 'N/A', leftX + 60, currentY);
+
+        currentY += 25;
+        ctx.fillText('Session :', leftX, currentY);
+        ctx.fillText(`${profile.monthSession || ''} ${profile.year || ''} - ${profile.session || ''}`, leftX + 60, currentY);
+
+        currentY += 25;
+        ctx.fillText('Enroll. No. :', leftX, currentY);
+        ctx.fillText(profile.registrationNo || 'N/A', leftX + 80, currentY);
+
+        currentY += 25;
+        ctx.fillText('DOB :', leftX, currentY);
+        const dob = profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-GB') : 'N/A';
+        ctx.fillText(dob, leftX + 40, currentY);
+
+        currentY += 25;
+        ctx.fillText('Phone :', leftX, currentY);
+        ctx.fillText(profile.contactNumber || 'N/A', leftX + 60, currentY);
+
+        // QR Code (right side, moved lower)
+        const qrX = width - 120;
+        const qrY = photoY + 250; // Moved lower
+        const qrSize = 80;
+
+        // Generate actual QR code
+        const qrData = `${profile.candidateName} - ${profile.registrationNo} - MIVPS`;
+        const qrImg = new Image();
+        qrImg.crossOrigin = 'anonymous';
+        qrImg.onload = () => {
+          ctx.drawImage(qrImg, qrX - qrSize/2, qrY - qrSize/2, qrSize, qrSize);
+        };
+        qrImg.onerror = () => {
+          // Fallback: simple QR-like pattern
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(qrX - qrSize/2, qrY - qrSize/2, qrSize, qrSize);
+          
+          // Draw QR-like pattern
+          ctx.fillStyle = '#FFFFFF';
+          for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+              if ((i + j) % 2 === 0) {
+                ctx.fillRect(qrX - qrSize/2 + i * 10, qrY - qrSize/2 + j * 10, 10, 10);
+              }
+            }
+          }
+        };
+        
+        // Generate QR code using a QR code API
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(qrData)}`;
+        qrImg.src = qrUrl;
+
+        // Authorised Signatory (adjusted for new QR position)
+        ctx.fillStyle = '#000000';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText('Authorised Signatory', width - 60, qrY + 100);
+
+        // Footer background (dark teal)
+        const footerY = height - 80;
+        ctx.fillStyle = '#2D5A5A';
+        ctx.fillRect(0, footerY, width, 80);
+
+        // Footer text
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Student must carry this card before entering the college premises.', width/2, footerY + 20);
+        ctx.fillText('This card is the property of college, if found return it to the college.', width/2, footerY + 40);
+        ctx.fillText('If lost, immediately inform the office.', width/2, footerY + 60);
+
+        // Download the generated image
+        const link = document.createElement('a');
+        link.download = `id-card-${profile.registrationNo || 'student'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
     } catch (error) {
-      console.error('Failed to download ID card:', error);
+      console.error('Failed to generate ID card:', error);
+      alert('Failed to generate ID card. Please try again.');
     }
   };
 
-  const handleGenerateIdCard = () => {
-    setIdCardDialogOpen(true);
-  };
-
-  const handleCloseIdCardDialog = () => {
-    setIdCardDialogOpen(false);
-  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -97,31 +276,12 @@ const StudentProfilePage: React.FC = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 1 }}>
-                Student Profile
-              </Typography>
-              <Typography variant="subtitle1" color="text.secondary">
-                CMS Student Profile
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<IdCardIcon />}
-              onClick={handleGenerateIdCard}
-              sx={{
-                backgroundColor: '#228B22',
-                '&:hover': {
-                  backgroundColor: '#1E7A1E',
-                },
-                px: 3,
-                py: 1.5,
-              }}
-            >
-              Generate ID Card
-            </Button>
-          </Box>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 1 }}>
+            Student Profile
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            CMS Student Profile
+          </Typography>
         </Box>
 
         <Grid container spacing={4}>
@@ -144,7 +304,13 @@ const StudentProfilePage: React.FC = () => {
                 {/* Student Photo */}
                 <Box sx={{ mb: 3 }}>
                   <Avatar
-                    src={profile?.photo ? `${import.meta.env.VITE_APP_ENDPOINT || 'https://mivpsa.in/'}${profile.photo}` : '/default-avatar.png'}
+                    src={profile?.photo ? (() => {
+                      const baseUrl = import.meta.env.VITE_APP_ENDPOINT || 'http://localhost:5000';
+                      // Remove trailing slash from baseUrl and leading slash from photo path to avoid double slashes
+                      const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+                      const cleanPhotoPath = profile.photo.startsWith('/') ? profile.photo : `/${profile.photo}`;
+                      return `${cleanBaseUrl}${cleanPhotoPath}`;
+                    })() : '/default-avatar.png'}
                     alt="Student Photo"
                     sx={{
                       width: 120,
@@ -387,36 +553,6 @@ const StudentProfilePage: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* ID Card Generation Dialog */}
-        <Dialog
-          open={idCardDialogOpen}
-          onClose={handleCloseIdCardDialog}
-          maxWidth="md"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 2,
-              maxHeight: '90vh',
-            },
-          }}
-        >
-          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-              Student ID Card
-            </Typography>
-            <IconButton onClick={handleCloseIdCardDialog} size="small">
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent sx={{ pt: 1 }}>
-            {profile && (
-              <IdCardGenerator 
-                studentData={profile} 
-                onDownload={handleCloseIdCardDialog}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
       </Container>
     </StudentLayout>
   );
