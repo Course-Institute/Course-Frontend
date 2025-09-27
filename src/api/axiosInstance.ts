@@ -1,7 +1,7 @@
 import axios from 'axios';
 // import localStorageStore from '../store/localStorageStore';
 
-export const backendApi = import.meta.env.VITE_APP_ENDPOINT || 'https://app.mivips.com/api';
+export const backendApi = import.meta.env.VITE_APP_ENDPOINT || 'https://mivpsa.in/api';
 
 // Simple axios instance for API calls
 const axiosInstance = axios.create({
