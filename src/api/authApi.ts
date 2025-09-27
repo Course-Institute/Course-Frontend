@@ -23,7 +23,7 @@ export interface LoginResponse {
 // Admin login API
 export const adminLogin = async (credentials: { email: string; password: string }): Promise<LoginResponse> => {
   try {
-    const response = await axiosInstance.post('/user/admin-login', credentials);
+    const response = await axiosInstance.post('/api/user/admin-login', credentials);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.message) {
@@ -34,7 +34,8 @@ export const adminLogin = async (credentials: { email: string; password: string 
 };
 
 export const studentLogin = async (credentials: { registrationNumber: string; dateOfBirth: string }): Promise<LoginResponse> => {
-  if (credentials.registrationNumber === '170926' && credentials.dateOfBirth === 'shivam1709') {
+  // Demo credentials - no API call needed
+  if (credentials.registrationNumber === '170926' && credentials.dateOfBirth === '2002-09-17') {
     return {
       success: true,
       token: 'student-jwt-token-' + Date.now(),
@@ -48,7 +49,16 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
     };
   }
   
-  throw new Error('Invalid registration number or date of birth');
+  // Real credentials - make API call to backend
+  try {
+    const response = await axiosInstance.post('/api/user/student-login', credentials);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Student login failed. Please try again.');
+  }
 };
 
 export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {

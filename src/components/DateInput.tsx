@@ -15,6 +15,8 @@ interface DateInputProps {
   helperText?: string;
   required?: boolean;
   fullWidth?: boolean;
+  disabled?: boolean;
+  sx?: any;
 }
 
 const DateInput: React.FC<DateInputProps> = ({
@@ -25,6 +27,8 @@ const DateInput: React.FC<DateInputProps> = ({
   helperText,
   required = false,
   fullWidth = true,
+  disabled = false,
+  sx = {},
 }) => {
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
@@ -56,6 +60,7 @@ const DateInput: React.FC<DateInputProps> = ({
         error={error}
         helperText={helperText}
         required={required}
+        disabled={disabled}
         InputLabelProps={{
           shrink: true,
         }}
@@ -67,6 +72,7 @@ const DateInput: React.FC<DateInputProps> = ({
                 edge="end"
                 size="small"
                 sx={{ color: 'text.secondary' }}
+                disabled={disabled}
               >
                 <CalendarIcon />
               </IconButton>
@@ -77,6 +83,7 @@ const DateInput: React.FC<DateInputProps> = ({
           '& .MuiInputBase-input': {
             cursor: 'pointer',
           },
+          ...sx,
         }}
       />
     </Box>

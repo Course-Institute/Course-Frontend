@@ -11,6 +11,7 @@ import PaymentTrackingPage from './pages/admin/PaymentTrackingPage';
 import UploadResultsPage from './pages/admin/UploadResultsPage';
 import CenterManagementPage from './pages/admin/CenterManagementPage';
 import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
+import StudentProfilePage from './pages/student/StudentProfilePage';
 import { SessionProvider } from './contexts/SessionContext';
 
 function App() {
@@ -63,6 +64,9 @@ function App() {
               <ReportsDashboardPage />
             </AdminLayout>
           } />
+
+          {/* Student Routes */}
+          <Route path="/student-dashboard" element={<StudentProfilePage />} />
         </Routes>
       </SessionProvider>
     </Router>
