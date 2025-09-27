@@ -1,25 +1,33 @@
 import axiosInstance from './axiosInstance';
 
 export interface Student {
-  id: string;
-  studentId: string;
-  name: string;
+  _id: string;
+  registrationNo: string;
+  candidateName: string;
+  contactNumber: string;
+  emailAddress: string;
+  faculty: string;
   course: string;
-  semester: string;
-  admissionYear: number;
-  center: string;
-  status: 'Approved' | 'Pending' | 'ID Generated';
-  feeStatus: 'Full Payment' | 'Partial' | 'Pending';
-  email?: string;
-  phone?: string;
-  address?: string;
+  stream: string;
+  year: string;
+  session: string;
+  createdAt: string;
 }
 
 export interface StudentsResponse {
-  data: Student[];
-  total: number;
-  page: number;
-  limit: number;
+  status: boolean;
+  message: string;
+  data: {
+    students: Student[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalCount: number;
+      limit: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
+  };
 }
 
 export interface AddStudentData {
@@ -85,7 +93,7 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
 // Real API function to add a student
 export const addStudent = async (formData: FormData): Promise<AddStudentResponse> => {
   try {
-    const response = await axiosInstance.post('/api/student/add-Student', formData, {
+    const response = await axiosInstance.post('/api/student/add-student', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

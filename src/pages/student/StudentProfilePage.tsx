@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -11,18 +11,26 @@ import {
   Alert,
   CircularProgress,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
 } from '@mui/material';
 import {
   Download as DownloadIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
+  Close as CloseIcon,
+  CreditCard as IdCardIcon,
 } from '@mui/icons-material';
 import StudentLayout from '../../components/student/StudentLayout';
 import { useStudentProfile, useDownloadIdCard } from '../../hooks/useStudentProfile';
+import IdCardGenerator from '../../components/IdCardGenerator';
 
 const StudentProfilePage: React.FC = () => {
   const { data: profile, isLoading, isError, error } = useStudentProfile();
   const { downloadIdCard } = useDownloadIdCard();
+  const [idCardDialogOpen, setIdCardDialogOpen] = useState(false);
 
   const handleDownloadIdCard = async () => {
     try {
@@ -30,6 +38,14 @@ const StudentProfilePage: React.FC = () => {
     } catch (error) {
       console.error('Failed to download ID card:', error);
     }
+  };
+
+  const handleGenerateIdCard = () => {
+    setIdCardDialogOpen(true);
+  };
+
+  const handleCloseIdCardDialog = () => {
+    setIdCardDialogOpen(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -81,12 +97,31 @@ const StudentProfilePage: React.FC = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 1 }}>
-            Student Profile
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            CMS Student Profile
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 1 }}>
+                Student Profile
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary">
+                CMS Student Profile
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<IdCardIcon />}
+              onClick={handleGenerateIdCard}
+              sx={{
+                backgroundColor: '#228B22',
+                '&:hover': {
+                  backgroundColor: '#1E7A1E',
+                },
+                px: 3,
+                py: 1.5,
+              }}
+            >
+              Generate ID Card
+            </Button>
+          </Box>
         </Box>
 
         <Grid container spacing={4}>
@@ -109,7 +144,7 @@ const StudentProfilePage: React.FC = () => {
                 {/* Student Photo */}
                 <Box sx={{ mb: 3 }}>
                   <Avatar
-                    src={profile?.photo || '/default-avatar.png'}
+                    src={profile?.photo ? `${import.meta.env.VITE_APP_ENDPOINT || 'https://mivpsa.in/'}${profile.photo}` : '/default-avatar.png'}
                     alt="Student Photo"
                     sx={{
                       width: 120,
@@ -124,7 +159,7 @@ const StudentProfilePage: React.FC = () => {
                 {/* Basic Info */}
                 <Box sx={{ textAlign: 'left' }}>
                   <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-                    Student Ref. No. : {profile?.studentRefNo || 'N/A'}
+                    Registration No. : {profile?.registrationNo || 'N/A'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#666' }}>
                     Course : {profile?.course || 'N/A'}
@@ -157,7 +192,7 @@ const StudentProfilePage: React.FC = () => {
                         Student Name
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.studentName || 'N/A'}
+                        {profile?.candidateName || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -168,7 +203,7 @@ const StudentProfilePage: React.FC = () => {
                         Father's Name
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.fathersName || 'N/A'}
+                        {profile?.fatherName || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -179,7 +214,7 @@ const StudentProfilePage: React.FC = () => {
                         Mother's Name
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.mothersName || 'N/A'}
+                        {profile?.motherName || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -198,10 +233,10 @@ const StudentProfilePage: React.FC = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                        Enrollment No.
+                        Aadhar Card No.
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.enrollmentNo || 'N/A'}
+                        {profile?.adharCardNo || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -209,10 +244,10 @@ const StudentProfilePage: React.FC = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                        Roll No.
+                        Gender
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.rollNo || 'N/A'}
+                        {profile?.gender || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -234,25 +269,80 @@ const StudentProfilePage: React.FC = () => {
                         Mobile No.
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {profile?.mobileNo || 'N/A'}
+                        {profile?.contactNumber || 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Faculty
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {profile?.faculty || 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Stream
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {profile?.stream || 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Year
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {profile?.year || 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Course Fee
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        ₹{profile?.courseFee || 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Duration
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {profile?.duration || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>
                 </Grid>
 
                 {/* Contact Information */}
-                {profile?.email && (
+                {profile?.emailAddress && (
                   <Box sx={{ mt: 3, p: 2, backgroundColor: '#f8f9fa', borderRadius: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                       <EmailIcon sx={{ fontSize: 16, color: '#666' }} />
                       <Typography variant="body2" color="text.secondary">
-                        Email: {profile.email}
+                        Email: {profile.emailAddress}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <PhoneIcon sx={{ fontSize: 16, color: '#666' }} />
                       <Typography variant="body2" color="text.secondary">
-                        Phone: {profile.mobileNo}
+                        Phone: {profile.contactNumber}
                       </Typography>
                     </Box>
                   </Box>
@@ -296,6 +386,37 @@ const StudentProfilePage: React.FC = () => {
             </Card>
           </Grid>
         </Grid>
+
+        {/* ID Card Generation Dialog */}
+        <Dialog
+          open={idCardDialogOpen}
+          onClose={handleCloseIdCardDialog}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              maxHeight: '90vh',
+            },
+          }}
+        >
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+              Student ID Card
+            </Typography>
+            <IconButton onClick={handleCloseIdCardDialog} size="small">
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent sx={{ pt: 1 }}>
+            {profile && (
+              <IdCardGenerator 
+                studentData={profile} 
+                onDownload={handleCloseIdCardDialog}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </Container>
     </StudentLayout>
   );
