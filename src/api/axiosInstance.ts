@@ -1,12 +1,17 @@
 import axios from 'axios';
 // import localStorageStore from '../store/localStorageStore';
 
-export const backendApi = import.meta.env.VITE_APP_ENDPOINT || 'http://localhost:3001/api';
+export const backendApi = import.meta.env.VITE_APP_ENDPOINT || 'https://app.mivips.com/api';
 
 // Simple axios instance for API calls
 const axiosInstance = axios.create({
   baseURL: backendApi,
   timeout: 30000, // 30 seconds timeout
+  withCredentials: true, // Include cookies in CORS requests
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
 });
 
 // Add request interceptor for auth token

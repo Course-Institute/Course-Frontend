@@ -21,7 +21,7 @@ import {
   Business,
 } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import { mockLoginUser, type LoginResponse } from '../api/authApi';
+import { loginUser, type LoginResponse } from '../api/authApi';
 import { useSession } from '../contexts/SessionContext';
 import Navbar from '../components/Navbar';
 
@@ -33,15 +33,17 @@ const LoginPage = () => {
   const { login } = useSession();
 
   const [formData, setFormData] = useState({
-    loginId: '',
+    email: '',
     password: '',
+    registrationNumber: '',
+    dateOfBirth: '',
     keepSignedIn: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const loginMutation = useMutation<LoginResponse, Error, { loginId: string; password: string; role: string }>({
-    mutationFn: mockLoginUser,
+  const loginMutation = useMutation<LoginResponse, Error, { email?: string; password?: string; registrationNumber?: string; dateOfBirth?: string; role: string }>({
+    mutationFn: loginUser,
     onSuccess: (data) => {
       // Handle successful login
       console.log('Login successful:', data);
@@ -91,16 +93,33 @@ const LoginPage = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     
-    if (!formData.loginId.trim() || !formData.password.trim()) {
-      setError('Please fill in all fields');
-      return;
+    // Validate based on role
+    if (role.toLowerCase() === 'student') {
+      if (!formData.registrationNumber.trim() || !formData.dateOfBirth.trim()) {
+        setError('Please fill in all fields');
+        return;
+      }
+    } else {
+      if (!formData.email.trim() || !formData.password.trim()) {
+        setError('Please fill in all fields');
+        return;
+      }
     }
 
-    loginMutation.mutate({
-      loginId: formData.loginId,
-      password: formData.password,
-      role: role,
-    });
+    // Prepare credentials based on role
+    const credentials = role.toLowerCase() === 'student' 
+      ? {
+          registrationNumber: formData.registrationNumber,
+          dateOfBirth: formData.dateOfBirth,
+          role: role,
+        }
+      : {
+          email: formData.email,
+          password: formData.password,
+          role: role,
+        };
+
+    loginMutation.mutate(credentials);
 
   };
 
@@ -207,50 +226,88 @@ const LoginPage = () => {
 
             {/* Login Form */}
             <Box component="form" onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="Business Email"
-                type="email"
-                value={formData.loginId}
-                onChange={handleInputChange('loginId')}
-                sx={{
-                  mb: 3,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  },
-                }}
-                disabled={loginMutation.isPending}
-              />
+              {role.toLowerCase() === 'student' ? (
+                <>
+                  <TextField
+                    fullWidth
+                    label="Registration Number"
+                    value={formData.registrationNumber}
+                    onChange={handleInputChange('registrationNumber')}
+                    sx={{
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      },
+                    }}
+                    disabled={loginMutation.isPending}
+                    placeholder="Enter your registration number"
+                  />
 
-              <TextField
-                fullWidth
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={handleInputChange('password')}
-                sx={{
-                  mb: 3,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  },
-                }}
-                disabled={loginMutation.isPending}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                        disabled={loginMutation.isPending}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                  <TextField
+                    fullWidth
+                    label="Date of Birth"
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange('dateOfBirth')}
+                    sx={{
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      },
+                    }}
+                    disabled={loginMutation.isPending}
+                    placeholder="Enter your date of birth"
+                  />
+                </>
+              ) : (
+                <>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange('email')}
+                    sx={{
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      },
+                    }}
+                    disabled={loginMutation.isPending}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleInputChange('password')}
+                    sx={{
+                      mb: 3,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      },
+                    }}
+                    disabled={loginMutation.isPending}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            disabled={loginMutation.isPending}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </>
+              )}
 
               {/* Options */}
               <Grid container justifyContent="end" sx={{ mb: 4 }}>

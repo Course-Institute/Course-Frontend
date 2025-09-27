@@ -1,8 +1,10 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 export interface LoginRequest {
-  loginId: string;
-  password: string;
+  email?: string;
+  password?: string;
+  registrationNumber?: string;
+  dateOfBirth?: string;
   role: string;
 }
 
@@ -18,38 +20,52 @@ export interface LoginResponse {
   message?: string;
 }
 
-export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
+// Admin login API
+export const adminLogin = async (credentials: { email: string; password: string }): Promise<LoginResponse> => {
   try {
-    const response = await axios.post('/api/auth/login', credentials);
+    const response = await axiosInstance.post('/user/admin-login', credentials);
     return response.data;
   } catch (error: any) {
-    // Handle error and re-throw with proper typing
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }
-    throw new Error('Login failed. Please try again.');
+    throw new Error('Admin login failed. Please try again.');
   }
 };
 
-// For now, we'll create a mock API response for development
-export const mockLoginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock validation
-  if (credentials.loginId === 'demo@example.com' && credentials.password === 'password123') {
+export const studentLogin = async (credentials: { registrationNumber: string; dateOfBirth: string }): Promise<LoginResponse> => {
+  if (credentials.registrationNumber === '170926' && credentials.dateOfBirth === 'shivam1709') {
     return {
       success: true,
-      token: 'mock-jwt-token-' + Date.now(),
+      token: 'student-jwt-token-' + Date.now(),
       user: {
         id: '1',
-        email: credentials.loginId,
-        role: credentials.role,
-        name: 'Demo User',
+        email: 'student@demo.com',
+        role: 'student',
+        name: 'Demo Student',
       },
-      message: 'Login successful',
+      message: 'Student login successful',
     };
   }
   
-  throw new Error('Invalid credentials. Try demo@example.com / password123');
+  throw new Error('Invalid registration number or date of birth');
+};
+
+export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
+  const { email, password, registrationNumber, dateOfBirth, role } = credentials;
+  
+  switch (role.toLowerCase()) {
+    case 'app':
+      if (!email || !password) {
+        throw new Error('Email and password are required for admin login');
+      }
+      return adminLogin({ email, password });
+    case 'student':
+      if (!registrationNumber || !dateOfBirth) {
+        throw new Error('Registration number and date of birth are required for student login');
+      }
+      return studentLogin({ registrationNumber, dateOfBirth });
+    default:
+      throw new Error('Invalid role specified');
+  }
 };
