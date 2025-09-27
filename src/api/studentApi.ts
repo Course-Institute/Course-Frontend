@@ -35,7 +35,7 @@ export interface StudentProfileResponse {
 export const getStudentProfile = async (registrationNumber?: string): Promise<StudentProfileResponse> => {
   try {
     const regNumber = registrationNumber || localStorage.getItem('studentRegistrationNumber');
-    const url = regNumber ? `/student/profile?registrationNumber=${regNumber}` : '/student/profile';
+    const url = regNumber ? `/student/profile?registrationNo=${regNumber}` : '/student/profile';
     const response = await axiosInstance.get(url);
     return response.data;
   } catch (error: any) {
@@ -54,7 +54,7 @@ export const getStudentProfile = async (registrationNumber?: string): Promise<St
 export const downloadStudentIdCard = async (registrationNumber?: string): Promise<Blob> => {
   try {
     const regNumber = registrationNumber || localStorage.getItem('studentRegistrationNumber');
-    const url = regNumber ? `/student/id-card?registrationNumber=${regNumber}` : '/student/id-card';
+    const url = regNumber ? `/student/id-card?registrationNo=${regNumber}` : '/student/id-card';
     const response = await axiosInstance.get(url, {
       responseType: 'blob',
     });
