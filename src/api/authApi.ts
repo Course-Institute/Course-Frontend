@@ -9,15 +9,17 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  success: boolean;
-  token?: string;
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    name?: string;
+  status: boolean;
+  message: string;
+  data: {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+    };
+    token: string;
   };
-  message?: string;
 }
 
 // Admin login API
@@ -37,15 +39,17 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
   // Demo credentials - no API call needed
   if (credentials.registrationNumber === '170926' && credentials.dateOfBirth === '2002-09-17') {
     return {
-      success: true,
-      token: 'student-jwt-token-' + Date.now(),
-      user: {
-        id: '1',
-        email: 'student@demo.com',
-        role: 'student',
-        name: 'Demo Student',
+      status: true,
+      message: 'Student logged in successfully',
+      data: {
+        user: {
+          id: '1',
+          name: 'Demo Student',
+          email: 'student@demo.com',
+          role: 'student',
+        },
+        token: 'student-jwt-token-' + Date.now(),
       },
-      message: 'Student login successful',
     };
   }
   

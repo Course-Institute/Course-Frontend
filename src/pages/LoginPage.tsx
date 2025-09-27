@@ -50,20 +50,21 @@ const LoginPage = () => {
       console.log('Login successful:', data);
       console.log('Role:', role);
       
-      // Use session context to login
-      login(data.token || '', role);
+      // Use session context to login with token and user role from response
+      const userRole = data.data.user.role;
+      login(data.data.token, userRole);
       
       // Store keep signed in preference
       localStorage.setItem('keepSignedIn', formData.keepSignedIn.toString());
       
       // Store student registration number if student login
-      if (role.toLowerCase() === 'student' && formData.registrationNumber) {
+      if (userRole.toLowerCase() === 'student' && formData.registrationNumber) {
         localStorage.setItem('studentRegistrationNumber', formData.registrationNumber.toString());
       }
       
-      // Navigate to appropriate dashboard based on role
-      console.log('Navigating with role:', role.toLowerCase());
-      switch (role.toLowerCase()) {
+      // Navigate to appropriate dashboard based on role from response
+      console.log('Navigating with role:', userRole.toLowerCase());
+      switch (userRole.toLowerCase()) {
         case 'student':
           console.log('Navigating to student dashboard');
           navigate('/student-dashboard');
@@ -84,7 +85,7 @@ const LoginPage = () => {
     },
     onError: (error: any) => {
       console.log("error::", error)
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
+      setError(error.message || error.response?.data?.message || 'Login failed. Please try again.');
     },
   });
 
