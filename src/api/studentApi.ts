@@ -35,7 +35,7 @@ export interface StudentProfileResponse {
 export const getStudentProfile = async (registrationNumber?: string): Promise<StudentProfileResponse> => {
   try {
     const regNumber = registrationNumber || localStorage.getItem('studentRegistrationNumber');
-    const url = regNumber ? `/student/profile?registrationNo=${regNumber}` : '/student/profile';
+    const url = regNumber ? `api/student/profile?registrationNo=${regNumber}` : 'api/student/profile';
     const response = await axiosInstance.get(url);
     return response.data;
   } catch (error: any) {
