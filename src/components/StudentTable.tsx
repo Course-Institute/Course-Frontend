@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
   Typography,
   TextField,
   FormControl,
@@ -41,21 +40,9 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
     }));
   };
 
-  const getStatusColor = (status: Student['feeStatus']) => {
-    switch (status) {
-      case 'Approved':
-        return 'success';
-      case 'Pending':
-        return 'warning';
-      case 'Not Available':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
 
   const handleRowClick = (student: Student) => {
-    onStudentSelect(student.id);
+    onStudentSelect(student._id);
   };
 
   return (
@@ -72,7 +59,7 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
         }}
       >
         <TextField
-          placeholder="Search by Student ID / Name"
+          placeholder="Search by Registration No / Name"
           size="small"
           value={filters.search || ''}
           onChange={(e) => handleFilterChange('search', e.target.value)}
@@ -99,19 +86,34 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Center</InputLabel>
+          <InputLabel>Faculty</InputLabel>
           <Select
-            value={filters.center || ''}
-            onChange={(e) => handleFilterChange('center', e.target.value)}
-            label="Center"
+            value={filters.faculty || ''}
+            onChange={(e) => handleFilterChange('faculty', e.target.value)}
+            label="Faculty"
           >
-            <MenuItem value="">All Centers</MenuItem>
-            <MenuItem value="Delhi Center">Delhi Center</MenuItem>
-            <MenuItem value="Mumbai Center">Mumbai Center</MenuItem>
-            <MenuItem value="Jaipur Center">Jaipur Center</MenuItem>
-            <MenuItem value="Ahmedabad Center">Ahmedabad Center</MenuItem>
-            <MenuItem value="Pune Center">Pune Center</MenuItem>
-            <MenuItem value="Bangalore Center">Bangalore Center</MenuItem>
+            <MenuItem value="">All Faculties</MenuItem>
+            <MenuItem value="Engineering">Engineering</MenuItem>
+            <MenuItem value="Management">Management</MenuItem>
+            <MenuItem value="Science">Science</MenuItem>
+            <MenuItem value="Arts">Arts</MenuItem>
+            <MenuItem value="Commerce">Commerce</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Stream</InputLabel>
+          <Select
+            value={filters.stream || ''}
+            onChange={(e) => handleFilterChange('stream', e.target.value)}
+            label="Stream"
+          >
+            <MenuItem value="">All Streams</MenuItem>
+            <MenuItem value="Electronics">Electronics</MenuItem>
+            <MenuItem value="Computer Science">Computer Science</MenuItem>
+            <MenuItem value="Mechanical">Mechanical</MenuItem>
+            <MenuItem value="Civil">Civil</MenuItem>
+            <MenuItem value="Information Technology">Information Technology</MenuItem>
           </Select>
         </FormControl>
 
@@ -159,12 +161,15 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
           <Table stickyHeader>
             <TableHead>
               <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Student ID</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Registration No</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Contact</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Faculty</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Course</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Semester</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Center</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Fee Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Stream</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Year</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Session</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -177,57 +182,43 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
                     <TableCell><Skeleton /></TableCell>
                     <TableCell><Skeleton /></TableCell>
                     <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton width={80} /></TableCell>
+                    <TableCell><Skeleton /></TableCell>
+                    <TableCell><Skeleton /></TableCell>
+                    <TableCell><Skeleton /></TableCell>
+                    <TableCell><Skeleton /></TableCell>
                   </TableRow>
                 ))
               ) : (
                 studentData?.students.map((student) => (
                   <TableRow
-                    key={student.id}
+                    key={student._id}
                     hover
                     onClick={() => handleRowClick(student)}
                     sx={{
                       cursor: 'pointer',
-                      backgroundColor: selectedStudentId === student.id 
+                      backgroundColor: selectedStudentId === student._id 
                         ? theme.palette.primary.light + '20' 
                         : 'transparent',
                       '&:hover': {
-                        backgroundColor: selectedStudentId === student.id 
+                        backgroundColor: selectedStudentId === student._id 
                           ? theme.palette.primary.light + '30' 
                           : theme.palette.grey[50],
                       },
                     }}
                   >
-                    <TableCell>{student.studentId}</TableCell>
+                    <TableCell>{student.registrationNo}</TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {student.name}
+                        {student.candidateName}
                       </Typography>
                     </TableCell>
+                    <TableCell>{student.contactNumber}</TableCell>
+                    <TableCell>{student.emailAddress}</TableCell>
+                    <TableCell>{student.faculty}</TableCell>
                     <TableCell>{student.course}</TableCell>
-                    <TableCell>{student.semester}</TableCell>
-                    <TableCell>{student.center}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={student.feeStatus}
-                        color={getStatusColor(student.feeStatus)}
-                        size="small"
-                        sx={{
-                          fontWeight: 500,
-                          ...(student.feeStatus === 'Pending' && {
-                            '&::after': {
-                              content: '""',
-                              display: 'inline-block',
-                              width: 4,
-                              height: 4,
-                              backgroundColor: theme.palette.warning.main,
-                              borderRadius: '50%',
-                              marginLeft: 0.5,
-                            },
-                          }),
-                        }}
-                      />
-                    </TableCell>
+                    <TableCell>{student.stream}</TableCell>
+                    <TableCell>{student.year}</TableCell>
+                    <TableCell>{student.session}</TableCell>
                   </TableRow>
                 ))
               )}

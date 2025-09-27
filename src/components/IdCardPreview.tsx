@@ -114,7 +114,6 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
           {/* Student Photo */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <Avatar
-              src={student?.profileImage}
               sx={{
                 width: 80,
                 height: 80,
@@ -122,7 +121,7 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
               }}
             >
-              {student?.name?.charAt(0)}
+              {student?.candidateName?.charAt(0)}
             </Avatar>
           </Box>
 
@@ -137,7 +136,7 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
                 fontSize: '1rem',
               }}
             >
-              {student?.name}
+              {student?.candidateName}
             </Typography>
             <Typography
               variant="body2"
@@ -148,7 +147,7 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
                 fontSize: '0.9rem',
               }}
             >
-              {student?.studentId}
+              {student?.registrationNo}
             </Typography>
             <Typography
               variant="body2"
@@ -159,7 +158,7 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
                 fontSize: '0.9rem',
               }}
             >
-              {student?.course}
+              {student?.course} - {student?.stream}
             </Typography>
             <Typography
               variant="body2"
@@ -169,7 +168,7 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
                 fontSize: '0.9rem',
               }}
             >
-              {student?.semester}
+              {student?.year} - {student?.session}
             </Typography>
           </Box>
 
