@@ -85,7 +85,7 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
 // Real API function to add a student
 export const addStudent = async (formData: FormData): Promise<AddStudentResponse> => {
   try {
-    const response = await axiosInstance.post('/addStudent', formData, {
+    const response = await axiosInstance.post('/api/addStudent', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
