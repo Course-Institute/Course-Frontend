@@ -68,7 +68,7 @@ export interface AddStudentResponse {
 // Real API function to fetch students data
 export const getStudentsData = async (page: number = 1, limit: number = 10): Promise<StudentsResponse> => {
   try {
-    const response = await axiosInstance.get(`/api/students?page=${page}&limit=${limit}`);
+    const response = await axiosInstance.get(`/api/student/students?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -85,7 +85,7 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
 // Real API function to add a student
 export const addStudent = async (formData: FormData): Promise<AddStudentResponse> => {
   try {
-    const response = await axiosInstance.post('/api/addStudent', formData, {
+    const response = await axiosInstance.post('/api/student/add-Student', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
