@@ -25,6 +25,7 @@ import { loginUser, type LoginResponse } from '../api/authApi';
 import { useSession } from '../contexts/SessionContext';
 import Navbar from '../components/Navbar';
 import DateInput from '../components/DateInput';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -159,7 +160,8 @@ const LoginPage = () => {
   }, [role]);
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <ErrorBoundary>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Navbar */}
       <Navbar />
       
@@ -379,6 +381,7 @@ const LoginPage = () => {
       </Container>
       </Box>
     </Box>
+    </ErrorBoundary>
   );
 };
 

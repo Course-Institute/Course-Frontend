@@ -6,8 +6,11 @@ import {
   Avatar,
   useTheme,
   Skeleton,
+  Alert,
+  Button,
 } from '@mui/material';
-import { useStudentDetails } from '../hooks/useStudentDetails';
+import { Download } from '@mui/icons-material';
+import { useIdCardPreview } from '../hooks/useIdCardPreview';
 
 interface IdCardPreviewProps {
   selectedStudentId: string | null;
@@ -15,12 +18,16 @@ interface IdCardPreviewProps {
 
 const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
   const theme = useTheme();
-  const { data: student, isLoading } = useStudentDetails(selectedStudentId);
+  const { 
+    idCardPreview: student, 
+    isIdCardPreviewLoading: isLoading, 
+    idCardPreviewError: error 
+  } = useIdCardPreview(selectedStudentId || '');
 
   if (!selectedStudentId) {
     return (
       <Box sx={{ width: 300 }}>
-        <Typography variant="h1" sx={{ mb: 2, color: 'text.secondary' }}>
+        <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary' }}>
           ID Card Preview
         </Typography>
         <Box
@@ -38,6 +45,19 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
             Select a student to preview ID card
           </Typography>
         </Box>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ width: 300 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          ID Card Preview
+        </Typography>
+        <Alert severity="error">
+          {error?.message || 'Failed to load student data'}
+        </Alert>
       </Box>
     );
   }
@@ -62,11 +82,29 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
     );
   }
 
+  const handleDownloadIdCard = () => {
+    // TODO: Implement ID card download functionality
+    console.log('Downloading ID card for:', student?.candidateName);
+  };
+
   return (
     <Box sx={{ width: 400 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        ID Card Preview
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">
+          ID Card Preview
+        </Typography>
+        {student?.idCardStatus === 'generated' && (
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<Download />}
+            onClick={handleDownloadIdCard}
+            sx={{ textTransform: 'none' }}
+          >
+            Download
+          </Button>
+        )}
+      </Box>
       <Card
         sx={{
           width: 280,
@@ -108,12 +146,18 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
               fontSize: '1.1rem',
             }}
           >
-            VIET ACADEMY
+            MIVPS
           </Typography>
 
           {/* Student Photo */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <Avatar
+              src={student?.photo ? (() => {
+                const baseUrl = import.meta.env.VITE_APP_ENDPOINT || 'http://localhost:5000';
+                const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+                const cleanPhotoPath = student.photo.startsWith('/') ? student.photo : `/${student.photo}`;
+                return `${cleanBaseUrl}${cleanPhotoPath}`;
+              })() : undefined}
               sx={{
                 width: 80,
                 height: 80,
@@ -181,39 +225,20 @@ const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
               height: 60,
             }}
           >
-            {student?.qrCode ? (
-              <Box
-                component="img"
-                src={student.qrCode}
-                alt="QR Code"
-                sx={{
-                  width: 50,
-                  height: 50,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  p: 0.5,
-                }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: 50,
-                  height: 50,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'black', fontSize: '8px', textAlign: 'center' }}
-                >
-                  QR Code
-                </Typography>
-              </Box>
-            )}
+            <Box
+              component="img"
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(
+                `${student?.candidateName} - ${student?.registrationNo} - MIVPS`
+              )}`}
+              alt="QR Code"
+              sx={{
+                width: 50,
+                height: 50,
+                backgroundColor: 'white',
+                borderRadius: 1,
+                p: 0.5,
+              }}
+            />
           </Box>
         </CardContent>
       </Card>

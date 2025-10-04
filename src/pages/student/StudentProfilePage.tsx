@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import StudentLayout from '../../components/student/StudentLayout';
 import { useStudentProfile } from '../../hooks/useStudentProfile';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const StudentProfilePage: React.FC = () => {
   const { data: profile, isLoading, isError, error } = useStudentProfile();
@@ -265,14 +266,15 @@ const StudentProfilePage: React.FC = () => {
   }
 
   return (
-    <StudentLayout 
-      activeMenuItem="profile" 
-      pageTitle="Student Profile"
-      breadcrumbs={[
-        { label: 'Home' },
-        { label: 'Student Profile' }
-      ]}
-    >
+    <ErrorBoundary>
+      <StudentLayout 
+        activeMenuItem="profile" 
+        pageTitle="Student Profile"
+        breadcrumbs={[
+          { label: 'Home' },
+          { label: 'Student Profile' }
+        ]}
+      >
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
@@ -555,6 +557,7 @@ const StudentProfilePage: React.FC = () => {
 
       </Container>
     </StudentLayout>
+    </ErrorBoundary>
   );
 };
 

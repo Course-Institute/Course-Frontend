@@ -11,7 +11,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { useState } from 'react';
 import { useIdCardStats } from '../hooks/useIdCardStats';
-import StudentTable from './StudentTable';
+import IdCardStudentTable from './IdCardStudentTable';
 import IdCardPreview from './IdCardPreview';
 
 interface IdCardManagementProps {
@@ -22,7 +22,10 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
   const theme = useTheme();
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   
-  const { data: stats, isLoading: statsLoading } = useIdCardStats();
+  const { 
+    idCardStats: stats, 
+    isIdCardStatsLoading: statsLoading 
+  } = useIdCardStats();
 
   const handleStudentSelect = (studentId: string) => {
     setSelectedStudentId(studentId);
@@ -148,7 +151,7 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
           flexGrow: 1,
           minHeight: 400,
         }}>
-          {/* Student Table */}
+          {/* ID Card Student Table */}
           <Grid size={{ xs: 12, lg: selectedStudentId ? 8 : 12 }}>
             <Box sx={{ 
               height: '100%', 
@@ -156,7 +159,7 @@ const IdCardManagement = ({}: IdCardManagementProps = {}) => {
               flexDirection: 'column',
               minHeight: 400,
             }}>
-              <StudentTable
+              <IdCardStudentTable
                 onStudentSelect={handleStudentSelect}
                 selectedStudentId={selectedStudentId}
                 onExport={handleExport}

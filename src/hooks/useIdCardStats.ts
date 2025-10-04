@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import axiosInstance from '../api/axiosInstance';
 
 interface IdCardStats {
   totalStudents: number;
@@ -7,26 +8,29 @@ interface IdCardStats {
   rejectedApplications: number;
 }
 
-// Mock data for ID card statistics
-const mockIdCardStats: IdCardStats = {
-  totalStudents: 1247,
-  pendingIdCards: 23,
-  generatedIdCards: 1200,
-  rejectedApplications: 24,
-};
 
 const fetchIdCardStats = async (): Promise<IdCardStats> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 400));
-  
-  return mockIdCardStats;
+  const { data } = await axiosInstance.get('/api/id-card/stats');
+  return data?.data;
 };
 
 export const useIdCardStats = () => {
-  return useQuery<IdCardStats>({
+  const {
+    data: idCardStats,
+    isLoading: isIdCardStatsLoading,
+    error: idCardStatsError,
+    refetch: refetchIdCardStats,
+  } = useQuery({
     queryKey: ['idCardStats'],
     queryFn: fetchIdCardStats,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
+
+  return {
+    idCardStats,
+    isIdCardStatsLoading,
+    idCardStatsError,
+    refetchIdCardStats,
+  };
 };
