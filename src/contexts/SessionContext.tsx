@@ -60,16 +60,16 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
     setSessionTimeout(timeout);
 
-    // Update time remaining every second
+    // Update time remaining every 5 seconds to reduce performance impact
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
-        if (prev <= 1000) {
+        if (prev <= 5000) {
           clearInterval(interval);
           return 0;
         }
-        return prev - 1000;
+        return prev - 5000;
       });
-    }, 1000);
+    }, 5000);
 
     // Clean up interval when component unmounts or session ends
     return () => clearInterval(interval);

@@ -25,7 +25,7 @@ app.use(cors({
   origin: [
     'https://app.mivips.com',           // Production frontend
     'http://localhost:5173',            // Vite dev server
-    'http://localhost:3000',            // Alternative dev server
+    'http://localhost:4000',            // Alternative dev server
     'https://localhost:5173',           // HTTPS dev server
   ],
   credentials: true,
@@ -53,7 +53,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'https://app.mivips.com',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:4000'
   ];
   
   const origin = req.headers.origin;
