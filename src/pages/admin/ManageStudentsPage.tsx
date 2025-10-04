@@ -23,6 +23,7 @@ import {
 import { useStudentsData } from '../../hooks/useStudentsData';
 import { useStudentStatusUpdate } from '../../hooks/useStudentStatusUpdate';
 import Table, { type Column } from '../../components/core-components/Table';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const ManageStudentsPage = () => {
   const [searchTerm] = useState('');
@@ -178,14 +179,15 @@ const ManageStudentsPage = () => {
     },
   ];
   return (
-    <Box sx={{ 
-      width: '100%', 
-      // height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 3,
-      overflow: 'hidden',
-    }}>
+    <ErrorBoundary>
+      <Box sx={{ 
+        width: '100%', 
+        // height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        overflow: 'hidden',
+      }}>
 
 
       {/* Error Alert */}
@@ -514,6 +516,7 @@ const ManageStudentsPage = () => {
         </Alert>
       </Snackbar>
     </Box>
+    </ErrorBoundary>
   );
 };
 
