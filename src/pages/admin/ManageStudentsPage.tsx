@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -13,6 +13,7 @@ import {
   Alert,
   InputAdornment,
   Grid,
+  Snackbar,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -20,44 +21,71 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useStudentsData } from '../../hooks/useStudentsData';
+import { useStudentStatusUpdate } from '../../hooks/useStudentStatusUpdate';
 import Table, { type Column } from '../../components/core-components/Table';
 
 const ManageStudentsPage = () => {
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [allStudents, setAllStudents] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [searchTerm] = useState('');
+  const [registrationNo, setRegistrationNo] = useState('');
+  const [fullPayment, setFullPayment] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   
-  const { data: studentsData, isLoading, isError, error } = useStudentsData({ page, limit });
+  const { 
+    students, 
+    lastElementRef,
+    tableContainerRef,
+    isError, 
+    error, 
+    isFetchingNextPage
+  } = useStudentsData({ limit: 10 });
 
-  // Update allStudents when new data arrives
-  useEffect(() => {
-    if (studentsData?.data?.students) {
-      if (page === 1) {
-        setAllStudents(studentsData.data.students);
-      } else {
-        setAllStudents(prev => [...prev, ...studentsData.data.students]);
+  const { 
+    updateStudentStatus, 
+    isUpdating
+  } = useStudentStatusUpdate();
+
+  // Filter students based on search term
+  const filteredStudents = students.filter(student =>
+    student.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.registrationNo.includes(searchTerm) ||
+    student.emailAddress.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle status update
+  const handleStatusUpdate = () => {
+    if (!registrationNo.trim()) {
+      setSnackbarMessage('Please enter registration number');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    updateStudentStatus({
+      registrationNo: registrationNo.trim(),
+      fullPayment,
+    }, {
+      onSuccess: () => {
+        setSnackbarMessage('Student status updated successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        // Reset form
+        setRegistrationNo('');
+        setFullPayment(false);
+      },
+      onError: (error: any) => {
+        setSnackbarMessage(error?.message || 'Failed to update student status');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
-      setHasMore(studentsData.data.pagination.hasNextPage);
-    }
-  }, [studentsData, page, limit]);
+    });
+  };
 
-  // Infinite scroll handler
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5 && hasMore && !loadingMore && !isLoading) {
-      setLoadingMore(true);
-      setPage(prev => prev + 1);
-    }
-  }, [hasMore, loadingMore, isLoading]);
-
-  // Reset loading more when new data arrives
-  useEffect(() => {
-    if (studentsData) {
-      setLoadingMore(false);
-    }
-  }, [studentsData]);
+  // Handle snackbar close
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
 
   // Define table columns matching backend data structure
@@ -152,10 +180,11 @@ const ManageStudentsPage = () => {
   return (
     <Box sx={{ 
       width: '100%', 
-      minHeight: '100%',
+      // height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       gap: 3,
+      overflow: 'hidden',
     }}>
 
 
@@ -192,36 +221,50 @@ const ManageStudentsPage = () => {
               </Typography>
               <TextField
                 fullWidth
-                label="STUDENTS ID"
+                label="Registration Number"
                 variant="outlined"
+                value={registrationNo}
+                onChange={(e) => setRegistrationNo(e.target.value)}
                 sx={{ mb: 3 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
+                disabled={isUpdating}
+                placeholder="Enter registration number"
               />
               <Box sx={{ mb: 3 }}>
                 <FormControlLabel
-                  control={<Switch size="small" />}
+                  control={
+                    <Switch 
+                      size="small" 
+                      checked={fullPayment}
+                      onChange={(e) => setFullPayment(e.target.checked)}
+                      disabled={isUpdating}
+                    />
+                  }
                   label="FULL PAYMENT"
-                  sx={{ width: '100%', justifyContent: 'space-between' }}
+                  sx={{ width: '100%', justifyContent: 'space-between', }}
                 />
               </Box>
               <Button
                 variant="contained"
                 fullWidth
+                onClick={handleStatusUpdate}
+                disabled={isUpdating || !registrationNo.trim()}
                 sx={{
                   backgroundColor: '#3b82f6',
                   '&:hover': { backgroundColor: '#2563eb' },
+                  '&:disabled': { backgroundColor: '#9ca3af' },
                   textTransform: 'none',
                   borderRadius: 2,
                   py: 1.5,
                 }}
               >
-                SAVE
+                {isUpdating ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <CircularProgress size={16} color="inherit" />
+                    Updating...
+                  </Box>
+                ) : (
+                  'SAVE'
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -367,35 +410,35 @@ const ManageStudentsPage = () => {
       </Grid>
 
       {/* Students Data Table - Takes remaining space */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 400 }}>
-        {isLoading && page === 1 ? (
+      <Box sx={{ }}>
+        {isError ? (
           <Box sx={{ 
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center',
             flexGrow: 1,
-            p: 4 
+            p: 4 ,
+            height: '500px',
           }}>
             <CircularProgress size={40} />
           </Box>
         ) : (
           <Box 
-            sx={{ position: 'relative', height: '100%' }}
-            onScroll={handleScroll}
+            ref={tableContainerRef}
+            sx={{    height: '500px', display: 'flex', flexDirection: 'column' }}
           >
             <Table
               columns={columns}
-              rows={allStudents}
+              rows={filteredStudents}
               stickyHeader={true}
+              lastRowRef={lastElementRef as React.RefObject<HTMLTableRowElement>}
               tableContainerSx={{
                 height: '100%',
-                minHeight: '400px',
-                maxHeight: '600px',
+                maxHeight: '100%',
                 borderRadius: 3,
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 border: '1px solid #f1f5f9',
                 overflow: 'auto',
-                flexGrow: 1,
                 '&::-webkit-scrollbar': {
                   width: '8px',
                 },
@@ -435,16 +478,13 @@ const ManageStudentsPage = () => {
                 },
               }}
             />
-            {loadingMore && (
+            
+            {isFetchingNextPage && (
               <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center',
                 p: 2,
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(4px)',
               }}>
@@ -457,6 +497,22 @@ const ManageStudentsPage = () => {
           </Box>
         )}
       </Box>
+
+      {/* Success/Error Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

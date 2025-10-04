@@ -33,7 +33,16 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Get the current role before clearing
+      // Don't redirect if this is a login API call failure
+      const isLoginApi = error.config?.url?.includes('/user/admin-login') || 
+                        error.config?.url?.includes('/user/student-login');
+      
+      if (isLoginApi) {
+        // For login failures, just reject the promise without redirecting
+        return Promise.reject(error);
+      }
+      
+      // Get the current role before clearing (for authenticated API calls)
       const userRole = localStorage.getItem('userRole');
       
       // Clear auth data
