@@ -4,6 +4,7 @@ export interface Student {
   _id: string;
   registrationNo: string;
   candidateName: string;
+  dateOfBirth?: string;
   contactNumber: string;
   emailAddress: string;
   faculty: string;

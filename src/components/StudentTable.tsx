@@ -18,8 +18,9 @@ import {
   Skeleton,
 } from '@mui/material';
 import { Search, GetApp } from '@mui/icons-material';
-  import { useStudentList,type Student, type StudentListFilters } from '../hooks/useStudentList';
+import { useInfiniteStudents, type StudentListFilters } from '../hooks/useInfiniteStudents';
 import { useState } from 'react';
+import InfiniteScrollContainer from './InfiniteScrollContainer';
 
 interface StudentTableProps {
   onStudentSelect: (studentId: string) => void;
@@ -31,7 +32,19 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
   const theme = useTheme();
   const [filters, setFilters] = useState<StudentListFilters>({});
 
-  const { data: studentData, isLoading } = useStudentList(filters);
+  const {
+    data: studentsData,
+    isLoading,
+    isError,
+    error,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch
+  } = useInfiniteStudents(filters, 10);
+
+  // The useInfiniteData hook already returns flattened data
+  const students = studentsData || [];
 
   const handleFilterChange = (key: keyof StudentListFilters, value: string) => {
     setFilters(prev => ({
@@ -41,7 +54,7 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
   };
 
 
-  const handleRowClick = (student: Student) => {
+  const handleRowClick = (student: any) => {
     onStudentSelect(student._id);
   };
 
@@ -133,98 +146,102 @@ const StudentTable = ({ onStudentSelect, selectedStudentId, onExport }: StudentT
 
       {/* Table - Takes remaining space */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
-            flexGrow: 1,
-            height: '100%',
-            borderRadius: 3,
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #f1f5f9',
-            overflow: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#c1c1c1',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: '#a8a8a8',
-            },
-          }}
+        <InfiniteScrollContainer
+          onLoadMore={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isLoading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          error={isError ? error?.message : null}
+          onRetry={refetch}
+          height="100%"
+          maxHeight="600px"
+          loadingText="Loading more students..."
+          errorText="Failed to load students"
+          noMoreDataText="No more students to load"
+          showScrollToTop={true}
         >
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Registration No</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Contact</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Faculty</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Course</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Stream</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Year</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Session</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading ? (
-                // Loading skeleton
-                Array.from({ length: 8 }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                studentData?.students.map((student) => (
-                  <TableRow
-                    key={student._id}
-                    hover
-                    onClick={() => handleRowClick(student)}
-                    sx={{
-                      cursor: 'pointer',
-                      backgroundColor: selectedStudentId === student._id 
-                        ? theme.palette.primary.light + '20' 
-                        : 'transparent',
-                      '&:hover': {
+          <TableContainer 
+            component={Paper} 
+            sx={{ 
+              borderRadius: 3,
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #f1f5f9',
+              overflow: 'visible',
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Registration No</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>DOB</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Contact</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Faculty</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Course</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Stream</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Year</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Session</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {isLoading ? (
+                  // Loading skeleton
+                  Array.from({ length: 8 }).map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  students?.map((student: any) => (
+                    <TableRow
+                      key={student._id}
+                      hover
+                      onClick={() => handleRowClick(student)}
+                      sx={{
+                        cursor: 'pointer',
                         backgroundColor: selectedStudentId === student._id 
-                          ? theme.palette.primary.light + '30' 
-                          : theme.palette.grey[50],
-                      },
-                    }}
-                  >
-                    <TableCell>{student.registrationNo}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {student.candidateName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{student.contactNumber}</TableCell>
-                    <TableCell>{student.emailAddress}</TableCell>
-                    <TableCell>{student.faculty}</TableCell>
-                    <TableCell>{student.course}</TableCell>
-                    <TableCell>{student.stream}</TableCell>
-                    <TableCell>{student.year}</TableCell>
-                    <TableCell>{student.session}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                          ? theme.palette.primary.light + '20' 
+                          : 'transparent',
+                        '&:hover': {
+                          backgroundColor: selectedStudentId === student._id 
+                            ? theme.palette.primary.light + '30' 
+                            : theme.palette.grey[50],
+                        },
+                      }}
+                    >
+                      <TableCell>{student.registrationNo}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {student.candidateName}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString('en-GB') : 'N/A'}
+                      </TableCell>
+                      <TableCell>{student.contactNumber}</TableCell>
+                      <TableCell>{student.emailAddress}</TableCell>
+                      <TableCell>{student.faculty}</TableCell>
+                      <TableCell>{student.course}</TableCell>
+                      <TableCell>{student.stream}</TableCell>
+                      <TableCell>{student.year}</TableCell>
+                      <TableCell>{student.session}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </InfiniteScrollContainer>
 
         {/* Export Button */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2, flexShrink: 0 }}>

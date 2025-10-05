@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -19,45 +19,102 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
-import { useStudentsData } from '../../hooks/useStudentsData';
+import { useInfiniteStudents } from '../../hooks/useInfiniteStudents';
 import Table, { type Column } from '../../components/core-components/Table';
 
 const ManageStudentsPage = () => {
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [allStudents, setAllStudents] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [filters] = useState({});
+  const tableContainerRef = useRef<HTMLDivElement>(null);
   
-  const { data: studentsData, isLoading, isError, error } = useStudentsData({ page, limit });
+  const {
+    data: students,
+    isLoading,
+    isError,
+    error,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage
+  } = useInfiniteStudents(filters, 10);
 
-  // Update allStudents when new data arrives
+  // The useInfiniteData hook already returns flattened data
+  const allStudents = students || [];
+
+  // Debug logging
   useEffect(() => {
-    if (studentsData?.data?.students) {
-      if (page === 1) {
-        setAllStudents(studentsData.data.students);
-      } else {
-        setAllStudents(prev => [...prev, ...studentsData.data.students]);
+    console.log('Students data structure:', {
+      students,
+      allStudents,
+      hasNextPage,
+      isFetchingNextPage,
+      isLoading,
+      isError,
+      error,
+      totalStudents: allStudents.length
+    });
+  }, [students, allStudents, hasNextPage, isFetchingNextPage, isLoading, isError, error]);
+
+  // Test API call directly and check authentication
+  useEffect(() => {
+    const testAPI = async () => {
+      try {
+        console.log('Testing API call directly...');
+        console.log('Auth token:', localStorage.getItem('authToken'));
+        console.log('User role:', localStorage.getItem('userRole'));
+        console.log('Backend API:', import.meta.env.VITE_APP_ENDPOINT || 'https://mivpsa.in/');
+        
+        const { getStudentsData } = await import('../../api/studentsApi');
+        const result = await getStudentsData(1, 10);
+        console.log('Direct API call result:', result);
+      } catch (error) {
+        console.error('Direct API call error:', error);
+        console.error('Error details:', {
+          message: (error as any).message,
+          response: (error as any).response?.data,
+          status: (error as any).response?.status
+        });
       }
-      setHasMore(studentsData.data.pagination.hasNextPage);
-    }
-  }, [studentsData, page, limit]);
+    };
+    testAPI();
+  }, []);
 
-  // Infinite scroll handler
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5 && hasMore && !loadingMore && !isLoading) {
-      setLoadingMore(true);
-      setPage(prev => prev + 1);
-    }
-  }, [hasMore, loadingMore, isLoading]);
-
-  // Reset loading more when new data arrives
+  // Direct scroll event listener
   useEffect(() => {
-    if (studentsData) {
-      setLoadingMore(false);
-    }
-  }, [studentsData]);
+    const tableContainer = tableContainerRef.current;
+    if (!tableContainer) return;
+
+    const handleDirectScroll = (event: Event) => {
+      const target = event.target as HTMLDivElement;
+      const { scrollTop, scrollHeight, clientHeight } = target;
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      
+      console.log('Direct scroll event:', {
+        scrollTop,
+        scrollHeight,
+        clientHeight,
+        distanceFromBottom,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading
+      });
+      
+      if (
+        distanceFromBottom <= 100 &&
+        hasNextPage &&
+        !isFetchingNextPage &&
+        !isLoading
+      ) {
+        console.log('Direct scroll: Fetching next page...');
+        fetchNextPage();
+      }
+    };
+
+    tableContainer.addEventListener('scroll', handleDirectScroll);
+    
+    return () => {
+      tableContainer.removeEventListener('scroll', handleDirectScroll);
+    };
+  }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
+
 
 
   // Define table columns matching backend data structure
@@ -71,6 +128,15 @@ const ManageStudentsPage = () => {
       field: 'candidateName',
       headerName: 'Student Name',
       minWidth: '150px',
+    },
+    {
+      field: 'dateOfBirth', // Try: 'dob', 'birthDate', 'dateOfBirth', etc.
+      headerName: 'DOB',
+      width: '100px',
+      align: 'center',
+      renderCell: (value: string) => {
+        return value ? new Date(value).toLocaleDateString('en-GB') : 'N/A';
+      },
     },
     {
       field: 'course',
@@ -159,10 +225,53 @@ const ManageStudentsPage = () => {
     }}>
 
 
+      {/* Debug Info - Remove this after testing */}
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <strong>Scroll Debug:</strong>
+        <div>Students Count: {allStudents.length}</div>
+        <div>Has Next Page: {hasNextPage ? 'Yes' : 'No'}</div>
+        <div>Is Fetching Next: {isFetchingNextPage ? 'Yes' : 'No'}</div>
+        <div>Is Loading: {isLoading ? 'Yes' : 'No'}</div>
+        <Button 
+          variant="outlined" 
+          size="small" 
+          onClick={() => {
+            console.log('Manual fetch test');
+            console.log('hasNextPage:', hasNextPage);
+            console.log('isFetchingNextPage:', isFetchingNextPage);
+            console.log('isLoading:', isLoading);
+            if (hasNextPage && !isFetchingNextPage && !isLoading) {
+              console.log('Calling fetchNextPage...');
+              fetchNextPage();
+            } else {
+              console.log('Cannot fetch next page - conditions not met');
+            }
+          }}
+          sx={{ mt: 1 }}
+        >
+          Test Fetch Next Page
+        </Button>
+      </Alert>
+
       {/* Error Alert */}
       {isError && (
         <Alert severity="error" sx={{ mb: 3 }}>
           Failed to load students data: {error?.message || 'Unknown error'}
+          {(error as any)?.response?.status === 401 && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Authentication Error:</strong> Please login again.
+            </div>
+          )}
+          {(error as any)?.response?.status === 403 && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Access Denied:</strong> You don't have permission to access this data.
+            </div>
+          )}
+          {(error as any)?.code === 'NETWORK_ERROR' && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Network Error:</strong> Please check your internet connection.
+            </div>
+          )}
         </Alert>
       )}
 
@@ -368,7 +477,7 @@ const ManageStudentsPage = () => {
 
       {/* Students Data Table - Takes remaining space */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 400 }}>
-        {isLoading && page === 1 ? (
+        {isLoading && !students?.length ? (
           <Box sx={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -379,23 +488,15 @@ const ManageStudentsPage = () => {
             <CircularProgress size={40} />
           </Box>
         ) : (
-          <Box 
-            sx={{ position: 'relative', height: '100%' }}
-            onScroll={handleScroll}
-          >
-            <Table
-              columns={columns}
-              rows={allStudents}
-              stickyHeader={true}
-              tableContainerSx={{
-                height: '100%',
-                minHeight: '400px',
-                maxHeight: '600px',
+          <Box sx={{ position: 'relative', height: '100%', flexGrow: 1 }}>
+            <Box
+              ref={tableContainerRef}
+              sx={{
+                height: '300px',
+                overflow: 'auto',
+                border: '1px solid #f1f5f9',
                 borderRadius: 3,
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #f1f5f9',
-                overflow: 'auto',
-                flexGrow: 1,
                 '&::-webkit-scrollbar': {
                   width: '8px',
                 },
@@ -410,32 +511,23 @@ const ManageStudentsPage = () => {
                 '&::-webkit-scrollbar-thumb:hover': {
                   background: '#a8a8a8',
                 },
-                '& .MuiTable-root': {
-                  '& .MuiTableHead-root': {
-                    '& .MuiTableCell-root': {
-                      backgroundColor: '#f5f5f5',
-                      color: '#333',
-                      fontWeight: 'bold',
-                      borderBottom: '2px solid #e0e0e0',
-                      position: 'sticky',
-                      top: 0,
-                      zIndex: 1,
-                    },
-                  },
-                  '& .MuiTableBody-root': {
-                    '& .MuiTableRow-root': {
-                      '&:hover': {
-                        backgroundColor: '#e3f2fd !important',
-                      },
-                      '& .MuiTableCell-root': {
-                        borderBottom: '1px solid #f0f0f0',
-                      },
-                    },
-                  },
-                },
               }}
-            />
-            {loadingMore && (
+            >
+              <Table
+                columns={columns}
+                rows={allStudents}
+                stickyHeader={true}
+                tableContainerSx={{
+                  height: 'auto',
+                  minHeight: 'auto',
+                  maxHeight: 'none',
+                  overflow: 'visible',
+                  boxShadow: 'none',
+                  border: 'none',
+                }}
+              />
+            </Box>
+            {isFetchingNextPage && (
               <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
@@ -447,6 +539,7 @@ const ManageStudentsPage = () => {
                 right: 0,
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(4px)',
+                zIndex: 2,
               }}>
                 <CircularProgress size={24} />
                 <Typography variant="body2" sx={{ ml: 1 }}>

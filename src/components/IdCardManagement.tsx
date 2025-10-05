@@ -3,209 +3,71 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
-  useTheme,
   Button,
-  Skeleton,
+  Container,
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
-import { useState } from 'react';
-import { useIdCardStats } from '../hooks/useIdCardStats';
-import StudentTable from './StudentTable';
-import IdCardPreview from './IdCardPreview';
+import { CreditCard, ArrowForward } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 interface IdCardManagementProps {
   sidebarOpen?: boolean;
 }
 
 const IdCardManagement = ({}: IdCardManagementProps = {}) => {
-  const theme = useTheme();
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  
-  const { data: stats, isLoading: statsLoading } = useIdCardStats();
+  const navigate = useNavigate();
 
-  const handleStudentSelect = (studentId: string) => {
-    setSelectedStudentId(studentId);
+  const handleGenerateIdCard = () => {
+    navigate('/admin/generate-id-card');
   };
-
-  const handleExport = () => {
-    // Handle export functionality
-    console.log('Exporting data...');
-  };
-
-  const handleBulkGenerate = () => {
-    // Handle bulk generate functionality
-    console.log('Bulk generating ID cards...');
-  };
-
-  const statsCards = [
-    {
-      title: 'Total Students',
-      value: stats?.totalStudents || 0,
-      color: theme.palette.primary.main,
-    },
-    {
-      title: 'Pending ID Cards',
-      value: stats?.pendingIdCards || 0,
-      color: theme.palette.warning.main,
-    },
-    {
-      title: 'Generated ID Cards',
-      value: stats?.generatedIdCards || 0,
-      color: theme.palette.success.main,
-    },
-    {
-      title: 'Rejected Applications',
-      value: stats?.rejectedApplications || 0,
-      color: theme.palette.error.main,
-    },
-  ];
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        minHeight: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 3,
-        boxSizing: 'border-box',
-      }}
-    >
-      {/* Page Title */}
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 'bold',
-          color: theme.palette.text.primary,
-          flexShrink: 0,
-        }}
-      >
-        ID Card Management
-      </Typography>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+          ID Card Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Generate and manage student ID cards
+        </Typography>
 
-      {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ flexShrink: 0 }}>
-        {statsCards.map((stat, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-            <Card
+        <Card
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #f1f5f9',
+          }}
+        >
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 3 }}>
+              Generate Student ID Card
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Click the button below to generate a new student ID card
+            </Typography>
+            
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<CreditCard />}
+              endIcon={<ArrowForward />}
+              onClick={handleGenerateIdCard}
               sx={{
-                height: '100%',
-                background: 'white',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                border: '1px solid rgba(0,0,0,0.05)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-                },
+                backgroundColor: '#3b82f6',
+                '&:hover': { backgroundColor: '#2563eb' },
+                textTransform: 'none',
+                borderRadius: 2,
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
               }}
             >
-              <CardContent sx={{ p: 3 }}>
-                {statsLoading ? (
-                  <>
-                    <Skeleton variant="text" width="60%" height={24} />
-                    <Skeleton variant="text" width="40%" height={32} sx={{ mt: 1 }} />
-                  </>
-                ) : (
-                  <>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 'bold',
-                        color: stat.color,
-                        fontSize: '1.5rem',
-                        mb: 1,
-                      }}
-                    >
-                      {stat.value.toLocaleString()}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {stat.title}
-                    </Typography>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-        {/* Main Content - Takes remaining space */}
-        <Box sx={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 500,
-        }}>
-        <Grid container spacing={3} sx={{ 
-          flexGrow: 1,
-          minHeight: 400,
-        }}>
-          {/* Student Table */}
-          <Grid size={{ xs: 12, lg: selectedStudentId ? 8 : 12 }}>
-            <Box sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              minHeight: 400,
-            }}>
-              <StudentTable
-                onStudentSelect={handleStudentSelect}
-                selectedStudentId={selectedStudentId}
-                onExport={handleExport}
-              />
-            </Box>
-          </Grid>
-
-          {/* ID Card Preview */}
-          {selectedStudentId && (
-            <Grid size={{ xs: 12, lg: 4 }}>
-            <Box sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: 2,
-              minHeight: 400,
-            }}>
-                <Box sx={{ 
-                  flexGrow: 1,
-                  minHeight: 0,
-                  overflow: 'auto',
-                }}>
-                  <IdCardPreview selectedStudentId={selectedStudentId} />
-                </Box>
-                
-                {/* Bulk Generate Button */}
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={handleBulkGenerate}
-                  sx={{
-                    alignSelf: 'flex-start',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    backgroundColor: theme.palette.secondary.main,
-                    '&:hover': {
-                      backgroundColor: theme.palette.secondary.dark,
-                    },
-                    flexShrink: 0,
-                  }}
-                >
-                  Bulk Generate
-                </Button>
-              </Box>
-            </Grid>
-          )}
-        </Grid>
+              Generate ID Card
+            </Button>
+          </CardContent>
+        </Card>
       </Box>
-    </Box>
+    </Container>
   );
 };
 
