@@ -1,223 +1,184 @@
+import React from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Avatar,
-  useTheme,
-  Skeleton,
+  Chip,
+  Divider,
 } from '@mui/material';
-import { useStudentDetails } from '../hooks/useStudentDetails';
+import { Person, School } from '@mui/icons-material';
 
 interface IdCardPreviewProps {
-  selectedStudentId: string | null;
+  student?: {
+    _id: string;
+    candidateName: string;
+    registrationNo: string;
+    course: string;
+    faculty: string;
+    stream: string;
+    year: string;
+    session: string;
+    contactNumber?: string;
+    emailAddress?: string;
+    dateOfBirth?: string;
+  };
+  instituteName?: string;
+  instituteLogo?: string;
 }
 
-const IdCardPreview = ({ selectedStudentId }: IdCardPreviewProps) => {
-  const theme = useTheme();
-  const { data: student, isLoading } = useStudentDetails(selectedStudentId);
-
-  if (!selectedStudentId) {
+const IdCardPreview: React.FC<IdCardPreviewProps> = ({
+  student,
+  instituteName = "MIVPSA Institute",
+  instituteLogo
+}) => {
+  if (!student) {
     return (
-      <Box sx={{ width: 300 }}>
-        <Typography variant="h1" sx={{ mb: 2, color: 'text.secondary' }}>
-          ID Card Preview
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: 400,
+          height: 250,
+          border: '2px dashed #ccc',
+          borderRadius: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          No student selected
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 400,
-            border: `2px dashed ${theme.palette.grey[300]}`,
-            borderRadius: 2,
-            backgroundColor: theme.palette.grey[50],
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            Select a student to preview ID card
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <Box sx={{ width: 300 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          ID Card Preview
-        </Typography>
-        <Card sx={{ width: 280, height: 400 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Skeleton variant="text" width="60%" height={24} sx={{ mb: 1 }} />
-            <Skeleton variant="circular" width={80} height={80} sx={{ mb: 2 }} />
-            <Skeleton variant="text" width="80%" height={20} sx={{ mb: 1 }} />
-            <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
-            <Skeleton variant="text" width="70%" height={20} sx={{ mb: 1 }} />
-            <Skeleton variant="text" width="50%" height={20} />
-          </CardContent>
-        </Card>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ width: 400 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        ID Card Preview
-      </Typography>
-      <Card
+    <Card
+      sx={{
+        width: '100%',
+        maxWidth: 400,
+        height: 250,
+        borderRadius: 3,
+        boxShadow: 3,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Background Pattern */}
+      <Box
         sx={{
-          width: 280,
-          height: 400,
-          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 100,
-            height: 100,
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '50%',
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: -30,
-            left: -30,
-            width: 80,
-            height: 80,
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '50%',
-          },
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 100,
+          height: 100,
+          background: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '50%',
+          transform: 'translate(30px, -30px)',
         }}
-      >
-        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
-          {/* Institution Name */}
-          <Typography
-            variant="h6"
-            sx={{
-              textAlign: 'center',
-              fontWeight: 'bold',
-              mb: 3,
-              fontSize: '1.1rem',
-            }}
-          >
-            VIET ACADEMY
-          </Typography>
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: 80,
+          height: 80,
+          background: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '50%',
+          transform: 'translate(-20px, 20px)',
+        }}
+      />
 
-          {/* Student Photo */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+      <CardContent sx={{ p: 2, height: '100%', position: 'relative', zIndex: 1 }}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+              {instituteName}
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              Student ID Card
+            </Typography>
+          </Box>
+          {instituteLogo && (
             <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                border: '3px solid white',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-              }}
-            >
-              {student?.candidateName?.charAt(0)}
-            </Avatar>
-          </Box>
+              src={instituteLogo}
+              sx={{ width: 40, height: 40, border: '2px solid white' }}
+            />
+          )}
+        </Box>
 
-          {/* Student Details */}
-          <Box sx={{ mb: 2 }}>
-            <Typography
-              variant="body1"
-              sx={{
-                fontWeight: 'bold',
-                textAlign: 'center',
-                mb: 1,
-                fontSize: '1rem',
-              }}
-            >
-              {student?.candidateName}
+        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.3)', mb: 2 }} />
+
+        {/* Student Info */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Person sx={{ fontSize: 16, mr: 1 }} />
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+              {student.candidateName}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: 'center',
-                mb: 0.5,
-                opacity: 0.9,
-                fontSize: '0.9rem',
-              }}
-            >
-              {student?.registrationNo}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: 'center',
-                mb: 0.5,
-                opacity: 0.9,
-                fontSize: '0.9rem',
-              }}
-            >
-              {student?.course} - {student?.stream}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: 'center',
-                opacity: 0.9,
-                fontSize: '0.9rem',
-              }}
-            >
-              {student?.year} - {student?.session}
+          </Box>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <School sx={{ fontSize: 16, mr: 1 }} />
+            <Typography variant="caption">
+              {student.course} - {student.stream}
             </Typography>
           </Box>
 
-          {/* QR Code */}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-              height: 60,
-            }}
-          >
-            {student?.qrCode ? (
-              <Box
-                component="img"
-                src={student.qrCode}
-                alt="QR Code"
-                sx={{
-                  width: 50,
-                  height: 50,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  p: 0.5,
-                }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: 50,
-                  height: 50,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'black', fontSize: '8px', textAlign: 'center' }}
-                >
-                  QR Code
-                </Typography>
-              </Box>
-            )}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              Reg No: {student.registrationNo}
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              Year: {student.year}
+            </Typography>
           </Box>
-        </CardContent>
-      </Card>
-    </Box>
+
+          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+            <Chip
+              label={student.faculty}
+              size="small"
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                fontSize: '0.7rem',
+                height: 20,
+              }}
+            />
+            <Chip
+              label={student.session}
+              size="small"
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                fontSize: '0.7rem',
+                height: 20,
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            fontSize: '0.6rem',
+            opacity: 0.8,
+          }}
+        >
+          Valid for Academic Year {student.year}
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
