@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
@@ -25,6 +25,7 @@ import { loginUser, type LoginResponse } from '../api/authApi';
 import { useSession } from '../contexts/SessionContext';
 import Navbar from '../components/Navbar';
 import DateInput from '../components/DateInput';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -43,7 +44,9 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const loginMutation = useMutation<LoginResponse, Error, { email?: string; password?: string; registrationNumber?: string; dateOfBirth?: string; role: string }>({
+  const loginMutation = useMutation<LoginResponse, Error, { email?: string; password?: string; registrationNumber?: string; dateOfBirth?: string; role: string }>(
+
+    {
     mutationFn: loginUser,
     onSuccess: (data) => {
       // Handle successful login
@@ -89,16 +92,16 @@ const LoginPage = () => {
     },
   });
 
-  const handleInputChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [field]: event.target.value,
     }));
     if (error) setError(''); // Clear error when user starts typing
-  };
+  }, [error]);
 
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
     
     // Validate based on role
@@ -128,10 +131,9 @@ const LoginPage = () => {
         };
 
     loginMutation.mutate(credentials);
+  }, [formData, role, loginMutation]);
 
-  };
-
-  const getTitle = () => {
+  const getTitle = useCallback(() => {
     switch (role.toLowerCase()) {
       case 'student':
         return 'Student Login';
@@ -142,9 +144,9 @@ const LoginPage = () => {
       default:
         return 'Welcome Back';
     }
-  };
+  }, [role]);
 
-  const getSubtitle = () => {
+  const getSubtitle = useCallback(() => {
     switch (role.toLowerCase()) {
       case 'student':
         return 'Please sign in to your student account';
@@ -155,10 +157,11 @@ const LoginPage = () => {
       default:
         return 'Please sign in to your corporate account';
     }
-  };
+  }, [role]);
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <ErrorBoundary>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Navbar */}
       <Navbar />
       
@@ -296,6 +299,7 @@ const LoginPage = () => {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={handleInputChange('password')}
+                    autoComplete="current-password"
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
@@ -377,6 +381,7 @@ const LoginPage = () => {
       </Container>
       </Box>
     </Box>
+    </ErrorBoundary>
   );
 };
 
