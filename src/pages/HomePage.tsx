@@ -7,18 +7,21 @@ import AboutSection from '../components/AboutSection';
 import StatisticsSection from '../components/StatisticsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import FooterSection from '../components/FooterSection';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const HomePage = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <StatisticsSection />
-      <TestimonialsSection />
-      <FooterSection />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Navbar />
+        <HeroSection />
+        <AboutSection />
+        <StatisticsSection />
+        <TestimonialsSection />
+        <FooterSection />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 

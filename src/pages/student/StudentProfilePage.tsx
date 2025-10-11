@@ -20,6 +20,7 @@ import { useStudentProfile } from '../../hooks/useStudentProfile';
 import { Button } from '@mui/material';
 import { CreditCard } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const StudentProfilePage: React.FC = () => {
   const { data: profile, isLoading, isError, error } = useStudentProfile();
@@ -90,14 +91,15 @@ const StudentProfilePage: React.FC = () => {
   }
 
   return (
-    <StudentLayout 
-      activeMenuItem="profile" 
-      pageTitle="Student Profile"
-      breadcrumbs={[
-        { label: 'Home' },
-        { label: 'Student Profile' }
-      ]}
-    >
+    <ErrorBoundary>
+      <StudentLayout 
+        activeMenuItem="profile" 
+        pageTitle="Student Profile"
+        breadcrumbs={[
+          { label: 'Home' },
+          { label: 'Student Profile' }
+        ]}
+      >
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
@@ -382,6 +384,7 @@ const StudentProfilePage: React.FC = () => {
 
       </Container>
     </StudentLayout>
+    </ErrorBoundary>
   );
 };
 

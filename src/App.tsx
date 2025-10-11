@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CoursesPage from './pages/CoursesPage';
 import LoginPage from './pages/LoginPage';
+import NotFoundPage from './pages/NotFoundPage';
 import AdminLayout from './components/admin/AdminLayout';
 import DashboardPage from './pages/admin/DashboardPage';
 import AddStudentPage from './pages/admin/AddStudentPage';
@@ -14,13 +15,15 @@ import CenterManagementPage from './pages/admin/CenterManagementPage';
 import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import { SessionProvider } from './contexts/SessionContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
 
 function App() {
   return (
-    <Router>
-      <SessionProvider>
-        <ToastProvider>
+    <ErrorBoundary>
+      <Router>
+        <SessionProvider>
+          <ToastProvider>
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
@@ -71,10 +74,15 @@ function App() {
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
+          
+          {/* 404 Route - Must be last */}
+          <Route path="*" element={<NotFoundPage />} />
           </Routes>
+        
         </ToastProvider>
       </SessionProvider>
     </Router>
+    </ErrorBoundary>
   );
 }
 
