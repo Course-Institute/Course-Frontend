@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import Button from '../Button/Button';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -54,7 +54,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(() => ({
   minWidth: '100px',
 }));
 
@@ -111,7 +111,7 @@ function ConfirmationDialog(props: ConfirmationDialogProps) {
               props.handleClose();
             }}
           >
-            <Typography variant="body" color={action.textColor}>
+            <Typography variant="body1" color={action.textColor}>
               {action.text}
             </Typography>
           </StyledButton>

@@ -40,11 +40,11 @@ interface IdCardPreviewData {
   updatedAt: string;
 }
 
-interface IdCardPreviewResponse {
-  status: boolean;
-  message: string;
-  data: IdCardPreviewData;
-}
+// interface IdCardPreviewResponse {
+//   status: boolean;
+//   message: string;
+//   data: IdCardPreviewData;
+// }
 
 const fetchIdCardPreview = async (studentId: string): Promise<IdCardPreviewData> => {
   const { data } = await axiosInstance.get(`/api/id-card/preview/${studentId}`);

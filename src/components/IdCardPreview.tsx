@@ -55,10 +55,10 @@ const IdCardPreview: React.FC<IdCardPreviewProps> = ({
     );
   }
 
-  const handleDownloadIdCard = () => {
-    // TODO: Implement ID card download functionality
-    console.log('Downloading ID card for:', student?.candidateName);
-  };
+  // const _handleDownloadIdCard = () => {
+  //   // TODO: Implement ID card download functionality
+  //   console.log('Downloading ID card for:', student?.candidateName);
+  // };
 
   return (
     <Card
