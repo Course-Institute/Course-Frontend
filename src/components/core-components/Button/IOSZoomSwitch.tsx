@@ -1,7 +1,7 @@
 import React from 'react';
-import { Switch, SwitchProps, Box, Typography } from '@mui/material';
+import { Switch, type SwitchProps, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
-import { Theme } from '@mui/material/styles';
+import { type Theme } from '@mui/material/styles';
 
 // Custom styled iOS switch with "On"/"Off" text inside the thumb
 const IOSSwitch = styled((props: SwitchProps) => (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Box, SxProps, Theme } from '@mui/material';
+import { Grid, Box, type SxProps, type Theme } from '@mui/material';
 
 export interface CoreIconButtonProps {
   onClick: () => void;

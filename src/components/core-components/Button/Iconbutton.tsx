@@ -1,6 +1,6 @@
 import React from 'react';
-import { IconButton as MuiIconButton, IconButtonProps as MuiIconButtonProps } from '@mui/material';
-import { SvgIconComponent } from '@mui/icons-material';
+import { IconButton as MuiIconButton, type IconButtonProps as MuiIconButtonProps } from '@mui/material';
+import { type SvgIconComponent } from '@mui/icons-material';
 
 interface CustomIconButtonProps extends MuiIconButtonProps {
   icon: SvgIconComponent;

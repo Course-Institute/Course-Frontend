@@ -91,7 +91,7 @@ const IdCardStudentTable = ({ onStudentSelect, selectedStudentId, onExport }: Id
       onSuccess: () => {
         console.log('ID card generated successfully for:', registrationNo);
       },
-      onError: (error) => {
+      onError: (error: any) => {
         console.error('Error generating ID card:', error);
       }
     });

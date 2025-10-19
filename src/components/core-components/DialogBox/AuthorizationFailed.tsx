@@ -4,14 +4,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Primary } from '../../color-palette/colors';
+// import { Primary } from '../../color-palette/colors';
 import { Box } from '@mui/material';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const AuthorizationFailed = ({ isFeature }: any) => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
-  const [params] = useSearchParams();
+  const [_params] = useSearchParams();
 
   const handleClose = () => {
     setOpen(false);
@@ -57,7 +57,7 @@ const AuthorizationFailed = ({ isFeature }: any) => {
             disableElevation
             fullWidth
             sx={{
-              background: Primary[500],
+              background: '#1976d2',
               padding: '0.5rem',
             }}
             onClick={() => (navigate as any)(-1, { replace: true })}

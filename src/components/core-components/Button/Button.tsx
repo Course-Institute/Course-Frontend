@@ -1,5 +1,5 @@
-import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
-import React, { ReactNode } from 'react';
+import { Button as MuiButton, type ButtonProps as MuiButtonProps } from '@mui/material';
+import React, { type ReactNode } from 'react';
 
 interface Buttonprops extends MuiButtonProps {
   children: ReactNode;
@@ -7,7 +7,7 @@ interface Buttonprops extends MuiButtonProps {
   height?: string | number;
 }
 const Button: React.FC<Buttonprops> = ({
-  color = 'Primary',
+  color = 'primary',
   variant = 'contained',
   width,
   height,

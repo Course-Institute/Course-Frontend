@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
+import { Button as MuiButton, type ButtonProps as MuiButtonProps } from '@mui/material';
+import { Link as RouterLink, type LinkProps as RouterLinkProps } from 'react-router-dom';
 
 interface LinkButtonProps extends MuiButtonProps {
   to: RouterLinkProps['to'];

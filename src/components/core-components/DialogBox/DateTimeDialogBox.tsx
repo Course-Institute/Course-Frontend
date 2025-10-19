@@ -1,8 +1,6 @@
 import React from 'react';
 import DialogBox from '../DialogBox/DialogBox';
 import { Box, Stack, Typography, Divider } from '@mui/material';
-import { StaticDatePicker, TimePicker } from '@mui/x-date-pickers';
-import SaveCancelButtons from '../SaveCancelComponent/SaveCancelButtons';
 
 interface DateTimeDialogBoxProps {
   open: boolean;
@@ -20,40 +18,40 @@ const DateTimeDialogBox: React.FC<DateTimeDialogBoxProps> = ({
   onClose,
   onSave,
   value,
-  setValue,
+  setValue: _setValue,
   title = 'Date and Time',
   granularity,
-  setGranularity,
+  setGranularity: _setGranularity,
 }) => {
-  const handleDateChange = (date: Date | null) => {
-    if (!date && value) {
-      setValue(null);
-      return;
-    }
-    if (date && value) {
-      const newDate = new Date(date);
-      newDate.setHours(value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());
-      setValue(newDate);
-    } else {
-      setValue(date);
-    }
-  };
+  // const _handleDateChange = (date: Date | null) => {
+  //   if (!date && value) {
+  //     setValue(null);
+  //     return;
+  //   }
+  //   if (date && value) {
+  //     const newDate = new Date(date);
+  //     newDate.setHours(value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());
+  //     setValue(newDate);
+  //   } else {
+  //     setValue(date);
+  //   }
+  // };
 
-  const handleTimeChange = (time: Date | null) => {
-    if (!time && value) {
-      setValue(null);
-      return;
-    }
-    if (time && value) {
-      const newDate = new Date(value);
-      newDate.setHours(time.getHours(), time.getMinutes(), 0, 0); 
-      setValue(newDate);
-    } else if (time) {
-      const newDate = new Date(time);
-      newDate.setSeconds(0, 0);
-      setValue(newDate);
-    }
-  };
+  // const _handleTimeChange = (time: Date | null) => {
+  //   if (!time && value) {
+  //     setValue(null);
+  //     return;
+  //   }
+  //   if (time && value) {
+  //     const newDate = new Date(value);
+  //     newDate.setHours(time.getHours(), time.getMinutes(), 0, 0); 
+  //     setValue(newDate);
+  //   } else if (time) {
+  //     const newDate = new Date(time);
+  //     newDate.setSeconds(0, 0);
+  //     setValue(newDate);
+  //   }
+  // };
 
   const handleSave = () => {
     onSave({
@@ -79,12 +77,9 @@ const DateTimeDialogBox: React.FC<DateTimeDialogBoxProps> = ({
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, minWidth: 350, bgcolor: '#fafbfc', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 420, justifyContent: 'flex-start', p: 2 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Date</Typography>
-            <StaticDatePicker
-              displayStaticWrapperAs="desktop"
-              value={value}
-              onChange={handleDateChange}
-              maxDate={new Date()}
-            />
+            <Typography variant="body2">
+              Date picker component would go here
+            </Typography>
           </Box>
       
           </Box>
@@ -92,11 +87,9 @@ const DateTimeDialogBox: React.FC<DateTimeDialogBoxProps> = ({
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, minWidth: 350, bgcolor: '#fafbfc', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 420, justifyContent: 'flex-start', p: 2 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Time</Typography>
-            <TimePicker
-              value={value}
-              onChange={handleTimeChange}
-              ampm={false}
-            />
+            <Typography variant="body2">
+              Time picker component would go here
+            </Typography>
 
           </Box>
 
@@ -107,19 +100,15 @@ const DateTimeDialogBox: React.FC<DateTimeDialogBoxProps> = ({
         
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <SaveCancelButtons
-          onSave={handleSave}
-          onCancel={onClose}
-          cancelButtonStyle={{
-            width: { xs: '50%', sm: '50%', md: '12%' },
-          }}
-          saveButtonStyle={{
-            width: { xs: '50%', sm: '50%', md: '12%' },
-          }}
-        />
+        <button onClick={onClose}>
+          Cancel
+        </button>
+        <button onClick={handleSave}>
+          Save
+        </button>
       </Box>
     </DialogBox>
   );
 };
 
-export default DateTimeDialogBox; 
+export default DateTimeDialogBox;

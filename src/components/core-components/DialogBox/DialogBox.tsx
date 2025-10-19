@@ -7,7 +7,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { MouseEventHandler } from 'react';
+import { type MouseEventHandler } from 'react';
 import CloseIcon from '@mui/icons-material/Close'; // Importing the close icon
 import Button from '../Button/Button';
 
@@ -73,14 +73,14 @@ const DialogBoxStyle = styled(MuiDialog, {
   })
 );
 
-const DialogTitleContainer = styled('div')(({ theme }) => ({
+const DialogTitleContainer = styled('div')(() => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   // padding: theme.spacing(0), // Adjusted padding
 }));
 
-const DialogTitle = styled(MuiDialogTitle)(({ theme }) => ({
+const DialogTitle = styled(MuiDialogTitle)(() => ({
   margin: 0,
   // padding: theme.spacing(2),
   paddingRight: 0, // Adjust padding right for close button alignment
@@ -95,7 +95,7 @@ export default function DialogBox(props: any) {
       <DialogBoxStyle
         maxWidth={props.maxWidth}
         minWidth={props.minWidth}
-        onClose={(event, reason) => {
+        onClose={(_, reason) => {
           if (disableBackdropClick && reason === 'backdropClick') {
             return;
           }
@@ -120,7 +120,7 @@ export default function DialogBox(props: any) {
             sx={{ display: 'flex', alignItems: 'center', padding: '0', ...titleProps }}
             id="customized-dialog-title"
           > 
-            <Typography fontSize={props.TitlefontSize} letterSpacing={0} variant="title" sx={centerTitle ? { textAlign: 'center', width: '100%' } : {}}>
+            <Typography fontSize={props.TitlefontSize} letterSpacing={0} variant="h6" sx={centerTitle ? { textAlign: 'center', width: '100%' } : {}}>
               {props.title}
             </Typography>
           </DialogTitle>
