@@ -39,7 +39,7 @@ export const useDownloadReport = () => {
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: downloadReport,
-    onSuccess: (response, variables) => {
+    onSuccess: (response) => {
       // Create download link and trigger download
       const { downloadUrl, fileName } = response.data;
       
