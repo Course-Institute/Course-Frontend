@@ -32,6 +32,7 @@ interface ReusableTableProps {
   lastRowRef?: React.RefObject<HTMLTableRowElement>;
   selectedRow?: number;
   onRowSelect?: (rowIndex: number) => void;
+  onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   scrollbarWidth?: string;
   headerHeight?: string | number;
   tableContainerSx?: any
@@ -45,6 +46,7 @@ const Table: React.FC<ReusableTableProps> = ({
   lastRowRef,
   onRowSelect,
   selectedRow,
+  onScroll,
   scrollbarWidth,
   headerHeight,
   tableContainerSx={}
@@ -58,6 +60,7 @@ const Table: React.FC<ReusableTableProps> = ({
     <MuiTableContainer
       component={Paper}
       elevation={0}
+      onScroll={onScroll}
       sx={{
         border: `1px solid #e2e8f0`,
         borderRadius: '8px',

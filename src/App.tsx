@@ -8,6 +8,7 @@ import DashboardPage from './pages/admin/DashboardPage';
 import AddStudentPage from './pages/admin/AddStudentPage';
 import ManageStudentsPage from './pages/admin/ManageStudentsPage';
 import IdCardManagementPage from './pages/admin/IdCardManagementPage';
+import IdCardGenerationPage from './pages/admin/IdCardGenerationPage';
 import PaymentTrackingPage from './pages/admin/PaymentTrackingPage';
 import UploadResultsPage from './pages/admin/UploadResultsPage';
 import CenterManagementPage from './pages/admin/CenterManagementPage';
@@ -15,12 +16,14 @@ import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import { SessionProvider } from './contexts/SessionContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ToastProvider } from './contexts/ToastContext';
 
 function App() {
   return (
     <ErrorBoundary>
       <Router>
         <SessionProvider>
+          <ToastProvider>
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
@@ -47,6 +50,7 @@ function App() {
               <IdCardManagementPage />
             </AdminLayout>
           } />
+          <Route path="/admin/generate-id-card" element={<IdCardGenerationPage />} />
           <Route path="/admin/payments" element={
             <AdminLayout title="PAYMENT TRACKING">
               <PaymentTrackingPage />
@@ -73,8 +77,9 @@ function App() {
           
           {/* 404 Route - Must be last */}
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+          </Routes>
         
+        </ToastProvider>
       </SessionProvider>
     </Router>
     </ErrorBoundary>

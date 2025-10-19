@@ -1,49 +1,46 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axiosInstance from '../api/axiosInstance';
+import { useState } from 'react';
 
-interface GenerateIdCardPayload {
-  studentId: string;
-  registrationNo: string;
+interface UseIdCardGenerationReturn {
+  isModalOpen: boolean;
+  selectedStudentId: string | null;
+  openModal: (studentId: string) => void;
+  closeModal: () => void;
+  generateIdCard: (params: { studentId: string; registrationNo: string }, callbacks?: { onSuccess?: () => void; onError?: (error: any) => void }) => void;
+  isGenerating: boolean;
 }
 
-interface GenerateIdCardResponse {
-  status: boolean;
-  message: string;
-  data: {
-    idCardUrl: string;
-    generatedAt: string;
+export const useIdCardGeneration = (): UseIdCardGenerationReturn => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const openModal = (studentId: string) => {
+    setSelectedStudentId(studentId);
+    setIsModalOpen(true);
   };
-}
 
-const generateIdCard = async ({
-  studentId,
-  registrationNo,
-}: GenerateIdCardPayload): Promise<GenerateIdCardResponse> => {
-  const { data } = await axiosInstance.post('/api/id-card/generate', {
-    studentId,
-    registrationNo,
-  });
-  return data;
-};
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedStudentId(null);
+  };
 
-export const useIdCardGeneration = () => {
-  const queryClient = useQueryClient();
-
-  const { mutate, isPending, isSuccess, isError, error } = useMutation({
-    mutationFn: generateIdCard,
-    onSuccess: () => {
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['idCardStudents'] });
-      queryClient.invalidateQueries({ queryKey: ['idCardStats'] });
-      queryClient.invalidateQueries({ queryKey: ['idCardPreview'] });
-    },
-  });
+  const generateIdCard = (_params: { studentId: string; registrationNo: string }, callbacks?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+    setIsGenerating(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsGenerating(false);
+      if (callbacks?.onSuccess) {
+        callbacks.onSuccess();
+      }
+    }, 2000);
+  };
 
   return {
-    generateIdCard: mutate,
-    isGenerating: isPending,
-    isSuccess,
-    isError,
-    error,
+    isModalOpen,
+    selectedStudentId,
+    openModal,
+    closeModal,
+    generateIdCard,
+    isGenerating,
   };
 };

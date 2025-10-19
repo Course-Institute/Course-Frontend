@@ -102,6 +102,15 @@ const ManageStudentsPage = () => {
       minWidth: '150px',
     },
     {
+      field: 'dateOfBirth', // Try: 'dob', 'birthDate', 'dateOfBirth', etc.
+      headerName: 'DOB',
+      width: '100px',
+      align: 'center',
+      renderCell: (value: string) => {
+        return value ? new Date(value).toLocaleDateString('en-GB') : 'N/A';
+      },
+    },
+    {
       field: 'course',
       headerName: 'Course',
       minWidth: '120px',
@@ -190,10 +199,50 @@ const ManageStudentsPage = () => {
       }}>
 
 
+      {/* Debug Info - Remove this after testing */}
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <strong>Scroll Debug:</strong>
+        <div>Students Count: {students.length}</div>
+        <div>Has Next Page: {isFetchingNextPage ? 'Yes' : 'No'}</div>
+        <div>Is Fetching Next: {isFetchingNextPage ? 'Yes' : 'No'}</div>
+        <Button 
+          variant="outlined" 
+          size="small" 
+          onClick={() => {
+            console.log('Manual fetch test');
+            console.log('isFetchingNextPage:', isFetchingNextPage);
+            if (!isFetchingNextPage) {
+              console.log('Calling fetchNextPage...');
+              // fetchNextPage();
+            } else {
+              console.log('Cannot fetch next page - conditions not met');
+            }
+          }}
+          sx={{ mt: 1 }}
+        >
+          Test Fetch Next Page
+        </Button>
+      </Alert>
+
       {/* Error Alert */}
       {isError && (
         <Alert severity="error" sx={{ mb: 3 }}>
           Failed to load students data: {error?.message || 'Unknown error'}
+          {(error as any)?.response?.status === 401 && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Authentication Error:</strong> Please login again.
+            </div>
+          )}
+          {(error as any)?.response?.status === 403 && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Access Denied:</strong> You don't have permission to access this data.
+            </div>
+          )}
+          {(error as any)?.code === 'NETWORK_ERROR' && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Network Error:</strong> Please check your internet connection.
+            </div>
+          )}
         </Alert>
       )}
 
@@ -489,6 +538,7 @@ const ManageStudentsPage = () => {
                 p: 2,
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(4px)',
+                zIndex: 2,
               }}>
                 <CircularProgress size={24} />
                 <Typography variant="body2" sx={{ ml: 1 }}>

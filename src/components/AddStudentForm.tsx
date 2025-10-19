@@ -14,6 +14,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useAddStudent, type AddStudentData } from '../hooks/useAddStudent';
+import { useToast } from '../contexts/ToastContext';
 import DateInput from './DateInput';
 
 interface AddStudentFormProps {
@@ -63,47 +64,55 @@ interface FormErrors {
   [key: string]: string;
 }
 
+const initialFormData: FormData = {
+  candidateName: '',
+  motherName: '',
+  fatherName: '',
+  dateOfBirth: '',
+  gender: 'Male',
+  adharCardNo: '',
+  category: '',
+  adharCardFront: null,
+  adharCardBack: null,
+  photo: null,
+  signature: null,
+  employerName: '',
+  isEmployed: 'No',
+  designation: '',
+  contactNumber: '',
+  alternateNumber: '',
+  emailAddress: '',
+  permanentAddress: '',
+  currentAddress: '',
+  state: '',
+  city: '',
+  country: '',
+  nationality: '',
+  pincode: '',
+  courseType: '',
+  course: '',
+  faculty: '',
+  stream: '',
+  year: '2025',
+  session: '2025',
+  monthSession: 'July',
+  courseFee: '',
+  hostelFacility: 'No',
+  duration: '',
+};
+
 const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormProps) => {
   const { addStudent, isSubmitting, error: submitError } = useAddStudent();
+  const { showSuccess, showError } = useToast();
   
-  const [formData, setFormData] = useState<FormData>({
-    candidateName: '',
-    motherName: '',
-    fatherName: '',
-    dateOfBirth: '',
-    gender: 'Male',
-    adharCardNo: '',
-    category: '',
-    adharCardFront: null,
-    adharCardBack: null,
-    photo: null,
-    signature: null,
-    employerName: '',
-    isEmployed: 'No',
-    designation: '',
-    contactNumber: '',
-    alternateNumber: '',
-    emailAddress: '',
-    permanentAddress: '',
-    currentAddress: '',
-    state: '',
-    city: '',
-    country: '',
-    nationality: '',
-    pincode: '',
-    courseType: '',
-    course: '',
-    faculty: '',
-    stream: '',
-    year: '2025',
-    session: '2025',
-    monthSession: 'July',
-    courseFee: '',
-    hostelFacility: 'No',
-    duration: '',
-  });
+  const [formData, setFormData] = useState<FormData>(initialFormData);
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setErrors({});
+  };
 
   const handleInputChange = (field: keyof FormData, value: string | File | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -271,12 +280,17 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
         
         await addStudent(formDataToSend as any);
         
-        // Success - close dialog after a short delay to show success state
+        // Show success toast and reset form
+        showSuccess('Student added successfully!');
+        resetForm();
+        
+        // Close dialog after a short delay to show success state
         setTimeout(() => {
           onClose();
         }, 1000);
       } catch (error) {
         console.error('Error submitting form:', error);
+        showError('Failed to add student. Please try again.');
       }
     }
   };
