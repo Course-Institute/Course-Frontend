@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Box,
   Table,
@@ -11,24 +12,39 @@ import {
   Typography,
   useTheme,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
-import { type ReportStudent } from '../hooks/useReportsData';
+import {
+  Download,
+  Visibility,
+} from '@mui/icons-material';
+import type { ReportStudent } from '../hooks/useReportsData';
 
 interface ReportsTableProps {
   students: ReportStudent[];
-  isLoading?: boolean;
+  lastElementRef?: React.RefObject<HTMLDivElement | null>;
+  tableContainerRef?: React.RefObject<HTMLDivElement | null>;
+  isFetchingNextPage?: boolean;
 }
 
-const ReportsTable = ({ students, isLoading = false }: ReportsTableProps) => {
+const ReportsTable = ({ 
+  students, 
+  lastElementRef, 
+  tableContainerRef, 
+  isFetchingNextPage = false 
+}: ReportsTableProps) => {
   const theme = useTheme();
 
   const getResultStatusColor = (status: string) => {
     switch (status) {
-      case 'Result Ready':
+      case 'published':
         return 'success';
-      case 'Pending':
+      case 'uploaded':
+        return 'info';
+      case 'pending':
         return 'warning';
-      case 'Not Available':
+      case 'not_available':
         return 'error';
       default:
         return 'default';
@@ -36,31 +52,56 @@ const ReportsTable = ({ students, isLoading = false }: ReportsTableProps) => {
   };
 
   const getPaymentStatusColor = (status: string) => {
-    const amount = parseInt(status.replace('₹', '').replace(',', ''));
-    if (amount === 0) return 'error';
-    if (amount < 20000) return 'warning';
-    return 'success';
+    switch (status) {
+      case 'completed':
+        return 'success';
+      case 'partial':
+        return 'warning';
+      case 'pending':
+        return 'error';
+      case 'overdue':
+        return 'error';
+      default:
+        return 'default';
+    }
   };
 
-  if (isLoading) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        height: 400,
-        p: 4 
-      }}>
-        <CircularProgress size={40} />
-      </Box>
-    );
-  }
+  const getStatusLabel = (status: string, type: 'payment' | 'results') => {
+    if (type === 'payment') {
+      switch (status) {
+        case 'completed': return 'Completed';
+        case 'partial': return 'Partial';
+        case 'pending': return 'Pending';
+        case 'overdue': return 'Overdue';
+        default: return status;
+      }
+    } else {
+      switch (status) {
+        case 'published': return 'Published';
+        case 'uploaded': return 'Uploaded';
+        case 'pending': return 'Pending';
+        case 'not_available': return 'Not Available';
+        default: return status;
+      }
+    }
+  };
+
+  const handleDownloadStudentReport = (studentId: string, studentName: string) => {
+    // TODO: Implement individual student report download
+    console.log(`Downloading report for student: ${studentName} (${studentId})`);
+  };
+
+  const handleViewDetails = (studentId: string) => {
+    // TODO: Implement view student details
+    console.log(`Viewing details for student: ${studentId}`);
+  };
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Table - Takes remaining space */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <TableContainer 
+          ref={tableContainerRef}
           component={Paper} 
           sx={{ 
             flexGrow: 1,
@@ -90,78 +131,130 @@ const ReportsTable = ({ students, isLoading = false }: ReportsTableProps) => {
           <Table stickyHeader>
             <TableHead>
               <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Student ID</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Registration No</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Student Name</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Course</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Semester</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Year</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Center</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Faculty</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Payment Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Result Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Results Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Total Paid</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Grade</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
+                  <TableCell colSpan={9} sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       No students found
                     </Typography>
                   </TableCell>
                 </TableRow>
               ) : (
-                students.map((student) => (
-                  <TableRow
-                    key={student.id}
-                    hover
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: theme.palette.grey[50],
-                      },
-                    }}
-                  >
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {student.studentId}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {student.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{student.course}</TableCell>
-                    <TableCell>{student.semester}</TableCell>
-                    <TableCell>{student.year}</TableCell>
-                    <TableCell>{student.center}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={student.paymentStatus}
-                        size="small"
-                        color={getPaymentStatusColor(student.paymentStatus) as any}
-                        variant="outlined"
-                        sx={{
-                          fontWeight: 500,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={student.resultStatus}
-                        size="small"
-                        color={getResultStatusColor(student.resultStatus) as any}
-                        variant="outlined"
-                        sx={{
-                          fontWeight: 500,
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
+                students.map((student, index) => {
+                  const isLastRow = index === students.length - 1;
+                  return (
+                    <TableRow 
+                      key={student._id || index}
+                      ref={isLastRow ? (lastElementRef as React.RefObject<HTMLTableRowElement>) : null}
+                      sx={{ 
+                        '&:hover': { 
+                          backgroundColor: theme.palette.grey[50] 
+                        } 
+                      }}
+                    >
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {student.registrationNo}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {student.candidateName}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {student.course} - {student.stream}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {student.faculty}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={getStatusLabel(student.paymentStatus, 'payment')}
+                          color={getPaymentStatusColor(student.paymentStatus) as any}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={getStatusLabel(student.resultsStatus, 'results')}
+                          color={getResultStatusColor(student.resultsStatus) as any}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          ₹{student.totalPaid || '0'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {student.grade || 'N/A'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="View Details">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleViewDetails(student._id)}
+                              sx={{ color: theme.palette.primary.main }}
+                            >
+                              <Visibility fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Download Report">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDownloadStudentReport(student._id, student.candidateName)}
+                              sx={{ color: theme.palette.success.main }}
+                            >
+                              <Download fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
         </TableContainer>
+        
+        {/* Loading indicator for infinite scroll */}
+        {isFetchingNextPage && (
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            py: 2,
+            borderTop: '1px solid #f1f5f9',
+          }}>
+            <CircularProgress size={24} sx={{ mr: 1 }} />
+            <Typography variant="body2" color="text.secondary">
+              Loading more reports...
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

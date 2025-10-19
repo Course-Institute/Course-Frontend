@@ -1,174 +1,158 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useMemo, useRef } from 'react';
+import React from 'react';
+import axiosInstance from '../api/axiosInstance';
+import { useIntersectionObserver } from './useIntersectionObserver';
 
 export interface ReportStudent {
-  id: string;
-  studentId: string;
-  name: string;
+  _id: string;
+  registrationNo: string;
+  candidateName: string;
+  motherName: string;
+  fatherName: string;
+  gender: string;
+  dateOfBirth: string;
+  contactNumber: string;
+  emailAddress: string;
+  faculty: string;
   course: string;
-  semester: string;
-  year: number;
-  center: string;
-  paymentStatus: string;
-  resultStatus: string;
+  stream: string;
+  year: string;
+  session: string;
+  courseFee: string;
+  paymentStatus: 'pending' | 'partial' | 'completed' | 'overdue';
+  resultsStatus: 'pending' | 'uploaded' | 'published' | 'not_available';
+  lastPaymentDate?: string;
+  totalPaid?: string;
+  remainingAmount?: string;
+  examDate?: string;
+  resultDate?: string;
+  grade?: string;
+  percentage?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ReportFilters {
-  fromDate?: string;
-  toDate?: string;
-  semester?: string;
-  center?: string;
+export interface ReportsPage {
+  students: ReportStudent[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    limit: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+interface UseReportsDataOptions {
+  limit?: number;
+  paymentStatus?: 'all' | 'pending' | 'partial' | 'completed' | 'overdue';
+  resultsStatus?: 'all' | 'pending' | 'uploaded' | 'published' | 'not_available';
+  faculty?: string;
+  course?: string;
+  year?: string;
+  session?: string;
   search?: string;
 }
 
-export interface ReportsDataResponse {
-  students: ReportStudent[];
-  total: number;
-  page: number;
-  limit: number;
-}
+const fetchReports = async ({
+  pageParam = 1,
+  queryKey,
+}: {
+  pageParam?: number;
+  queryKey: (string | UseReportsDataOptions | undefined)[];
+}): Promise<ReportsPage> => {
+  const [_key, options] = queryKey;
+  const { 
+    limit = 10, 
+    paymentStatus, 
+    resultsStatus, 
+    faculty, 
+    course, 
+    year, 
+    session, 
+    search 
+  } = options as UseReportsDataOptions || {};
 
-// Mock data for reports
-const mockReportStudents: ReportStudent[] = [
-  {
-    id: '1',
-    studentId: 'STU-1001',
-    name: 'Ramesh Kumar',
-    course: 'BCA',
-    semester: 'Sem 2',
-    year: 2025,
-    center: 'Delhi Center',
-    paymentStatus: '₹33,000',
-    resultStatus: 'Result Ready',
-  },
-  {
-    id: '2',
-    studentId: 'STU-1002',
-    name: 'Priya Sharma',
-    course: 'MCA',
-    semester: 'Sem 1',
-    year: 2025,
-    center: 'Mumbai Center',
-    paymentStatus: '₹25,000',
-    resultStatus: 'Pending',
-  },
-  {
-    id: '3',
-    studentId: 'STU-1003',
-    name: 'Ankit Verma',
-    course: 'MBA',
-    semester: 'Sem 3',
-    year: 2024,
-    center: 'Jaipur Center',
-    paymentStatus: '₹0',
-    resultStatus: 'Not Available',
-  },
-  {
-    id: '4',
-    studentId: 'STU-1004',
-    name: 'Neha Singh',
-    course: 'BBA',
-    semester: 'Sem 4',
-    year: 2025,
-    center: 'Kolkata Center',
-    paymentStatus: '₹15,000',
-    resultStatus: 'Result Ready',
-  },
-  {
-    id: '5',
-    studentId: 'STU-1005',
-    name: 'Vikram Singh',
-    course: 'B.Tech',
-    semester: 'Sem 6',
-    year: 2024,
-    center: 'Bangalore Center',
-    paymentStatus: '₹45,000',
-    resultStatus: 'Result Ready',
-  },
-  {
-    id: '6',
-    studentId: 'STU-1006',
-    name: 'Sneha Patel',
-    course: 'B.Sc IT',
-    semester: 'Sem 3',
-    year: 2025,
-    center: 'Chennai Center',
-    paymentStatus: '₹20,000',
-    resultStatus: 'Pending',
-  },
-  {
-    id: '7',
-    studentId: 'STU-1007',
-    name: 'Rajesh Gupta',
-    course: 'MBA',
-    semester: 'Sem 2',
-    year: 2025,
-    center: 'Pune Center',
-    paymentStatus: '₹30,000',
-    resultStatus: 'Result Ready',
-  },
-  {
-    id: '8',
-    studentId: 'STU-1008',
-    name: 'Kavita Reddy',
-    course: 'MCA',
-    semester: 'Sem 4',
-    year: 2025,
-    center: 'Hyderabad Center',
-    paymentStatus: '₹35,000',
-    resultStatus: 'Result Ready',
-  }
-];
+  const params = new URLSearchParams({
+    page: pageParam.toString(),
+    limit: limit.toString(),
+  });
 
-const fetchReportsData = async (filters: ReportFilters = {}): Promise<ReportsDataResponse> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  // Apply filters to mock data
-  let filteredStudents = [...mockReportStudents];
-  
-  if (filters.search) {
-    const searchTerm = filters.search.toLowerCase();
-    filteredStudents = filteredStudents.filter(student => 
-      student.name.toLowerCase().includes(searchTerm) ||
-      student.studentId.toLowerCase().includes(searchTerm) ||
-      student.course.toLowerCase().includes(searchTerm)
-    );
-  }
-  
-  if (filters.semester) {
-    filteredStudents = filteredStudents.filter(student => 
-      student.semester === filters.semester
-    );
-  }
-  
-  if (filters.center) {
-    filteredStudents = filteredStudents.filter(student => 
-      student.center === filters.center
-    );
-  }
-  
-  if (filters.fromDate && filters.toDate) {
-    // Filter by year range
-    const fromYear = parseInt(filters.fromDate);
-    const toYear = parseInt(filters.toDate);
-    filteredStudents = filteredStudents.filter(student => 
-      student.year >= fromYear && student.year <= toYear
-    );
-  }
-  
-  return {
-    students: filteredStudents,
-    total: filteredStudents.length,
-    page: 1,
-    limit: 10
-  };
+  if (paymentStatus && paymentStatus !== 'all') params.append('paymentStatus', paymentStatus);
+  if (resultsStatus && resultsStatus !== 'all') params.append('resultsStatus', resultsStatus);
+  if (faculty) params.append('faculty', faculty);
+  if (course) params.append('course', course);
+  if (year) params.append('year', year);
+  if (session) params.append('session', session);
+  if (search) params.append('search', search);
+
+  const { data } = await axiosInstance.get(`/api/reports/students?${params.toString()}`);
+  return data?.data;
 };
 
-export const useReportsData = (filters: ReportFilters = {}) => {
-  return useQuery<ReportsDataResponse>({
-    queryKey: ['reportsData', filters],
-    queryFn: () => fetchReportsData(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: false,
-  });
+const nextPageParam = (lastPage: ReportsPage): number | undefined => {
+  const { pagination } = lastPage;
+  return pagination.hasNextPage ? pagination.currentPage + 1 : undefined;
+};
+
+export const useReportsData = (options: UseReportsDataOptions = {}) => {
+  const { limit = 10 } = options;
+  const lastElementRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useSuspenseInfiniteQuery({
+      queryKey: ['reports', options],
+      queryFn: fetchReports,
+      getNextPageParam: nextPageParam,
+      initialPageParam: 1,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      gcTime: 0,
+    });
+
+  const students = useMemo(() => {
+    const allStudents = data?.pages.flatMap(page => page?.students ?? []) as ReportStudent[];
+    console.log('📊 Reports data updated:', {
+      totalPages: data?.pages.length,
+      totalStudents: allStudents.length,
+      lastPagePagination: data?.pages[data.pages.length - 1]?.pagination,
+      hasNextPage
+    });
+    return allStudents;
+  }, [data, hasNextPage]);
+
+  const pagination = useMemo(() => {
+    return data?.pages[data.pages.length - 1]?.pagination ?? null;
+  }, [data]);
+
+  useIntersectionObserver(
+    tableContainerRef as React.RefObject<HTMLElement>,
+    lastElementRef as React.RefObject<HTMLElement>,
+    () => {
+      console.log('🚀 Reports intersection observer triggered!', {
+        hasNextPage,
+        isFetchingNextPage,
+        studentsCount: students.length
+      });
+      fetchNextPage();
+    },
+    hasNextPage ?? false,
+    isFetchingNextPage
+  );
+
+  return {
+    students,
+    pagination,
+    lastElementRef,
+    tableContainerRef,
+    error,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  };
 };
