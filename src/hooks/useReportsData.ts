@@ -104,7 +104,7 @@ export const useReportsData = (options: UseReportsDataOptions = {}) => {
 
   const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ['reports', options],
+      queryKey: ['reports', { limit, ...options }],
       queryFn: fetchReports,
       getNextPageParam: nextPageParam,
       initialPageParam: 1,

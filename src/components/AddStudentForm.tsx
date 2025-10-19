@@ -16,6 +16,7 @@ import {
 import { useAddStudent, type AddStudentData } from '../hooks/useAddStudent';
 import { useToast } from '../contexts/ToastContext';
 import DateInput from './DateInput';
+import StudentFormPreviewDialog from './StudentFormPreviewDialog';
 
 interface AddStudentFormProps {
   onClose: () => void;
@@ -106,8 +107,8 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
   const { showSuccess, showError } = useToast();
   
   const [formData, setFormData] = useState<FormData>(initialFormData);
-
   const [errors, setErrors] = useState<FormErrors>({});
+  const [showPreview, setShowPreview] = useState(false);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -252,47 +253,56 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
       // In step mode, just pass data to next step
       onNext(formData as AddStudentData);
     } else {
-      // In dialog mode, submit directly using FormData
-      try {
-        const formDataToSend = new FormData();
-        
-        // Add all text fields (excluding empty values)
-        Object.keys(formData).forEach(key => {
-          const value = formData[key as keyof FormData];
-          if (value && typeof value === 'string' && value.trim() !== '') {
-            formDataToSend.append(key, value);
-          }
-        });
-        
-        // Add file fields
-        if (formData.photo) {
-          formDataToSend.append('photo', formData.photo);
-        }
-        if (formData.adharCardFront) {
-          formDataToSend.append('adharCardFront', formData.adharCardFront);
-        }
-        if (formData.adharCardBack) {
-          formDataToSend.append('adharCardBack', formData.adharCardBack);
-        }
-        if (formData.signature) {
-          formDataToSend.append('signature', formData.signature);
-        }
-        
-        await addStudent(formDataToSend as any);
-        
-        // Show success toast and reset form
-        showSuccess('Student added successfully!');
-        resetForm();
-        
-        // Close dialog after a short delay to show success state
-        setTimeout(() => {
-          onClose();
-        }, 1000);
-      } catch (error) {
-        console.error('Error submitting form:', error);
-        showError('Failed to add student. Please try again.');
-      }
+      // Show preview dialog instead of directly submitting
+      setShowPreview(true);
     }
+  };
+
+  const handlePreviewSave = async () => {
+    try {
+      const formDataToSend = new FormData();
+      
+      // Add all text fields (excluding empty values)
+      Object.keys(formData).forEach(key => {
+        const value = formData[key as keyof FormData];
+        if (value && typeof value === 'string' && value.trim() !== '') {
+          formDataToSend.append(key, value);
+        }
+      });
+      
+      // Add file fields
+      if (formData.photo) {
+        formDataToSend.append('photo', formData.photo);
+      }
+      if (formData.adharCardFront) {
+        formDataToSend.append('adharCardFront', formData.adharCardFront);
+      }
+      if (formData.adharCardBack) {
+        formDataToSend.append('adharCardBack', formData.adharCardBack);
+      }
+      if (formData.signature) {
+        formDataToSend.append('signature', formData.signature);
+      }
+      
+      await addStudent(formDataToSend as any);
+      
+      // Show success toast and reset form
+      showSuccess('Student added successfully!');
+      resetForm();
+      setShowPreview(false);
+      
+      // Close dialog after a short delay to show success state
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      showError('Failed to add student. Please try again.');
+    }
+  };
+
+  const handlePreviewCancel = () => {
+    setShowPreview(false);
   };
 
   const handleFileChange = (field: keyof FormData, file: File | null) => {
@@ -304,7 +314,8 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <>
+      <Box component="form" onSubmit={handleSubmit}>
         {submitError && (
           <Alert severity="error" sx={{ mb: 3 }}>
             {submitError}
@@ -910,11 +921,22 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
                 Submitting...
               </>
             ) : (
-              isStepMode ? 'Next' : 'Submit'
+              isStepMode ? 'Next' : 'Preview & Submit'
             )}
           </Button>
         </Box>
       </Box>
+
+      {/* Preview Dialog */}
+      <StudentFormPreviewDialog
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        onSave={handlePreviewSave}
+        onCancel={handlePreviewCancel}
+        formData={formData as AddStudentData}
+        isSubmitting={isSubmitting}
+      />
+    </>
   );
 };
 
