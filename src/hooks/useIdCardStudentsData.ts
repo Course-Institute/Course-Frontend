@@ -71,7 +71,7 @@ const nextPageParam = (lastPage: IdCardStudentsPage): number | undefined => {
 };
 
 export const useIdCardStudentsData = (options: UseIdCardStudentsDataOptions = {}) => {
-  const { limit = 10 } = options;
+  const { limit: _limit = 10 } = options;
   const lastElementRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 

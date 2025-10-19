@@ -202,21 +202,18 @@ const ManageStudentsPage = () => {
       {/* Debug Info - Remove this after testing */}
       <Alert severity="info" sx={{ mb: 3 }}>
         <strong>Scroll Debug:</strong>
-        <div>Students Count: {allStudents.length}</div>
-        <div>Has Next Page: {hasNextPage ? 'Yes' : 'No'}</div>
+        <div>Students Count: {students.length}</div>
+        <div>Has Next Page: {isFetchingNextPage ? 'Yes' : 'No'}</div>
         <div>Is Fetching Next: {isFetchingNextPage ? 'Yes' : 'No'}</div>
-        <div>Is Loading: {isLoading ? 'Yes' : 'No'}</div>
         <Button 
           variant="outlined" 
           size="small" 
           onClick={() => {
             console.log('Manual fetch test');
-            console.log('hasNextPage:', hasNextPage);
             console.log('isFetchingNextPage:', isFetchingNextPage);
-            console.log('isLoading:', isLoading);
-            if (hasNextPage && !isFetchingNextPage && !isLoading) {
+            if (!isFetchingNextPage) {
               console.log('Calling fetchNextPage...');
-              fetchNextPage();
+              // fetchNextPage();
             } else {
               console.log('Cannot fetch next page - conditions not met');
             }

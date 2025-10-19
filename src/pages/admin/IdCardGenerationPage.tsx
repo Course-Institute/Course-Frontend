@@ -188,10 +188,10 @@ const IdCardGenerationPage = () => {
                 {/* Student Photo - Positioned in the photo box on the right */}
                 <Box sx={{ 
                   position: 'absolute', 
-                  right: getResponsivePosition(130), 
-                  top: getResponsivePosition(186), 
-                  width: getResponsivePosition(135), 
-                  height: getResponsivePosition(135),
+                  right: getResponsivePosition(127), 
+                  top: getResponsivePosition(180), 
+                  width: getResponsivePosition(140), 
+                  height: getResponsivePosition(140),
                   borderRadius: '12px',
                   overflow: 'hidden',
                   border: '2px solid #fff',
@@ -241,11 +241,11 @@ const IdCardGenerationPage = () => {
                     variant="h6" 
                     sx={{ 
                       fontWeight: 'bold', 
-                      fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1.05rem' },
+                      fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1.2rem' },
                       color: 'black',
                       position: 'absolute',
                       left: getResponsivePosition(195),
-                      top: getResponsivePosition(204),
+                      top: getResponsivePosition(202),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -268,8 +268,8 @@ const IdCardGenerationPage = () => {
                       fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
                       color: 'black',
                       position: 'absolute',
-                      left: getResponsivePosition(168),
-                      top: getResponsivePosition(203),
+                      left: getResponsivePosition(135),
+                      top: getResponsivePosition(204),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -292,8 +292,8 @@ const IdCardGenerationPage = () => {
                       fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
                       color: 'black',
                       position: 'absolute',
-                      left: getResponsivePosition(78),
-                      top: getResponsivePosition(224),
+                      left: getResponsivePosition(75),
+                      top: getResponsivePosition(229),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -316,8 +316,8 @@ const IdCardGenerationPage = () => {
                       fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
                       color: 'black',
                       position: 'absolute',
-                      left: getResponsivePosition(78),
-                      top: getResponsivePosition(225),
+                      left: getResponsivePosition(75),
+                      top: getResponsivePosition(231),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -340,8 +340,8 @@ const IdCardGenerationPage = () => {
                       fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
                       color: 'black',
                       position: 'absolute',
-                      left: getResponsivePosition(55),
-                      top: getResponsivePosition(278),
+                      left: getResponsivePosition(50),
+                      top: getResponsivePosition(286),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -367,8 +367,8 @@ const IdCardGenerationPage = () => {
                       fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
                       color: 'black',
                       position: 'absolute',
-                      left: getResponsivePosition(70),
-                      top: getResponsivePosition(280),
+                      left: getResponsivePosition(65),
+                      top: getResponsivePosition(290),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
