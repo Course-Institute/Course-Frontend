@@ -79,6 +79,7 @@ export function useCenterForm(): {
   isSavingCenter: boolean;
   saveCenterError: unknown;
   savedCenterData: unknown;
+  validateForm: () => boolean;
 } {
   const [formValues, setFormValues] = useState<CenterFormData>({
     centerName: '',
@@ -371,5 +372,6 @@ export function useCenterForm(): {
     isSavingCenter,
     saveCenterError,
     savedCenterData,
+    validateForm,
   };
 }

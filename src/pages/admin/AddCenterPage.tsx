@@ -1,5 +1,4 @@
 import { Box, Typography, TextField, MenuItem, Button, Divider, Paper, FormControlLabel, Checkbox } from '@mui/material';
-import { Visibility as PreviewIcon } from '@mui/icons-material';
 import { useCenterForm } from '../../hooks/useCenterForm';
 import CenterFormPreviewModal from '../../components/CenterFormPreviewModal';
 import { useState } from 'react';
@@ -33,10 +32,16 @@ const AddCenterPage = () => {
     setDeclarationAccepted,
     onSave,
     isSavingCenter,
+    validateForm,
   } = useCenterForm();
 
   const handlePreview = () => {
-    setPreviewOpen(true);
+    // First run validation from the hook
+    const isValid = validateForm();
+    if (isValid) {
+      setPreviewOpen(true);
+    }
+    // If validation fails, errors will be shown in the form fields
   };
 
   const handleSubmitFromPreview = () => {
@@ -613,65 +618,25 @@ const AddCenterPage = () => {
             />
           </Box>
         </Box>
-        <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+        <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', mt: 2 }}>
           <Button 
-            variant="outlined" 
+            type="button" 
+            variant="contained" 
             size="large"
-            startIcon={<PreviewIcon />}
+            disabled={!declarationAccepted}
             onClick={handlePreview}
             sx={{ 
-              px: 4, 
+              px: 6, 
               py: 1.5, 
-              fontSize: '1rem',
-              borderColor: '#1e293b',
-              color: '#1e293b',
+              fontSize: '1.1rem',
+              backgroundColor: declarationAccepted ? '#1e293b' : '#94a3b8',
               '&:hover': {
-                borderColor: '#334155',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: declarationAccepted ? '#334155' : '#94a3b8'
               }
             }}
           >
-            Preview
+            Preview & Submit
           </Button>
-          
-          {/* <Button 
-            variant="outlined" 
-            size="large"
-            startIcon={<DownloadIcon />}
-            onClick={handleDownload}
-            sx={{ 
-              px: 4, 
-              py: 1.5, 
-              fontSize: '1rem',
-              borderColor: '#1e293b',
-              color: '#1e293b',
-              '&:hover': {
-                borderColor: '#334155',
-                backgroundColor: '#f8f9fa'
-              }
-            }}
-          >
-            Download PDF
-          </Button> */}
-          
-            <Button 
-              type="button" 
-              variant="contained" 
-              size="large"
-              disabled={!declarationAccepted}
-              onClick={handlePreview}
-              sx={{ 
-                px: 6, 
-                py: 1.5, 
-                fontSize: '1.1rem',
-                backgroundColor: declarationAccepted ? '#1e293b' : '#94a3b8',
-                '&:hover': {
-                  backgroundColor: declarationAccepted ? '#334155' : '#94a3b8'
-                }
-              }}
-            >
-              Submit Registration
-            </Button>
         </Box>
       </Box>
       </Box>
