@@ -14,6 +14,7 @@ import UploadResultsPage from './pages/admin/UploadResultsPage';
 import CenterManagementPage from './pages/admin/CenterManagementPage';
 import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
+import AddCenterPage from './pages/admin/AddCenterPage';
 import { SessionProvider } from './contexts/SessionContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
@@ -64,6 +65,11 @@ function App() {
           <Route path="/admin/centers" element={
             <AdminLayout title="CENTER MANAGEMENT">
               <CenterManagementPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/add-center" element={
+            <AdminLayout title="ADD CENTER">
+              <AddCenterPage />
             </AdminLayout>
           } />
           <Route path="/admin/reports" element={

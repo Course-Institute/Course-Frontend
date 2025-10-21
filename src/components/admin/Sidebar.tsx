@@ -53,6 +53,7 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
     { id: 4, label: 'ID Card Management', icon: <CreditCard />, path: '/admin/id-cards' },
     { id: 5, label: 'Upload Results', icon: <Upload />, path: '/admin/upload-results' },
     { id: 6, label: 'Payment Tracking', icon: <Payment />, path: '/admin/payments' },
+    { id: 9, label: 'Add Center', icon: <Business />, path: '/admin/add-center' },
     { id: 7, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
     { id: 8, label: 'Reports', icon: <Assessment />, path: '/admin/reports' },
   ];
