@@ -42,13 +42,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
   formData,
   isSubmitting = false,
 }) => {
-  const handleDownload = async () => {
+  const handleDownload = () => {
     try {
-      await generateStudentFormPDF({
-        formData,
-        instituteName: 'MIVPS',
-        instituteIcon: '/institute-logo.svg'
-      });
+      generateStudentFormPDF(formData);
     } catch (error) {
       console.error('Error generating PDF:', error);
       // Fallback to text download if PDF generation fails

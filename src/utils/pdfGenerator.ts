@@ -192,6 +192,189 @@ export const generateCenterFormPDF = (formData: CenterFormData): void => {
   doc.save(fileName);
 };
 
+interface StudentFormData {
+  candidateName: string;
+  fatherName: string;
+  motherName: string;
+  dateOfBirth: string;
+  gender: string;
+  category: string;
+  adharCardNo: string;
+  contactNumber: string;
+  alternateNumber?: string;
+  emailAddress: string;
+  permanentAddress: string;
+  currentAddress: string;
+  city: string;
+  state: string;
+  country: string;
+  nationality: string;
+  pincode: string;
+  isEmployed: string;
+  employerName?: string;
+  designation?: string;
+  courseType: string;
+  faculty: string;
+  course: string;
+  stream: string;
+  year: string;
+  session: string;
+  monthSession?: string;
+  duration?: string;
+  courseFee?: string;
+  hostelFacility?: string;
+  photo?: File;
+  adharCardFront?: File;
+  adharCardBack?: File;
+  signature?: File;
+}
+
+export const generateStudentFormPDF = (formData: StudentFormData): void => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  // Set font
+  doc.setFont('helvetica');
+  
+  // Header
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
+  
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Student Registration Form', pageWidth / 2, 40, { align: 'center' });
+  
+  // Logo placeholder
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
+  
+  // Section 1 heading
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bolditalic');
+  doc.text('SECTION 1: STUDENT REGISTRATION FORM', 20, 65);
+  
+  let yPosition = 80;
+  const lineHeight = 7;
+  const leftColumn = 20;
+  const rightColumn = 110;
+  
+  // Helper function to add a row
+  const addRow = (label: string, value: string, isHeader: boolean = false) => {
+    if (isHeader) {
+      // Header row with background
+      doc.setFillColor(240, 240, 240);
+      doc.rect(leftColumn - 2, yPosition - 5, pageWidth - 40, lineHeight + 2, 'F');
+    doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text(label, leftColumn, yPosition);
+    } else {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(label, leftColumn, yPosition);
+      doc.text(value || '', rightColumn, yPosition);
+    }
+    yPosition += lineHeight;
+  };
+  
+  // Personal Information Section
+  addRow('Personal Information', '', true);
+  addRow('Full Name:', formData.candidateName);
+  addRow('Father\'s Name:', formData.fatherName);
+  addRow('Mother\'s Name:', formData.motherName);
+  addRow('Date of Birth:', formData.dateOfBirth);
+  addRow('Gender:', formData.gender);
+  addRow('Category:', formData.category);
+  addRow('Aadhar Card No:', formData.adharCardNo);
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // Contact Information Section
+  addRow('Contact Information', '', true);
+  addRow('Contact Number:', formData.contactNumber);
+  addRow('Alternate Number:', formData.alternateNumber || '');
+  addRow('Email Address:', formData.emailAddress);
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // Address Information Section
+  addRow('Address Information', '', true);
+  addRow('Permanent Address:', formData.permanentAddress);
+  addRow('Current Address:', formData.currentAddress);
+  addRow('City:', formData.city);
+  addRow('State:', formData.state);
+  addRow('Country:', formData.country);
+  addRow('Nationality:', formData.nationality);
+  addRow('Pincode:', formData.pincode);
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // Employment Information Section
+  addRow('Employment Information', '', true);
+  addRow('Employed:', formData.isEmployed);
+  addRow('Employer Name:', formData.employerName || '');
+  addRow('Designation:', formData.designation || '');
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // Academic Information Section
+  addRow('Academic Information', '', true);
+  addRow('Course Type:', formData.courseType);
+  addRow('Faculty:', formData.faculty);
+  addRow('Course:', formData.course);
+  addRow('Stream:', formData.stream);
+  addRow('Year:', formData.year);
+  addRow('Session:', formData.session);
+  addRow('Month Session:', formData.monthSession || '');
+  addRow('Duration:', formData.duration || '');
+  addRow('Course Fee:', formData.courseFee ? `₹${formData.courseFee}` : 'N/A');
+  addRow('Hostel Facility:', formData.hostelFacility || 'No');
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // Documents Section
+  addRow('Documents Upload', '', true);
+  addRow('Photo:', formData.photo ? '[File Uploaded]' : '[Not Uploaded]');
+  addRow('Aadhar Front:', formData.adharCardFront ? '[File Uploaded]' : '[Not Uploaded]');
+  addRow('Aadhar Back:', formData.adharCardBack ? '[File Uploaded]' : '[Not Uploaded]');
+  addRow('Signature:', formData.signature ? '[File Uploaded]' : '[Not Uploaded]');
+  
+  // Declaration
+  yPosition += 10;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('I hereby declare that all information provided is true and correct to the best of my knowledge.', leftColumn, yPosition);
+  
+  yPosition += 15;
+  doc.text('Student Signature:', leftColumn, yPosition);
+
+  // Save the PDF
+  const fileName = `Student_Registration_${formData.candidateName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(fileName);
+};
+
 export const generateCenterFormPreview = (formData: CenterFormData): string => {
   // Generate HTML for preview
   const html = `
