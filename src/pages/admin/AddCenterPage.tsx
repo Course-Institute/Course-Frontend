@@ -1,5 +1,8 @@
 import { Box, Typography, TextField, MenuItem, Button, Divider, Paper, FormControlLabel, Checkbox } from '@mui/material';
+import { Visibility as PreviewIcon } from '@mui/icons-material';
 import { useCenterForm } from '../../hooks/useCenterForm';
+import CenterFormPreviewModal from '../../components/CenterFormPreviewModal';
+import { useState } from 'react';
 import {
   validateEmail,
   validatePhoneNumber,
@@ -18,6 +21,8 @@ import {
 } from '../../utils/validationHelpers';
 
 const AddCenterPage = () => {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  
   const {
     formValues,
     errors,
@@ -29,6 +34,15 @@ const AddCenterPage = () => {
     onSave,
     isSavingCenter,
   } = useCenterForm();
+
+  const handlePreview = () => {
+    setPreviewOpen(true);
+  };
+
+  const handleSubmitFromPreview = () => {
+    setPreviewOpen(false);
+    onSave();
+  };
 
   const handleChange = (key: string, validator?: (value: string) => ValidationResult) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -51,6 +65,8 @@ const AddCenterPage = () => {
 
 
   return (
+
+    <>
     <Paper elevation={2} sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
       <Box component="form" onSubmit={onSave} sx={{ width: '100%' }}>
 
@@ -79,6 +95,11 @@ const AddCenterPage = () => {
             label="Center Code" 
             value={formValues.centerCode || ''}
             onChange={handleChange('centerCode', validateNumber)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.centerCode}
             helperText={errors.centerCode || helperTexts.centerCode}
           />
@@ -107,6 +128,11 @@ const AddCenterPage = () => {
             label="Year of Establishment" 
             value={formValues.yearOfEstablishment || ''}
             onChange={handleChange('yearOfEstablishment', validateYear)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.yearOfEstablishment}
             helperText={errors.yearOfEstablishment || helperTexts.yearOfEstablishment}
           />
@@ -154,6 +180,11 @@ const AddCenterPage = () => {
             label="Pin Code" 
             value={formValues.pinCode || ''}
             onChange={handleChange('pinCode', validatePinCode)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.pinCode}
             helperText={errors.pinCode || helperTexts.pinCode}
           />
@@ -283,6 +314,11 @@ const AddCenterPage = () => {
             label="No. of Classrooms" 
             value={formValues.numClassrooms || ''}
             onChange={handleChange('numClassrooms', validateNumber)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.numClassrooms}
             helperText={errors.numClassrooms || helperTexts.numClassrooms}
           />
@@ -295,6 +331,11 @@ const AddCenterPage = () => {
             label="No. of Computers" 
             value={formValues.numComputers || ''}
             onChange={handleChange('numComputers', validateNumber)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.numComputers}
             helperText={errors.numComputers || helperTexts.numComputers}
           />
@@ -322,6 +363,11 @@ const AddCenterPage = () => {
             label="Seating Capacity" 
             value={formValues.seatingCapacity || ''}
             onChange={handleChange('seatingCapacity', validateNumber)}
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+              }
+            }}
             error={!!errors.seatingCapacity}
             helperText={errors.seatingCapacity || helperTexts.seatingCapacity}
           />
@@ -567,28 +613,79 @@ const AddCenterPage = () => {
             />
           </Box>
         </Box>
-        <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
           <Button 
-            type="submit" 
-            variant="contained" 
+            variant="outlined" 
             size="large"
-            disabled={!declarationAccepted || isSavingCenter}
+            startIcon={<PreviewIcon />}
+            onClick={handlePreview}
             sx={{ 
-              px: 6, 
+              px: 4, 
               py: 1.5, 
-              fontSize: '1.1rem',
-              backgroundColor: declarationAccepted && !isSavingCenter ? '#1e293b' : '#94a3b8',
+              fontSize: '1rem',
+              borderColor: '#1e293b',
+              color: '#1e293b',
               '&:hover': {
-                backgroundColor: declarationAccepted && !isSavingCenter ? '#334155' : '#94a3b8'
+                borderColor: '#334155',
+                backgroundColor: '#f8f9fa'
               }
             }}
           >
-            {isSavingCenter ? 'Submitting...' : 'Submit Registration'}
+            Preview
           </Button>
+          
+          {/* <Button 
+            variant="outlined" 
+            size="large"
+            startIcon={<DownloadIcon />}
+            onClick={handleDownload}
+            sx={{ 
+              px: 4, 
+              py: 1.5, 
+              fontSize: '1rem',
+              borderColor: '#1e293b',
+              color: '#1e293b',
+              '&:hover': {
+                borderColor: '#334155',
+                backgroundColor: '#f8f9fa'
+              }
+            }}
+          >
+            Download PDF
+          </Button> */}
+          
+            <Button 
+              type="button" 
+              variant="contained" 
+              size="large"
+              disabled={!declarationAccepted}
+              onClick={handlePreview}
+              sx={{ 
+                px: 6, 
+                py: 1.5, 
+                fontSize: '1.1rem',
+                backgroundColor: declarationAccepted ? '#1e293b' : '#94a3b8',
+                '&:hover': {
+                  backgroundColor: declarationAccepted ? '#334155' : '#94a3b8'
+                }
+              }}
+            >
+              Submit Registration
+            </Button>
         </Box>
       </Box>
       </Box>
     </Paper>
+    
+    {/* Preview Modal */}
+    <CenterFormPreviewModal
+      open={previewOpen}
+      onClose={() => setPreviewOpen(false)}
+      formData={formValues}
+      onSubmit={handleSubmitFromPreview}
+      isSubmitting={isSavingCenter}
+    />
+    </>
   );
 };
 
