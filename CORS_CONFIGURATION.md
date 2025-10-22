@@ -177,8 +177,8 @@ fetch('https://app.mivips.com/api/user/admin-login', {
   })
 })
 .then(response => response.json())
-.then(data => console.log('Success:', data))
-.catch(error => console.error('Error:', error));
+// .then(data => console.log('Success:', data))
+// .catch(error => console.error('Error:', error));
 ```
 
 ### 2. cURL Test:

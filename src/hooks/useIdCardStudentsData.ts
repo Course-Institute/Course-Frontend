@@ -89,12 +89,6 @@ export const useIdCardStudentsData = (options: UseIdCardStudentsDataOptions = {}
 
   const students = useMemo(() => {
     const allStudents = data?.pages.flatMap(page => page?.students ?? []) as IdCardStudent[];
-    console.log('📊 ID Card Students data updated:', {
-      totalPages: data?.pages.length,
-      totalStudents: allStudents.length,
-      lastPagePagination: data?.pages[data.pages.length - 1]?.pagination,
-      hasNextPage
-    });
     return allStudents;
   }, [data, hasNextPage]);
 
@@ -106,11 +100,6 @@ export const useIdCardStudentsData = (options: UseIdCardStudentsDataOptions = {}
     tableContainerRef as React.RefObject<HTMLElement>,
     lastElementRef as React.RefObject<HTMLElement>,
     () => {
-      console.log('🚀 ID Card Students intersection observer triggered!', {
-        hasNextPage,
-        isFetchingNextPage,
-        studentsCount: students.length
-      });
       fetchNextPage();
     },
     hasNextPage ?? false,
