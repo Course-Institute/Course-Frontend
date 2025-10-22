@@ -8,8 +8,6 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import Sidebar from './Sidebar';
-import SessionWarning from '../SessionWarning';
-import { useSession } from '../../contexts/SessionContext';
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 280;
@@ -23,20 +21,24 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-  const { isAuthenticated, logout, extendSession, timeRemaining } = useSession();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    
+    console.log('AdminLayout auth check:', { token: !!token, role });
+    
+    if (!token || !role || role !== 'admin') {
+      console.log('AdminLayout: Redirecting to login - no valid auth');
       navigate('/login?role=app');
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   const handleDrawerToggle = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const showWarning = timeRemaining < 60000 && timeRemaining > 0;
 
   return (
     <Box sx={{ 
@@ -147,12 +149,6 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
         </Box>
       </Box>
 
-      {/* Session Warning Modal */}
-      <SessionWarning
-        open={showWarning}
-        onExtend={extendSession}
-        onLogout={logout}
-      />
     </Box>
   );
 };

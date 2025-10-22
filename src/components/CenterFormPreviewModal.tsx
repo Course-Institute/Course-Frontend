@@ -15,7 +15,6 @@ import { generateCenterFormPDF } from '../utils/pdfGenerator';
 interface CenterFormData {
   // Center Details
   centerName: string;
-  centerCode: string;
   centerType: string;
   yearOfEstablishment: string;
   address: string;
@@ -46,10 +45,10 @@ interface CenterFormData {
   branchName: string;
 
   // Documents
-  gstCertificate: string;
-  panCard: string;
-  addressProof: string;
-  directorIdProof: string;
+  gstCertificate?: File | File[] | null;
+  panCard?: File | File[] | null;
+  addressProof?: File | File[] | null;
+  directorIdProof?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -144,8 +143,6 @@ const CenterFormPreviewModal: React.FC<CenterFormPreviewModalProps> = ({
                   <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, fontSize: '0.9rem' }}>
                     <Box>Center Name:</Box>
                     <Box sx={{ fontWeight: 'bold' }}>{formData.centerName || ''}</Box>
-                    <Box>Center Code (if any):</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.centerCode || ''}</Box>
                     <Box>Center Type:</Box>
                     <Box sx={{ fontWeight: 'bold' }}>{formData.centerType || ''}</Box>
                     <Box>Year of Establishment:</Box>
@@ -243,13 +240,37 @@ const CenterFormPreviewModal: React.FC<CenterFormPreviewModalProps> = ({
                     <Box>Documents Upload:</Box>
                     <Box sx={{ fontWeight: 'bold', color: 'text.secondary' }}>[File Upload]</Box>
                     <Box>Registration/GST Certificate:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.gstCertificate || ''}</Box>
+                    <Box sx={{ fontWeight: 'bold' }}>
+                      {formData.gstCertificate ? 
+                        (Array.isArray(formData.gstCertificate) ? 
+                          formData.gstCertificate.map(f => f.name).join(', ') : 
+                          formData.gstCertificate.name) : 
+                        'No file uploaded'}
+                    </Box>
                     <Box>PAN Card:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.panCard || ''}</Box>
+                    <Box sx={{ fontWeight: 'bold' }}>
+                      {formData.panCard ? 
+                        (Array.isArray(formData.panCard) ? 
+                          formData.panCard.map(f => f.name).join(', ') : 
+                          formData.panCard.name) : 
+                        'No file uploaded'}
+                    </Box>
                     <Box>Address Proof:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.addressProof || ''}</Box>
+                    <Box sx={{ fontWeight: 'bold' }}>
+                      {formData.addressProof ? 
+                        (Array.isArray(formData.addressProof) ? 
+                          formData.addressProof.map(f => f.name).join(', ') : 
+                          formData.addressProof.name) : 
+                        'No file uploaded'}
+                    </Box>
                     <Box>Director ID Proof:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.directorIdProof || ''}</Box>
+                    <Box sx={{ fontWeight: 'bold' }}>
+                      {formData.directorIdProof ? 
+                        (Array.isArray(formData.directorIdProof) ? 
+                          formData.directorIdProof.map(f => f.name).join(', ') : 
+                          formData.directorIdProof.name) : 
+                        'No file uploaded'}
+                    </Box>
                   </Box>
                 </Box>
               </Box>

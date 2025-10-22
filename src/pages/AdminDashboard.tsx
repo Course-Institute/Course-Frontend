@@ -8,8 +8,6 @@ import {
 } from '@mui/material';
 import Sidebar from '../components/admin/Sidebar';
 import DashboardContent from '../components/admin/DashboardContent';
-import SessionWarning from '../components/SessionWarning';
-import { useSession } from '../contexts/SessionContext';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -20,22 +18,22 @@ const AdminDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile); // Open by default on desktop, closed on mobile
-  const { isAuthenticated, logout, extendSession, timeRemaining } = useSession();
   const navigate = useNavigate();
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    
+    if (!token || !role || role !== 'admin') {
       navigate('/login?role=app');
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   const handleDrawerToggle = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Show warning when less than 1 minute remaining
-  const showWarning = timeRemaining < 60000 && timeRemaining > 0;
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -112,12 +110,6 @@ const AdminDashboard = () => {
         </Box>
       </Box>
       
-      {/* Session Warning Dialog */}
-      <SessionWarning
-        open={showWarning}
-        onExtend={extendSession}
-        onLogout={logout}
-      />
     </Box>
   );
 };

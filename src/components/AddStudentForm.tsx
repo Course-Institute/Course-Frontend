@@ -17,6 +17,7 @@ import { useAddStudent, type AddStudentData } from '../hooks/useAddStudent';
 import { useToast } from '../contexts/ToastContext';
 import DateInput from './DateInput';
 import StudentFormPreviewDialog from './StudentFormPreviewDialog';
+import ApiBasedAutoComplete from './core-components/apiBasedAutoComplete';
 
 interface AddStudentFormProps {
   onClose: () => void;
@@ -59,6 +60,8 @@ interface FormData {
   courseFee: string;
   hostelFacility: string;
   duration: string;
+  center: any;
+  centerId: string;
 }
 
 interface FormErrors {
@@ -100,6 +103,8 @@ const initialFormData: FormData = {
   courseFee: '',
   hostelFacility: 'No',
   duration: '',
+  center: null,
+  centerId: '',
 };
 
 const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormProps) => {
@@ -203,6 +208,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
       newErrors.courseFee = 'Course Fee must contain only numbers';
     }
     
+    // Center validation
+    if (!formData.centerId) {
+      newErrors.centerId = 'Center is required';
+    }
+    
     // Other required fields
     const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'nationality', 'courseType', 'course', 'faculty', 'stream', 'year', 'session'];
     otherRequiredFields.forEach(field => {
@@ -262,10 +272,15 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
     try {
       const formDataToSend = new FormData();
       
-      // Add all text fields (excluding empty values)
+      // Add all text fields (excluding empty values and center object)
       Object.keys(formData).forEach(key => {
         const value = formData[key as keyof FormData];
-        if (value && typeof value === 'string' && value.trim() !== '') {
+        if (key === 'center') {
+          // Handle center object separately
+          if (value && typeof value === 'object') {
+            formDataToSend.append('center', JSON.stringify(value));
+          }
+        } else if (value && typeof value === 'string' && value.trim() !== '') {
           formDataToSend.append(key, value);
         }
       });
@@ -321,6 +336,31 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
             {submitError}
           </Alert>
         )}
+
+        {/* Center Selection - Full Width */}
+        <Grid size={12}>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1e293b' }}>
+              Center Information
+            </Typography>
+            <ApiBasedAutoComplete
+              label="Select Center *"
+              apiPath="/api/center/getCenterAutoCompleteList"
+              searchKey="query"
+              keyToPick="name"
+              idKey="centerId"
+              customActionMethod="GET"
+              onSelect={(opt) => {
+                handleInputChange('centerId', opt?.centerId ? opt.centerId : '');
+                handleInputChange('center', opt);
+              }}
+              selectedOptions={formData?.center ?? null}
+              error={!!errors.centerId}
+              helperText={errors.centerId}
+              required
+            />
+          </Box>
+        </Grid>
 
         <Grid container spacing={3}>
           {/* Left Column */}

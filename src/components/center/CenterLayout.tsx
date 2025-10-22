@@ -8,8 +8,6 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import CenterSidebar from './CenterSidebar';
-import SessionWarning from '../SessionWarning';
-import { useSession } from '../../contexts/SessionContext';
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 280;
@@ -23,20 +21,22 @@ const CenterLayout = ({ children, title = "Center Dashboard" }: CenterLayoutProp
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-  const { isAuthenticated, logout, extendSession, timeRemaining } = useSession();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    
+    
+    if (!token || !role || role !== 'center') {
       navigate('/login?role=center');
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   const handleDrawerToggle = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const showWarning = timeRemaining < 60000 && timeRemaining > 0;
 
   return (
     <Box sx={{ 
@@ -147,12 +147,6 @@ const CenterLayout = ({ children, title = "Center Dashboard" }: CenterLayoutProp
         </Box>
       </Box>
 
-      {/* Session Warning Modal */}
-      <SessionWarning
-        open={showWarning}
-        onExtend={extendSession}
-        onLogout={logout}
-      />
     </Box>
   );
 };

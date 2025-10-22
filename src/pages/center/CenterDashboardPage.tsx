@@ -1,14 +1,8 @@
-import { useState } from 'react';
 import {
   Box,
   Typography,
   Card,
   CardContent,
-  Switch,
-  LinearProgress,
-  Chip,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
 import {
   People,
@@ -20,15 +14,9 @@ import {
   PendingActions,
   TrendingUp,
   TrendingDown,
-  Download,
-  Refresh,
 } from '@mui/icons-material';
 
 const CenterDashboardPage = () => {
-  const [idCardGeneration, setIdCardGeneration] = useState(true);
-  const [resultUpload, setResultUpload] = useState(false);
-  const [resultRelease, setResultRelease] = useState(true);
-  const [paymentTracking] = useState(75);
 
   // Mock data - replace with real API calls
   const stats = {
@@ -40,12 +28,6 @@ const CenterDashboardPage = () => {
     monthlyTarget: 500000,
   };
 
-  const recentActivities = [
-    { id: 1, action: 'New student registered', student: 'John Doe', time: '2 hours ago', type: 'success' },
-    { id: 2, action: 'Payment received', student: 'Jane Smith', amount: '₹2,500', time: '4 hours ago', type: 'payment' },
-    { id: 3, action: 'ID card generated', student: 'Mike Johnson', time: '6 hours ago', type: 'info' },
-    { id: 4, action: 'Results uploaded', course: 'Mathematics', time: '1 day ago', type: 'upload' },
-  ];
 
   const quickActions = [
     {

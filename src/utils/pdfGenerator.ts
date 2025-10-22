@@ -3,7 +3,6 @@ import jsPDF from 'jspdf';
 interface CenterFormData {
   // Center Details
   centerName: string;
-  centerCode: string;
   centerType: string;
   yearOfEstablishment: string;
   address: string;
@@ -34,10 +33,10 @@ interface CenterFormData {
   branchName: string;
 
   // Documents
-  gstCertificate: string;
-  panCard: string;
-  addressProof: string;
-  directorIdProof: string;
+  gstCertificate?: File | File[] | null;
+  panCard?: File | File[] | null;
+  addressProof?: File | File[] | null;
+  directorIdProof?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -98,7 +97,6 @@ export const generateCenterFormPDF = (formData: CenterFormData): void => {
   // Center Details Section
   addRow('Center Details', '', true);
   addRow('Center Name:', formData.centerName);
-  addRow('Center Code (if any):', formData.centerCode);
   addRow('Center Type:', formData.centerType);
   addRow('Year of Establishment:', formData.yearOfEstablishment);
   addRow('Full Address:', formData.address);
@@ -161,10 +159,26 @@ export const generateCenterFormPDF = (formData: CenterFormData): void => {
   // Documents Section
   addRow('Documents Upload', '', true);
   addRow('Documents Upload:', '[File Upload]');
-  addRow('Registration/GST Certificate:', formData.gstCertificate);
-  addRow('PAN Card:', formData.panCard);
-  addRow('Address Proof:', formData.addressProof);
-  addRow('Director ID Proof:', formData.directorIdProof);
+  addRow('Registration/GST Certificate:', formData.gstCertificate ? 
+    (Array.isArray(formData.gstCertificate) ? 
+      formData.gstCertificate.map(f => f.name).join(', ') : 
+      formData.gstCertificate.name) : 
+    'No file uploaded');
+  addRow('PAN Card:', formData.panCard ? 
+    (Array.isArray(formData.panCard) ? 
+      formData.panCard.map(f => f.name).join(', ') : 
+      formData.panCard.name) : 
+    'No file uploaded');
+  addRow('Address Proof:', formData.addressProof ? 
+    (Array.isArray(formData.addressProof) ? 
+      formData.addressProof.map(f => f.name).join(', ') : 
+      formData.addressProof.name) : 
+    'No file uploaded');
+  addRow('Director ID Proof:', formData.directorIdProof ? 
+    (Array.isArray(formData.directorIdProof) ? 
+      formData.directorIdProof.map(f => f.name).join(', ') : 
+      formData.directorIdProof.name) : 
+    'No file uploaded');
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -462,7 +476,6 @@ export const generateCenterFormPreview = (formData: CenterFormData): string => {
       <table class="form-table">
         <tr><th colspan="2">Center Details</th></tr>
         <tr><td>Center Name:</td><td>${formData.centerName || ''}</td></tr>
-        <tr><td>Center Code (if any):</td><td>${formData.centerCode || ''}</td></tr>
         <tr><td>Center Type:</td><td>${formData.centerType || ''}</td></tr>
         <tr><td>Year of Establishment:</td><td>${formData.yearOfEstablishment || ''}</td></tr>
         <tr><td>Full Address:</td><td>${formData.address || ''}</td></tr>
@@ -505,10 +518,26 @@ export const generateCenterFormPreview = (formData: CenterFormData): string => {
       <table class="form-table">
         <tr><th colspan="2">Documents Upload</th></tr>
         <tr><td>Documents Upload:</td><td>[File Upload]</td></tr>
-        <tr><td>Registration/GST Certificate:</td><td>${formData.gstCertificate || ''}</td></tr>
-        <tr><td>PAN Card:</td><td>${formData.panCard || ''}</td></tr>
-        <tr><td>Address Proof:</td><td>${formData.addressProof || ''}</td></tr>
-        <tr><td>Director ID Proof:</td><td>${formData.directorIdProof || ''}</td></tr>
+        <tr><td>Registration/GST Certificate:</td><td>${formData.gstCertificate ? 
+          (Array.isArray(formData.gstCertificate) ? 
+            formData.gstCertificate.map(f => f.name).join(', ') : 
+            formData.gstCertificate.name) : 
+          'No file uploaded'}</td></tr>
+        <tr><td>PAN Card:</td><td>${formData.panCard ? 
+          (Array.isArray(formData.panCard) ? 
+            formData.panCard.map(f => f.name).join(', ') : 
+            formData.panCard.name) : 
+          'No file uploaded'}</td></tr>
+        <tr><td>Address Proof:</td><td>${formData.addressProof ? 
+          (Array.isArray(formData.addressProof) ? 
+            formData.addressProof.map(f => f.name).join(', ') : 
+            formData.addressProof.name) : 
+          'No file uploaded'}</td></tr>
+        <tr><td>Director ID Proof:</td><td>${formData.directorIdProof ? 
+          (Array.isArray(formData.directorIdProof) ? 
+            formData.directorIdProof.map(f => f.name).join(', ') : 
+            formData.directorIdProof.name) : 
+          'No file uploaded'}</td></tr>
       </table>
       
       <table class="form-table">

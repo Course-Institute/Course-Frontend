@@ -85,6 +85,34 @@ export const validateFileSize = (file: File | null, maxSizeMB: number = 2): Vali
   return { isValid: true };
 };
 
+// File field validation (handles File, File[], or null)
+export const validateFileField = (file: File | File[] | null): ValidationResult => {
+  if (!file) {
+    return { isValid: false, error: 'File is required' };
+  }
+  
+  // Handle single file
+  if (file instanceof File) {
+    return validateFileSize(file);
+  }
+  
+  // Handle file array
+  if (Array.isArray(file)) {
+    if (file.length === 0) {
+      return { isValid: false, error: 'At least one file is required' };
+    }
+    // Validate each file in the array
+    for (const f of file) {
+      const result = validateFileSize(f);
+      if (!result.isValid) {
+        return result;
+      }
+    }
+  }
+  
+  return { isValid: true };
+};
+
 // Required field validation
 export const validateRequired = (value: string): ValidationResult => {
   if (!value || value.trim() === '') {

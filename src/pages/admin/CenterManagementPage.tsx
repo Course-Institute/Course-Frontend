@@ -27,12 +27,10 @@ import { useCenterStats } from '../../hooks/useCenterStats';
 import { useCenterList, type CenterFilters, type Center } from '../../hooks/useCenterList';
 import CenterTable from '../../components/CenterTable';
 import CenterInfiniteList from '../../components/CenterInfiniteList';
-import { type CenterAutoCompleteItem } from '../../hooks/useCenterAutoComplete';
 
 const CenterManagementPage = () => {
   const [filters, setFilters] = useState<CenterFilters>({});
   const [viewMode, setViewMode] = useState<'table' | 'infinite'>('infinite');
-  const [selectedCenter, setSelectedCenter] = useState<CenterAutoCompleteItem | null>(null);
   const { data: stats, isLoading: statsLoading } = useCenterStats();
   const { data: centerData, isLoading: centerLoading, isError, error } = useCenterList(filters);
 
@@ -277,7 +275,6 @@ const CenterManagementPage = () => {
               limit: 20,
             }}
             onCenterSelect={(center) => {
-              setSelectedCenter(center);
               console.log('Selected center:', center);
             }}
             height="100%"
