@@ -4,6 +4,7 @@ import CoursesPage from './pages/CoursesPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminLayout from './components/admin/AdminLayout';
+import CenterLayout from './components/center/CenterLayout';
 import DashboardPage from './pages/admin/DashboardPage';
 import AddStudentPage from './pages/admin/AddStudentPage';
 import ManageStudentsPage from './pages/admin/ManageStudentsPage';
@@ -15,6 +16,7 @@ import CenterManagementPage from './pages/admin/CenterManagementPage';
 import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import AddCenterPage from './pages/admin/AddCenterPage';
+import CenterDashboardPage from './pages/center/CenterDashboardPage';
 import { SessionProvider } from './contexts/SessionContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
@@ -80,6 +82,13 @@ function App() {
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
+
+          {/* Center Routes with Layout */}
+          <Route path="/center-dashboard" element={
+            <CenterLayout title="Center Dashboard">
+              <CenterDashboardPage />
+            </CenterLayout>
+          } />
           
           {/* 404 Route - Must be last */}
           <Route path="*" element={<NotFoundPage />} />

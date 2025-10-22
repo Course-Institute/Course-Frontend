@@ -11,6 +11,8 @@ import {
   MenuItem,
   CircularProgress,
   Alert,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import {
   Search,
@@ -18,13 +20,19 @@ import {
   PendingActions,
   CheckCircle,
   Cancel,
+  ViewList,
+  ViewModule,
 } from '@mui/icons-material';
 import { useCenterStats } from '../../hooks/useCenterStats';
 import { useCenterList, type CenterFilters, type Center } from '../../hooks/useCenterList';
 import CenterTable from '../../components/CenterTable';
+import CenterInfiniteList from '../../components/CenterInfiniteList';
+import { type CenterAutoCompleteItem } from '../../hooks/useCenterAutoComplete';
 
 const CenterManagementPage = () => {
   const [filters, setFilters] = useState<CenterFilters>({});
+  const [viewMode, setViewMode] = useState<'table' | 'infinite'>('infinite');
+  const [selectedCenter, setSelectedCenter] = useState<CenterAutoCompleteItem | null>(null);
   const { data: stats, isLoading: statsLoading } = useCenterStats();
   const { data: centerData, isLoading: centerLoading, isError, error } = useCenterList(filters);
 
@@ -170,57 +178,77 @@ const CenterManagementPage = () => {
             />
 
             {/* Filter Row */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={filters.status || ''}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
-                  label="Status"
-                >
-                  <MenuItem value="">All Status</MenuItem>
-                  <MenuItem value="Approve">Approve</MenuItem>
-                  <MenuItem value="Published">Published</MenuItem>
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="Deactivated">Deactivated</MenuItem>
-                  <MenuItem value="Refenisted">Refenisted</MenuItem>
-                  <MenuItem value="Renning">Renning</MenuItem>
-                </Select>
-              </FormControl>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={filters.status || ''}
+                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                    label="Status"
+                  >
+                    <MenuItem value="">All Status</MenuItem>
+                    <MenuItem value="Approve">Approve</MenuItem>
+                    <MenuItem value="Published">Published</MenuItem>
+                    <MenuItem value="Active">Active</MenuItem>
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="Deactivated">Deactivated</MenuItem>
+                    <MenuItem value="Refenisted">Refenisted</MenuItem>
+                    <MenuItem value="Renning">Renning</MenuItem>
+                  </Select>
+                </FormControl>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Region</InputLabel>
-                <Select
-                  value={filters.region || ''}
-                  onChange={(e) => handleFilterChange('region', e.target.value)}
-                  label="Region"
-                >
-                  <MenuItem value="">All Regions</MenuItem>
-                  <MenuItem value="Delhi">Delhi</MenuItem>
-                  <MenuItem value="Mumbai">Mumbai</MenuItem>
-                  <MenuItem value="Jaipur">Jaipur</MenuItem>
-                  <MenuItem value="Kolkata">Kolkata</MenuItem>
-                  <MenuItem value="Bangalore">Bangalore</MenuItem>
-                  <MenuItem value="Chennai">Chennai</MenuItem>
-                  <MenuItem value="Pune">Pune</MenuItem>
-                  <MenuItem value="Hyderabad">Hyderabad</MenuItem>
-                </Select>
-              </FormControl>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Region</InputLabel>
+                  <Select
+                    value={filters.region || ''}
+                    onChange={(e) => handleFilterChange('region', e.target.value)}
+                    label="Region"
+                  >
+                    <MenuItem value="">All Regions</MenuItem>
+                    <MenuItem value="Delhi">Delhi</MenuItem>
+                    <MenuItem value="Mumbai">Mumbai</MenuItem>
+                    <MenuItem value="Jaipur">Jaipur</MenuItem>
+                    <MenuItem value="Kolkata">Kolkata</MenuItem>
+                    <MenuItem value="Bangalore">Bangalore</MenuItem>
+                    <MenuItem value="Chennai">Chennai</MenuItem>
+                    <MenuItem value="Pune">Pune</MenuItem>
+                    <MenuItem value="Hyderabad">Hyderabad</MenuItem>
+                  </Select>
+                </FormControl>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Date</InputLabel>
-                <Select
-                  value={filters.date || ''}
-                  onChange={(e) => handleFilterChange('date', e.target.value)}
-                  label="Date"
-                >
-                  <MenuItem value="">All Dates</MenuItem>
-                  <MenuItem value="2025-01-01">January 2025</MenuItem>
-                  <MenuItem value="2025-01-15">Mid January 2025</MenuItem>
-                  <MenuItem value="2025-02-01">February 2025</MenuItem>
-                </Select>
-              </FormControl>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Date</InputLabel>
+                  <Select
+                    value={filters.date || ''}
+                    onChange={(e) => handleFilterChange('date', e.target.value)}
+                    label="Date"
+                  >
+                    <MenuItem value="">All Dates</MenuItem>
+                    <MenuItem value="2025-01-01">January 2025</MenuItem>
+                    <MenuItem value="2025-01-15">Mid January 2025</MenuItem>
+                    <MenuItem value="2025-02-01">February 2025</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {/* View Mode Toggle */}
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newView) => newView && setViewMode(newView)}
+                size="small"
+                sx={{ ml: 'auto' }}
+              >
+                <ToggleButton value="infinite">
+                  <ViewModule sx={{ mr: 1 }} />
+                  Infinite Scroll
+                </ToggleButton>
+                <ToggleButton value="table">
+                  <ViewList sx={{ mr: 1 }} />
+                  Table View
+                </ToggleButton>
+              </ToggleButtonGroup>
             </Box>
           </Box>
         </CardContent>
@@ -233,28 +261,44 @@ const CenterManagementPage = () => {
         </Alert>
       )}
 
-      {/* Centers Table - Takes remaining space */}
+      {/* Centers Display - Takes remaining space */}
       <Box sx={{ 
         flexGrow: 1, 
         display: 'flex', 
         flexDirection: 'column',
         minHeight: 500,
       }}>
-        {centerLoading ? (
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            flexGrow: 1,
-            p: 4 
-          }}>
-            <CircularProgress size={40} />
-          </Box>
-        ) : (
-          <CenterTable
-            centers={centerData?.centers || []}
-            onCenterAction={handleCenterAction}
+        {viewMode === 'infinite' ? (
+          <CenterInfiniteList
+            filters={{
+              query: filters.search,
+              status: filters.status,
+              region: filters.region,
+              limit: 20,
+            }}
+            onCenterSelect={(center) => {
+              setSelectedCenter(center);
+              console.log('Selected center:', center);
+            }}
+            height="100%"
           />
+        ) : (
+          centerLoading ? (
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              flexGrow: 1,
+              p: 4 
+            }}>
+              <CircularProgress size={40} />
+            </Box>
+          ) : (
+            <CenterTable
+              centers={centerData?.centers || []}
+              onCenterAction={handleCenterAction}
+            />
+          )
         )}
       </Box>
     </Box>
