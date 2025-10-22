@@ -14,7 +14,6 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import StudentSidebar from './StudentSidebar';
-import { useSession } from '../../contexts/SessionContext';
 
 interface StudentLayoutProps {
   children: React.ReactNode;
@@ -32,8 +31,6 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
   breadcrumbs = [{ label: 'Home' }, { label: pageTitle }],
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { logout } = useSession();
-
   const handleMenuClick = (item: string) => {
     if (onMenuItemClick) {
       onMenuItemClick(item);
@@ -41,7 +38,11 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('keepSignedIn');
+    localStorage.removeItem('studentRegistrationNumber');
+    window.location.href = '/login?role=student';
   };
 
   const handlePasswordChange = () => {

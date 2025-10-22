@@ -22,7 +22,6 @@ import {
 } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
 import { loginUser, type LoginResponse } from '../api/authApi';
-import { useSession } from '../contexts/SessionContext';
 import Navbar from '../components/Navbar';
 import DateInput from '../components/DateInput';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -32,7 +31,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') || 'Student';
-  const { login } = useSession();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -50,14 +48,12 @@ const LoginPage = () => {
     mutationFn: loginUser,
     onSuccess: (data) => {
       // Handle successful login
-      console.log('Login successful:', data);
-      console.log('Role:', role);
-      
-      // Use session context to login with token and user role from response
+      // Get user role from response
       const userRole = data.data.user.role;
-      login(data.data.token, userRole);
       
-      // Store keep signed in preference
+      // Store authentication data in localStorage
+      localStorage.setItem('authToken', data.data.token);
+      localStorage.setItem('userRole', userRole);
       localStorage.setItem('keepSignedIn', formData.keepSignedIn.toString());
       
       // Store student registration number if student login
@@ -66,28 +62,22 @@ const LoginPage = () => {
       }
       
       // Navigate to appropriate dashboard based on role from response
-      console.log('Navigating with role:', userRole.toLowerCase());
       switch (userRole.toLowerCase()) {
         case 'student':
-          console.log('Navigating to student dashboard');
           navigate('/student-dashboard');
           break;
         case 'center':
-          console.log('Navigating to center dashboard');
           navigate('/center-dashboard');
           break;
         case 'admin':
         case 'app': // App Login is also admin login
-          console.log('Navigating to admin dashboard');
           navigate('/admin-dashboard');
           break;
         default:
-          console.log('Navigating to home (default)');
           navigate('/');
       }
     },
     onError: (error: any) => {
-      console.log("error::", error)
       setError(error.message || error.response?.data?.message || 'Login failed. Please try again.');
     },
   });

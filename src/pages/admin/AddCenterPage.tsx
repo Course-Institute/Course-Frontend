@@ -57,7 +57,7 @@ const AddCenterPage = () => {
   const handleFileChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      if (key === 'photo' || key === 'cancelledCheque') {
+      if (key === 'photo' || key === 'cancelledCheque' || key === 'gstCertificate' || key === 'panCard' || key === 'addressProof' || key === 'directorIdProof') {
         updateFile(key, files[0]);
       } else {
         const fileList = Array.from(files);
@@ -90,23 +90,6 @@ const AddCenterPage = () => {
             onChange={handleChange('centerName', validateRequired)}
             error={!!errors.centerName}
             helperText={errors.centerName || helperTexts.centerName}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            type="number"
-            label="Center Code" 
-            value={formValues.centerCode || ''}
-            onChange={handleChange('centerCode', validateNumber)}
-            onKeyPress={(e) => {
-              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
-                e.preventDefault();
-              }
-            }}
-            error={!!errors.centerCode}
-            helperText={errors.centerCode || helperTexts.centerCode}
           />
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
@@ -251,8 +234,8 @@ const AddCenterPage = () => {
           <TextField 
             fullWidth 
             required
-            type="tel"
             label="Contact No." 
+            type="number"
             value={formValues.contactNo || ''}
             onChange={handleChange('contactNo', validatePhoneNumber)}
             error={!!errors.contactNo}
@@ -496,62 +479,78 @@ const AddCenterPage = () => {
             fullWidth
             sx={{ 
               height: '56px',
-              borderColor: errors.documents ? '#ef4444' : undefined,
-              color: errors.documents ? '#ef4444' : undefined
+              borderColor: errors.gstCertificate ? '#ef4444' : undefined,
+              color: errors.gstCertificate ? '#ef4444' : undefined
             }}
           >
-            {formValues.documents && Array.isArray(formValues.documents) ? `${formValues.documents.length} file(s) selected` : 'Documents Upload'}
-            <input hidden type="file" multiple onChange={handleFileChange('documents')} />
+            {formValues.gstCertificate ? (Array.isArray(formValues.gstCertificate) ? `${formValues.gstCertificate.length} file(s) selected` : formValues.gstCertificate.name) : 'Upload Registration/GST Certificate'}
+            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('gstCertificate')} />
           </Button>
-          {errors.documents && (
+          {errors.gstCertificate && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-              {errors.documents}
+              {errors.gstCertificate}
             </Typography>
           )}
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Registration/GST Certificate" 
-            value={formValues.gstCertificate || ''}
-            onChange={handleChange('gstCertificate', validateRequired)}
-            error={!!errors.gstCertificate}
-            helperText={errors.gstCertificate || helperTexts.gstCertificate}
-          />
+          <Button 
+            variant="outlined" 
+            component="label" 
+            fullWidth
+            sx={{ 
+              height: '56px',
+              borderColor: errors.panCard ? '#ef4444' : undefined,
+              color: errors.panCard ? '#ef4444' : undefined
+            }}
+          >
+            {formValues.panCard ? (Array.isArray(formValues.panCard) ? `${formValues.panCard.length} file(s) selected` : formValues.panCard.name) : 'Upload PAN Card'}
+            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('panCard')} />
+          </Button>
+          {errors.panCard && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+              {errors.panCard}
+            </Typography>
+          )}
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="PAN Card" 
-            value={formValues.panCard || ''}
-            onChange={handleChange('panCard', validateRequired)}
-            error={!!errors.panCard}
-            helperText={errors.panCard || helperTexts.panCard}
-          />
+          <Button 
+            variant="outlined" 
+            component="label" 
+            fullWidth
+            sx={{ 
+              height: '56px',
+              borderColor: errors.addressProof ? '#ef4444' : undefined,
+              color: errors.addressProof ? '#ef4444' : undefined
+            }}
+          >
+            {formValues.addressProof ? (Array.isArray(formValues.addressProof) ? `${formValues.addressProof.length} file(s) selected` : formValues.addressProof.name) : 'Upload Address Proof'}
+            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('addressProof')} />
+          </Button>
+          {errors.addressProof && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+              {errors.addressProof}
+            </Typography>
+          )}
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Address Proof" 
-            value={formValues.addressProof || ''}
-            onChange={handleChange('addressProof', validateRequired)}
-            error={!!errors.addressProof}
-            helperText={errors.addressProof || helperTexts.addressProof}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Director ID Proof" 
-            value={formValues.directorIdProof || ''}
-            onChange={handleChange('directorIdProof', validateRequired)}
-            error={!!errors.directorIdProof}
-            helperText={errors.directorIdProof || helperTexts.directorIdProof}
-          />
+          <Button 
+            variant="outlined" 
+            component="label" 
+            fullWidth
+            sx={{ 
+              height: '56px',
+              borderColor: errors.directorIdProof ? '#ef4444' : undefined,
+              color: errors.directorIdProof ? '#ef4444' : undefined
+            }}
+          >
+            {formValues.directorIdProof ? (Array.isArray(formValues.directorIdProof) ? `${formValues.directorIdProof.length} file(s) selected` : formValues.directorIdProof.name) : 'Upload Director ID Proof'}
+            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('directorIdProof')} />
+          </Button>
+          {errors.directorIdProof && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+              {errors.directorIdProof}
+            </Typography>
+          )}
         </Box>
 
         {/* Login Credentials */}

@@ -17,7 +17,6 @@ import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import AddCenterPage from './pages/admin/AddCenterPage';
 import CenterDashboardPage from './pages/center/CenterDashboardPage';
-import { SessionProvider } from './contexts/SessionContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
 
@@ -25,8 +24,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <SessionProvider>
-          <ToastProvider>
+        <ToastProvider>
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
@@ -95,7 +93,6 @@ function App() {
           </Routes>
         
         </ToastProvider>
-      </SessionProvider>
     </Router>
     </ErrorBoundary>
   );

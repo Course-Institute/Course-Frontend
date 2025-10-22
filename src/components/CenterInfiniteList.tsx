@@ -47,7 +47,6 @@ const CenterInfiniteList: React.FC<CenterInfiniteListProps> = ({
   } = useCenterAutoCompleteList(filters);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const handleCenterClick = useCallback((center: CenterAutoCompleteItem) => {
     if (onCenterSelect) {

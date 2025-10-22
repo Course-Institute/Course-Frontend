@@ -22,8 +22,6 @@ import {
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useSession } from '../../contexts/SessionContext';
-import { formatTimeRemaining } from '../../utils/timeUtils';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface CenterSidebarProps {
@@ -33,7 +31,13 @@ interface CenterSidebarProps {
 }
 
 const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
-  const { logout, timeRemaining } = useSession();
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('keepSignedIn');
+    localStorage.removeItem('studentRegistrationNumber');
+    navigate('/login?role=center');
+  };
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,26 +167,13 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
 
       {/* Footer */}
       <Box sx={{ p: 2, borderTop: '1px solid #e2e8f0' }}>
-        {/* Session Timer */}
-        <Box sx={{ mb: 2, textAlign: 'center' }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: timeRemaining < 60000 ? '#ef4444' : '#64748b',
-              fontSize: '0.75rem',
-              fontWeight: 'medium',
-            }}
-          >
-            Session: {formatTimeRemaining(timeRemaining)}
-          </Typography>
-        </Box>
         
         {/* Logout Button */}
         <Button
           variant="outlined"
           fullWidth
           startIcon={<LogoutIcon />}
-          onClick={logout}
+          onClick={handleLogout}
           sx={{
             color: '#ef4444',
             borderColor: '#ef4444',

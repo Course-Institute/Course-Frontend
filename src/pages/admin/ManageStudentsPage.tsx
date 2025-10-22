@@ -209,14 +209,7 @@ const ManageStudentsPage = () => {
           variant="outlined" 
           size="small" 
           onClick={() => {
-            console.log('Manual fetch test');
-            console.log('isFetchingNextPage:', isFetchingNextPage);
-            if (!isFetchingNextPage) {
-              console.log('Calling fetchNextPage...');
-              // fetchNextPage();
-            } else {
-              console.log('Cannot fetch next page - conditions not met');
-            }
+            // Manual fetch test - functionality removed
           }}
           sx={{ mt: 1 }}
         >

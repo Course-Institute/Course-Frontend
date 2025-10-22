@@ -6,7 +6,6 @@ import axiosInstance from '../api/axiosInstance';
 interface CenterFormData {
   // Center Details
   centerName: string;
-  centerCode: string;
   centerType: string;
   yearOfEstablishment: string;
   address: string;
@@ -40,11 +39,10 @@ interface CenterFormData {
   cancelledCheque?: File;
 
   // Documents
-  documents?: File[];
-  gstCertificate: string;
-  panCard: string;
-  addressProof: string;
-  directorIdProof: string;
+  gstCertificate?: File;
+  panCard?: File;
+  addressProof?: File;
+  directorIdProof?: File;
 
   // Login Credentials
   username: string;
@@ -81,7 +79,7 @@ const saveCenter = async (data: CenterFormData): Promise<SaveCenterResponse> => 
     }
   });
 
-  const response = await axiosInstance.post<SaveCenterResponse>('/centers/create', formData, {
+  const response = await axiosInstance.post<SaveCenterResponse>('/api/admin/register-center', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

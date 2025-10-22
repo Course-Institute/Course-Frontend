@@ -45,7 +45,6 @@ const PaymentTable = ({ payments, onExport }: PaymentTableProps) => {
   };
 
   const handleAction = (action: string, payment: Payment) => {
-    console.log(`${action} for payment:`, payment.transactionId);
   };
 
   return (

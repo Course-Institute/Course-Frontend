@@ -21,7 +21,6 @@ import {
 interface CenterFormData {
   // Center Details
   centerName: string;
-  centerCode: string;
   centerType: string;
   yearOfEstablishment: string;
   address: string;
@@ -55,11 +54,10 @@ interface CenterFormData {
   cancelledCheque?: File | File[] | null;
 
   // Documents
-  documents?: File | File[] | null;
-  gstCertificate: string;
-  panCard: string;
-  addressProof: string;
-  directorIdProof: string;
+  gstCertificate?: File | File[] | null;
+  panCard?: File | File[] | null;
+  addressProof?: File | File[] | null;
+  directorIdProof?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -83,7 +81,6 @@ export function useCenterForm(): {
 } {
   const [formValues, setFormValues] = useState<CenterFormData>({
     centerName: '',
-    centerCode: '',
     centerType: '',
     yearOfEstablishment: '',
     address: '',
@@ -109,11 +106,10 @@ export function useCenterForm(): {
     ifsc: '',
     branchName: '',
     cancelledCheque: null,
-    documents: null,
-    gstCertificate: '',
-    panCard: '',
-    addressProof: '',
-    directorIdProof: '',
+    gstCertificate: null,
+    panCard: null,
+    addressProof: null,
+    directorIdProof: null,
     username: '',
     password: '',
     confirmPassword: '',
@@ -180,9 +176,6 @@ export function useCenterForm(): {
     // Center Details
     const centerNameResult = validateRequired(formValues.centerName || '');
     if (!centerNameResult.isValid) newErrors.centerName = centerNameResult.error || '';
-
-    const centerCodeResult = validateNumber(formValues.centerCode || '');
-    if (!centerCodeResult.isValid) newErrors.centerCode = centerCodeResult.error || '';
 
     const centerTypeResult = validateRequired(formValues.centerType || '');
     if (!centerTypeResult.isValid) newErrors.centerType = centerTypeResult.error || '';
@@ -263,19 +256,16 @@ export function useCenterForm(): {
     if (!chequeResult.isValid) newErrors.cancelledCheque = chequeResult.error || '';
 
     // Documents
-    const documentsResult = validateFileField(formValues.documents);
-    if (!documentsResult.isValid) newErrors.documents = documentsResult.error || '';
-
-    const gstResult = validateRequired(formValues.gstCertificate || '');
+    const gstResult = validateFileField(formValues.gstCertificate);
     if (!gstResult.isValid) newErrors.gstCertificate = gstResult.error || '';
 
-    const panResult = validateRequired(formValues.panCard || '');
+    const panResult = validateFileField(formValues.panCard);
     if (!panResult.isValid) newErrors.panCard = panResult.error || '';
 
-    const addressProofResult = validateRequired(formValues.addressProof || '');
+    const addressProofResult = validateFileField(formValues.addressProof);
     if (!addressProofResult.isValid) newErrors.addressProof = addressProofResult.error || '';
 
-    const directorIdResult = validateRequired(formValues.directorIdProof || '');
+    const directorIdResult = validateFileField(formValues.directorIdProof);
     if (!directorIdResult.isValid) newErrors.directorIdProof = directorIdResult.error || '';
 
     // Login Credentials
@@ -296,7 +286,6 @@ export function useCenterForm(): {
     return {
       // Center Details
       centerName: data.centerName,
-      centerCode: data.centerCode,
       centerType: data.centerType,
       yearOfEstablishment: data.yearOfEstablishment,
       address: data.address,
@@ -330,11 +319,10 @@ export function useCenterForm(): {
       cancelledCheque: Array.isArray(data.cancelledCheque) ? data.cancelledCheque[0] : (data.cancelledCheque || undefined),
 
       // Documents
-      documents: Array.isArray(data.documents) ? data.documents : (data.documents ? [data.documents] : []),
-      gstCertificate: data.gstCertificate,
-      panCard: data.panCard,
-      addressProof: data.addressProof,
-      directorIdProof: data.directorIdProof,
+      gstCertificate: Array.isArray(data.gstCertificate) ? data.gstCertificate[0] : (data.gstCertificate || undefined),
+      panCard: Array.isArray(data.panCard) ? data.panCard[0] : (data.panCard || undefined),
+      addressProof: Array.isArray(data.addressProof) ? data.addressProof[0] : (data.addressProof || undefined),
+      directorIdProof: Array.isArray(data.directorIdProof) ? data.directorIdProof[0] : (data.directorIdProof || undefined),
 
       // Login Credentials
       username: data.username,

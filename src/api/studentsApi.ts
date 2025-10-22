@@ -66,6 +66,8 @@ export interface AddStudentData {
   courseFee?: string;
   hostelFacility?: string;
   duration?: string;
+  centerId: string;
+  center?: any;
 }
 
 export interface AddStudentResponse {

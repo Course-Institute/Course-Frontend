@@ -22,11 +22,9 @@ export const useInfiniteStudents = (
   const queryKey = createInfiniteQueryKey('students', filters);
   
   const queryFn = async ({ pageParam }: { pageParam: number }) => {
-    console.log('Fetching students data for page:', pageParam, 'limit:', limit);
     // For now, we'll use the existing API and apply filters client-side
     // In a real implementation, you'd want to pass filters to the API
     const response = await getStudentsData(pageParam, limit);
-    console.log('API response:', response);
     
     // Apply client-side filters
     let filteredStudents = response.data.students;
@@ -71,13 +69,6 @@ export const useInfiniteStudents = (
     }
     
     // Return in the format expected by useInfinitePaginatedData
-    console.log('Query function result:', {
-      dataLength: filteredStudents.length,
-      pagination: response.data.pagination,
-      hasNextPage: response.data.pagination.hasNextPage,
-      totalPages: response.data.pagination.totalPages,
-      currentPage: response.data.pagination.currentPage
-    });
     
     return {
       data: filteredStudents,
@@ -89,18 +80,10 @@ export const useInfiniteStudents = (
     queryKey,
     queryFn,
     getNextPageParam: (lastPage) => {
-      console.log('getNextPageParam called with:', {
-        lastPage,
-        pagination: lastPage.pagination,
-        hasNextPage: lastPage.pagination.hasNextPage,
-        currentPage: lastPage.pagination.currentPage
-      });
-      
       const nextPage = lastPage.pagination.hasNextPage 
         ? lastPage.pagination.currentPage + 1 
         : undefined;
         
-      console.log('getNextPageParam returning:', nextPage);
       return nextPage;
     },
     initialPageParam: 1,
@@ -112,14 +95,6 @@ export const useInfiniteStudents = (
 
   // Flatten the data manually
   const flattenedData = result.data?.pages?.flatMap(page => page.data) || [];
-
-  console.log('Direct useInfiniteQuery result:', {
-    data: result.data,
-    hasNextPage: result.hasNextPage,
-    isFetchingNextPage: result.isFetchingNextPage,
-    isLoading: result.isLoading,
-    flattenedData: flattenedData
-  });
 
   return {
     data: flattenedData,
