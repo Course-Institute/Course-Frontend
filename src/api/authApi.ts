@@ -74,6 +74,37 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
   }
 };
 
+// Center login API
+export const centerLogin = async (credentials: { email: string; password: string }): Promise<LoginResponse> => {
+  // Demo credentials - no API call needed
+  if (credentials.email === 'center@demo.com' && credentials.password === 'center123') {
+    return {
+      status: true,
+      message: 'Center login successful',
+      data: {
+        user: {
+          id: '2',
+          name: 'Demo Center',
+          email: 'center@demo.com',
+          role: 'center',
+        },
+        token: 'center-jwt-token-' + Date.now(),
+      },
+    };
+  }
+  
+  // Real credentials - make API call to backend
+  try {
+    const response = await axiosInstance.post('/api/user/center-login', credentials);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Center login failed. Please try again.');
+  }
+};
+
 export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
   const { email, password, registrationNumber, dateOfBirth, role } = credentials;
   switch (role.toLowerCase()) {
@@ -87,6 +118,11 @@ export const loginUser = async (credentials: LoginRequest): Promise<LoginRespons
         throw new Error('Email and password are required for admin login');
       }
       return adminLogin({ email, password });
+    case 'center':
+      if (!email || !password) {
+        throw new Error('Email and password are required for center login');
+      }
+      return centerLogin({ email, password });
     case 'student':
       if (!registrationNumber || !dateOfBirth) {
         throw new Error('Registration number and date of birth are required for student login');
