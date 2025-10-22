@@ -71,13 +71,6 @@ export const useInfiniteData = <TData>(
     isRefetching
   } = useInfiniteQuery(queryOptions);
 
-  // Debug logging
-  console.log('useInfiniteQuery result:', {
-    data,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading
-  });
 
   // Type assertion for infinite query data structure
   const infiniteData = data as { pages: TData[] } | undefined;

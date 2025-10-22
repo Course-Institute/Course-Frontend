@@ -116,12 +116,6 @@ export const useReportsData = (options: UseReportsDataOptions = {}) => {
 
   const students = useMemo(() => {
     const allStudents = data?.pages.flatMap(page => page?.students ?? []) as ReportStudent[];
-    console.log('📊 Reports data updated:', {
-      totalPages: data?.pages.length,
-      totalStudents: allStudents.length,
-      lastPagePagination: data?.pages[data.pages.length - 1]?.pagination,
-      hasNextPage
-    });
     return allStudents;
   }, [data, hasNextPage]);
 
@@ -133,11 +127,6 @@ export const useReportsData = (options: UseReportsDataOptions = {}) => {
     tableContainerRef as React.RefObject<HTMLElement>,
     lastElementRef as React.RefObject<HTMLElement>,
     () => {
-      console.log('🚀 Reports intersection observer triggered!', {
-        hasNextPage,
-        isFetchingNextPage,
-        studentsCount: students.length
-      });
       fetchNextPage();
     },
     hasNextPage ?? false,

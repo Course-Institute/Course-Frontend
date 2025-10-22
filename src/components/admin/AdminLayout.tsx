@@ -27,10 +27,8 @@ const AdminLayout = ({ children, title = "Admin Panel" }: AdminLayoutProps) => {
     const token = localStorage.getItem('authToken');
     const role = localStorage.getItem('userRole');
     
-    console.log('AdminLayout auth check:', { token: !!token, role });
     
     if (!token || !role || role !== 'admin') {
-      console.log('AdminLayout: Redirecting to login - no valid auth');
       navigate('/login?role=app');
     }
   }, [navigate]);
