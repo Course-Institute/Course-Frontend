@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -21,7 +21,6 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
   const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
@@ -34,14 +33,8 @@ const Navbar = () => {
     setMobileOpen(false); // Close mobile drawer if open
   };
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
     setMobileOpen(false);
   };
 
@@ -58,41 +51,14 @@ const Navbar = () => {
     setMobileOpen(false);
   };
 
-  // Track active section on scroll with throttling
-  useEffect(() => {
-    let ticking = false;
-    
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const sections = ['home', 'about', 'impact', 'reviews'];
-          const scrollPosition = window.scrollY + 100;
-
-          for (const section of sections) {
-            const element = document.getElementById(section);
-            if (element) {
-              const { offsetTop, offsetHeight } = element;
-              if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-                setActiveSection(section);
-                break;
-              }
-            }
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About Us' },
-    { id: 'impact', label: 'Impact' },
-    { id: 'reviews', label: 'Reviews' },
+    { id: 'home', label: 'Home', path: '/' },
+    { id: 'about', label: 'About Us', path: '/about' },
+    { id: 'programs', label: 'Programs', path: '/programs' },
+    { id: 'alumni', label: 'Alumni', path: '/alumni' },
+    { id: 'affiliation', label: 'Affiliation', path: '/affiliation' },
+    { id: 'contact', label: 'Contact', path: '/contact' },
   ];
 
   const drawer = (
@@ -121,7 +87,7 @@ const Navbar = () => {
         {navItems.map((item) => (
           <ListItem
             key={item.id}
-            onClick={() => scrollToSection(item.id)}
+            onClick={() => handleNavigation(item.path)}
             sx={{
               borderBottom: 1,
               borderColor: 'divider',
@@ -135,8 +101,8 @@ const Navbar = () => {
             <ListItemText
               primary={item.label}
               sx={{
-                color: activeSection === item.id ? theme.palette.primary.main : 'inherit',
-                fontWeight: activeSection === item.id ? 'bold' : 'normal',
+                color: window.location.pathname === item.path ? theme.palette.primary.main : 'inherit',
+                fontWeight: window.location.pathname === item.path ? 'bold' : 'normal',
               }}
             />
           </ListItem>
@@ -230,10 +196,10 @@ const Navbar = () => {
               {navItems.map((item) => (
                 <Button
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleNavigation(item.path)}
                   sx={{
-                    color: activeSection === item.id ? theme.palette.primary.main : 'text.primary',
-                    fontWeight: activeSection === item.id ? 'bold' : 'normal',
+                    color: window.location.pathname === item.path ? theme.palette.primary.main : 'text.primary',
+                    fontWeight: window.location.pathname === item.path ? 'bold' : 'normal',
                     textTransform: 'none',
                     position: 'relative',
                     '&:hover': {
@@ -249,7 +215,7 @@ const Navbar = () => {
                         backgroundColor: theme.palette.primary.main,
                       },
                     },
-                    '&::after': activeSection === item.id ? {
+                    '&::after': window.location.pathname === item.path ? {
                       content: '""',
                       position: 'absolute',
                       bottom: 0,

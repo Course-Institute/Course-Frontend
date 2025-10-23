@@ -3,6 +3,11 @@ import HomePage from './pages/HomePage';
 import CoursesPage from './pages/CoursesPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AboutUsPage from './pages/AboutUsPage';
+import ProgramsPage from './pages/ProgramsPage';
+import AlumniPage from './pages/AlumniPage';
+import AffiliationPage from './pages/AffiliationPage';
+import ContactUsPage from './pages/ContactUsPage';
 import AdminLayout from './components/admin/AdminLayout';
 import CenterLayout from './components/center/CenterLayout';
 import DashboardPage from './pages/admin/DashboardPage';
@@ -28,6 +33,11 @@ function App() {
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/alumni" element={<AlumniPage />} />
+          <Route path="/affiliation" element={<AffiliationPage />} />
+          <Route path="/contact" element={<ContactUsPage />} />
           <Route path="/login" element={<LoginPage />} />
           
           {/* Admin Routes with Layout */}
