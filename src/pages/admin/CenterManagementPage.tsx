@@ -19,7 +19,7 @@ import {
   CheckCircle,
   Cancel,
 } from '@mui/icons-material';
-import { useCenterStats } from '../../hooks/useCenterStats';
+import { useCenterStats, useRefreshCenterStats } from '../../hooks/useCenterStats';
 import { useCenterList, type CenterFilters } from '../../hooks/useCenterList';
 import Table, { type Column } from '../../components/core-components/Table';
 

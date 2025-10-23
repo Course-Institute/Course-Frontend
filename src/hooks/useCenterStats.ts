@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axiosInstance from '../api/axiosInstance';
 
 interface CenterStats {
   totalCenters: number;
@@ -7,19 +8,15 @@ interface CenterStats {
   deactivatedCenters: number;
 }
 
-// Mock data for center statistics
-const mockCenterStats: CenterStats = {
-  totalCenters: 120,
-  pendingApprovals: 15,
-  activeCenters: 98,
-  deactivatedCenters: 7,
-};
+interface CenterDynamicsResponse {
+  status: boolean;
+  message: string;
+  data: CenterStats;
+}
 
 const fetchCenterStats = async (): Promise<CenterStats> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return mockCenterStats;
+  const response = await axiosInstance.get('/api/admin/centerdynamics');
+  return response.data.data;
 };
 
 export const useCenterStats = () => {
@@ -28,5 +25,20 @@ export const useCenterStats = () => {
     queryFn: fetchCenterStats,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    retry: 2,
+  });
+};
+
+export const useRefreshCenterStats = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: fetchCenterStats,
+    onSuccess: (data) => {
+      queryClient.setQueryData(['centerStats'], data);
+    },
+    onError: (error) => {
+      console.error('Failed to refresh center stats:', error);
+    },
   });
 };
