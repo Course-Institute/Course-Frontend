@@ -27,6 +27,59 @@ const FooterSection = () => {
     navigate(`/login?role=${loginType.toLowerCase()}`);
   };
 
+  const handleQuickLinkClick = (link: string) => {
+    switch (link) {
+      case 'About Us':
+        navigate('/about-us');
+        break;
+      case 'Programs':
+        navigate('/programs');
+        break;
+      case 'Alumni':
+        navigate('/alumni');
+        break;
+      case 'Affiliation':
+        navigate('/affiliation');
+        break;
+      case 'Contact Us':
+        navigate('/contact-us');
+        break;
+      default:
+        navigate('/');
+    }
+  };
+
+  const handleContactClick = (type: string) => {
+    switch (type) {
+      case 'phone':
+        window.open('tel:+919876543210', '_self');
+        break;
+      case 'email':
+        window.open('mailto:info@mahavirinstitute.com', '_self');
+        break;
+      case 'location':
+        window.open('https://maps.google.com/?q=Mahavir+Institute+of+Vocational+Paramedical+Science+Delhi+India', '_blank');
+        break;
+    }
+  };
+
+  const handleSocialClick = (platform: string) => {
+    const socialLinks = {
+      facebook: 'https://facebook.com/mivps',
+      twitter: 'https://twitter.com/mivps',
+      linkedin: 'https://linkedin.com/company/mivps',
+      instagram: 'https://instagram.com/mivps'
+    };
+    window.open(socialLinks[platform as keyof typeof socialLinks], '_blank');
+  };
+
+  const handlePolicyClick = (policy: string) => {
+    // In a real app, these would navigate to actual policy pages
+    console.log(`Navigate to ${policy}`);
+    // For now, we'll show an alert
+    alert(`${policy} page will be available soon!`);
+  };
+
   return (
     <Box
       sx={{
@@ -124,25 +177,30 @@ const FooterSection = () => {
               Quick Links
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, alignItems: 'center' }}>
-              {['About Us', 'Courses', 'Faculty', 'Admissions', 'Career', 'Blog'].map((link, index) => (
+              {['About Us', 'Programs', 'Alumni', 'Affiliation', 'Contact Us'].map((link, index) => (
                 <Box key={index} sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Typography
                     variant="body1"
+                    onClick={() => handleQuickLinkClick(link)}
                     sx={{
                       color: 'rgba(255, 255, 255, 0.7)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       position: 'relative',
                       textAlign: 'center',
+                      px: 2,
+                      // py: 1,
+                      borderRadius: 1,
                       '&:hover': {
                         color: theme.palette.primary.main,
                         transform: 'scale(1.05)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
                     }}
                   >
                     {link}
                   </Typography>
-                  {index < 5 && (
+                  {index < 4 && (
                     <Box
                       sx={{
                         width: '60%',
@@ -184,7 +242,23 @@ const FooterSection = () => {
               Contact Info
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, justifyContent: 'center' }}>
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: 2, 
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  p: 2,
+                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
+                onClick={() => handleContactClick('location')}
+              >
                 <Box
                   sx={{
                     p: 1.5,
@@ -199,13 +273,30 @@ const FooterSection = () => {
                 </Box>
                 <Box>
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.6 }}>
-                    123 Education Street<br />
-                    Learning City, LC 12345<br />
-                    India
+                    Mahavir Institute of Vocational & Paramedical Science<br />
+                    Near Railway Station, Main Road<br />
+                    Delhi, India - 110001
                   </Typography>
                 </Box>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 2, 
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  p: 2,
+                  py: 0,
+                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
+                onClick={() => handleContactClick('phone')}
+              >
                 <Box
                   sx={{
                     p: 1.5,
@@ -219,10 +310,26 @@ const FooterSection = () => {
                   <Phone sx={{ fontSize: 20, color: theme.palette.primary.main }} />
                 </Box>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                  +91 (555) 123-4567
+                  +91 98765 43210
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 2, 
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  p: 2,
+                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
+                onClick={() => handleContactClick('email')}
+              >
                 <Box
                   sx={{
                     p: 1.5,
@@ -236,7 +343,7 @@ const FooterSection = () => {
                   <Email sx={{ fontSize: 20, color: theme.palette.primary.main }} />
                 </Box>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                  info@mivps.com
+                  info@mahavirinstitute.com
                 </Typography>
               </Box>
             </Box>
@@ -270,13 +377,14 @@ const FooterSection = () => {
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
             {[
-              { icon: <Facebook sx={{ fontSize: 24 }} />, color: '#1877F2' },
-              { icon: <Twitter sx={{ fontSize: 24 }} />, color: '#1DA1F2' },
-              { icon: <LinkedIn sx={{ fontSize: 24 }} />, color: '#0077B5' },
-              { icon: <Instagram sx={{ fontSize: 24 }} />, color: '#E4405F' },
+              { icon: <Facebook sx={{ fontSize: 24 }} />, color: '#1877F2', platform: 'facebook' },
+              { icon: <Twitter sx={{ fontSize: 24 }} />, color: '#1DA1F2', platform: 'twitter' },
+              { icon: <LinkedIn sx={{ fontSize: 24 }} />, color: '#0077B5', platform: 'linkedin' },
+              { icon: <Instagram sx={{ fontSize: 24 }} />, color: '#E4405F', platform: 'instagram' },
             ].map((social, index) => (
               <Box
                 key={index}
+                onClick={() => handleSocialClick(social.platform)}
                 sx={{
                   p: 1.5,
                   borderRadius: 2,
@@ -407,12 +515,18 @@ const FooterSection = () => {
                   <Typography
                     key={index}
                     variant="body2"
+                    onClick={() => handlePolicyClick(link)}
                     sx={{
                       color: 'rgba(255, 255, 255, 0.7)',
                       cursor: 'pointer',
-                      transition: 'color 0.3s ease',
+                      transition: 'all 0.3s ease',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
                       '&:hover': {
                         color: theme.palette.primary.main,
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >

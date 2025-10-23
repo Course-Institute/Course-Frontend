@@ -394,11 +394,11 @@ const ContactUsPage = () => {
                     </Grid>
                   </Box>
 
-                  <Box sx={{ mt: 3, p: 2, backgroundColor: 'info.light', borderRadius: 2, opacity: 0.1 }}>
+                  <Box sx={{ mt: 3, p: 2, backgroundColor: 'rgb(97, 152, 230)', borderRadius: 2,  }}>
                     <Typography
                       variant="body2"
                       sx={{
-                        color: '#64748b',
+                        color: 'rgb(185, 235, 175)',
                         fontStyle: 'italic',
                         textAlign: 'center'
                       }}

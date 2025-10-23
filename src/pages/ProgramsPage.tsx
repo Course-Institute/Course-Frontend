@@ -102,7 +102,7 @@ const ProgramsPage = () => {
           py: 8, 
           background: `
             linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
-            url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80')
+            url('https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
           `,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
