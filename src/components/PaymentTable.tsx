@@ -44,7 +44,8 @@ const PaymentTable = ({ payments, onExport }: PaymentTableProps) => {
     });
   };
 
-  const handleAction = (action: string, payment: Payment) => {
+  const handleAction = (_action: string, _payment: Payment) => {
+    // TODO: Implement payment actions
   };
 
   return (
