@@ -36,20 +36,33 @@ const AlumniPage = () => {
   ];
 
   const employmentSectors = [
-    { icon: <Business />, name: "Hospitals", color: "#ef4444" },
-    { icon: <Business />, name: "Private Clinics", color: "#3b82f6" },
-    { icon: <Computer />, name: "IT Companies", color: "#8b5cf6" },
-    { icon: <School />, name: "Schools", color: "#10b981" },
-    { icon: <Spa />, name: "Salons", color: "#f59e0b" },
-    { icon: <Business />, name: "Design Studios", color: "#ec4899" },
-    { icon: <Agriculture />, name: "Farms", color: "#22c55e" }
+    { icon: <Business />, name: "Hospitals", color: "#2563eb" },
+    { icon: <Business />, name: "Private Clinics", color: "#10b981" },
+    { icon: <Computer />, name: "IT Companies", color: "#0ea5e9" },
+    { icon: <School />, name: "Schools", color: "#059669" },
+    { icon: <Spa />, name: "Salons", color: "#1d4ed8" },
+    { icon: <Business />, name: "Design Studios", color: "#34d399" },
+    { icon: <Agriculture />, name: "Farms", color: "#0284c7" }
   ];
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box sx={{ flex: 1, py: 8, backgroundColor: '#f8fafc' }}>
+      <Box 
+        sx={{ 
+          flex: 1, 
+          py: 8, 
+          background: `
+            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            url('https://images.unsplash.com/photo-1523240798034-6c2165d3b3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <Container maxWidth="lg">
           {/* Page Header */}
           <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -67,7 +80,7 @@ const AlumniPage = () => {
             <Typography
               variant="h4"
               sx={{
-                color: '#3b82f6',
+                color: 'primary.main',
                 fontWeight: '600',
                 mb: 4
               }}
@@ -206,14 +219,14 @@ const AlumniPage = () => {
                         >
                           {testimonial.author}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: '#3b82f6',
-                            fontWeight: '600',
-                            mb: 1
-                          }}
-                        >
+                         <Typography
+                           variant="body2"
+                           sx={{
+                             color: 'primary.main',
+                             fontWeight: '600',
+                             mb: 1
+                           }}
+                         >
                           {testimonial.program}
                         </Typography>
                         <Typography
@@ -241,7 +254,7 @@ const AlumniPage = () => {
                 border: '1px solid #e2e8f0',
                 p: 6,
                 textAlign: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                 background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
                 color: 'white'
               }}
             >
@@ -271,13 +284,13 @@ const AlumniPage = () => {
               <Button
                 variant="contained"
                 size="large"
-                sx={{
-                  backgroundColor: 'white',
-                  color: '#667eea',
-                  '&:hover': {
-                    backgroundColor: '#f8fafc',
-                    color: '#667eea'
-                  },
+                 sx={{
+                   backgroundColor: 'white',
+                   color: 'primary.main',
+                   '&:hover': {
+                     backgroundColor: 'grey.50',
+                     color: 'primary.dark'
+                   },
                   textTransform: 'none',
                   borderRadius: 3,
                   px: 6,

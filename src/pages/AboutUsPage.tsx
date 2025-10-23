@@ -14,7 +14,20 @@ const AboutUsPage = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box sx={{ flex: 1, py: 8, backgroundColor: '#f8fafc' }}>
+      <Box 
+        sx={{ 
+          flex: 1, 
+          py: 8, 
+          background: `
+            linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%),
+            url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2022&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <Container maxWidth="lg">
           {/* Page Header */}
           <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -32,7 +45,7 @@ const AboutUsPage = () => {
             <Typography
               variant="h4"
               sx={{
-                color: '#3b82f6',
+                color: 'primary.main',
                 fontWeight: '600',
                 mb: 2
               }}
@@ -47,23 +60,77 @@ const AboutUsPage = () => {
               <Card
                 sx={{
                   height: '100%',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
+                  borderRadius: 4,
+                  boxShadow: '0 20px 40px rgba(37, 99, 235, 0.15)',
+                  border: '2px solid transparent',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '6px',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -50,
+                    right: -50,
+                    width: '100px',
+                    height: '100px',
+                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                    borderRadius: '50%',
+                    zIndex: 0,
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 25px 50px rgba(37, 99, 235, 0.25)',
+                    '&::after': {
+                      transform: 'scale(1.2)',
+                      transition: 'transform 0.3s ease',
+                    }
+                  },
+                  transition: 'all 0.3s ease',
                 }}
               >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: '#1e293b',
-                      mb: 3,
-                      textAlign: 'center'
-                    }}
-                  >
-                    Our Mission
-                  </Typography>
+                <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ textAlign: 'center', mb: 3 }}>
+                    <Box
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 2,
+                        boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
+                      }}
+                    >
+                      <Typography sx={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
+                        🎯
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 'bold',
+                        color: '#1e293b',
+                        background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      Our Mission
+                    </Typography>
+                  </Box>
                   <Typography
                     variant="body1"
                     sx={{
@@ -90,23 +157,77 @@ const AboutUsPage = () => {
               <Card
                 sx={{
                   height: '100%',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
+                  borderRadius: 4,
+                  boxShadow: '0 20px 40px rgba(16, 185, 129, 0.15)',
+                  border: '2px solid transparent',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '6px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -50,
+                    right: -50,
+                    width: '100px',
+                    height: '100px',
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%)',
+                    borderRadius: '50%',
+                    zIndex: 0,
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 25px 50px rgba(16, 185, 129, 0.25)',
+                    '&::after': {
+                      transform: 'scale(1.2)',
+                      transition: 'transform 0.3s ease',
+                    }
+                  },
+                  transition: 'all 0.3s ease',
                 }}
               >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: '#1e293b',
-                      mb: 3,
-                      textAlign: 'center'
-                    }}
-                  >
-                    Our Vision
-                  </Typography>
+                <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ textAlign: 'center', mb: 3 }}>
+                    <Box
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 2,
+                        boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
+                      <Typography sx={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
+                        👁️
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 'bold',
+                        color: '#1e293b',
+                        background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      Our Vision
+                    </Typography>
+                  </Box>
                   <Typography
                     variant="body1"
                     sx={{
@@ -152,14 +273,46 @@ const AboutUsPage = () => {
               Cultivating Talent, Building Careers
             </Typography>
             
-            <Card
-              sx={{
-                borderRadius: 3,
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                border: '1px solid #e2e8f0',
-                p: 4
-              }}
-            >
+                  <Card
+                    sx={{
+                      borderRadius: 4,
+                      boxShadow: '0 20px 40px rgba(59, 130, 246, 0.15)',
+                      border: '2px solid transparent',
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+                      p: 4,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '6px',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                      },
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: -30,
+                        right: -30,
+                        width: '80px',
+                        height: '80px',
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%)',
+                        borderRadius: '50%',
+                        zIndex: 0,
+                      },
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 25px 50px rgba(59, 130, 246, 0.25)',
+                        '&::after': {
+                          transform: 'scale(1.1)',
+                          transition: 'transform 0.3s ease',
+                        }
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
               <Typography
                 variant="body1"
                 sx={{
@@ -253,46 +406,109 @@ const AboutUsPage = () => {
                   title: "Accessible Education",
                   description: "Our programs are structured to support students from diverse educational backgrounds, starting from 10th pass level."
                 }
-              ].map((item, index) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      borderRadius: 3,
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.08)',
-                      border: '1px solid #e2e8f0',
-                      transition: 'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-5px)',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                      }
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b',
-                          mb: 2
-                        }}
-                      >
-                        {item.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#64748b',
-                          lineHeight: 1.6
-                        }}
-                      >
-                        {item.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+                      ].map((item, index) => {
+                        const colors = [
+                          { primary: '#2563eb', secondary: '#3b82f6', light: '#dbeafe' },
+                          { primary: '#10b981', secondary: '#34d399', light: '#d1fae5' },
+                          { primary: '#7c3aed', secondary: '#a855f7', light: '#ede9fe' },
+                          { primary: '#dc2626', secondary: '#ef4444', light: '#fee2e2' },
+                          { primary: '#ea580c', secondary: '#f97316', light: '#fed7aa' },
+                          { primary: '#0891b2', secondary: '#06b6d4', light: '#cffafe' }
+                        ];
+                        const colorSet = colors[index % colors.length];
+                        
+                        return (
+                        <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                          <Card
+                            sx={{
+                              height: '100%',
+                              borderRadius: 4,
+                              boxShadow: `0 15px 35px ${colorSet.primary}20`,
+                              border: '2px solid transparent',
+                              background: `linear-gradient(135deg, #ffffff 0%, ${colorSet.light} 100%)`,
+                              position: 'relative',
+                              overflow: 'hidden',
+                              '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '4px',
+                                background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
+                              },
+                              '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                top: -20,
+                                right: -20,
+                                width: '60px',
+                                height: '60px',
+                                background: `linear-gradient(135deg, ${colorSet.primary}20 0%, ${colorSet.secondary}20 100%)`,
+                                borderRadius: '50%',
+                                zIndex: 0,
+                              },
+                              transition: 'all 0.3s ease',
+                              '&:hover': {
+                                transform: 'translateY(-8px)',
+                                boxShadow: `0 20px 40px ${colorSet.primary}30`,
+                                '&::after': {
+                                  transform: 'scale(1.3)',
+                                  transition: 'transform 0.3s ease',
+                                }
+                              }
+                            }}
+                          >
+                            <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                                <Box
+                                  sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '50%',
+                                    background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    mr: 2,
+                                    flexShrink: 0,
+                                    boxShadow: `0 4px 12px ${colorSet.primary}40`,
+                                  }}
+                                >
+                                  <Typography sx={{ color: 'white', fontSize: '18px' }}>
+                                    {['🎓', '👨‍🏫', '🔬', '📚', '💼', '🌱'][index % 6]}
+                                  </Typography>
+                                </Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: 'bold',
+                                    color: '#1e293b',
+                                    background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                  }}
+                                >
+                                  {item.title}
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: '#64748b',
+                                  lineHeight: 1.6,
+                                  pl: 6
+                                }}
+                              >
+                                {item.description}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        );
+                      })}
+                    </Grid>
           </Box>
         </Container>
       </Box>
