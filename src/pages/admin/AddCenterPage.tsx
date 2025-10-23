@@ -57,7 +57,7 @@ const AddCenterPage = () => {
   const handleFileChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      if (key === 'photo' || key === 'cancelledCheque' || key === 'gstCertificate' || key === 'panCard' || key === 'addressProof' || key === 'directorIdProof') {
+      if (key === 'photo' || key === 'cancelledCheque' || key === 'gstCertificate' || key === 'panCard' || key === 'addressProof' || key === 'directorIdProof' || key === 'signature') {
         updateFile(key, files[0]);
       } else {
         const fileList = Array.from(files);
@@ -105,7 +105,9 @@ const AddCenterPage = () => {
           >
             <MenuItem value="franchise">Franchise</MenuItem>
             <MenuItem value="partner">Partner</MenuItem>
+            <MenuItem value="company">Company</MenuItem>
             <MenuItem value="own">Own Center</MenuItem>
+            <MenuItem value="other">Other</MenuItem>
           </TextField>
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
@@ -549,6 +551,26 @@ const AddCenterPage = () => {
           {errors.directorIdProof && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.directorIdProof}
+            </Typography>
+          )}
+        </Box>
+        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
+          <Button 
+            variant="outlined" 
+            component="label" 
+            fullWidth
+            sx={{ 
+              height: '56px',
+              borderColor: errors.signature ? '#ef4444' : undefined,
+              color: errors.signature ? '#ef4444' : undefined
+            }}
+          >
+            {formValues.signature ? (Array.isArray(formValues.signature) ? `${formValues.signature.length} file(s) selected` : formValues.signature.name) : 'Upload Signature'}
+            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('signature')} />
+          </Button>
+          {errors.signature && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+              {errors.signature}
             </Typography>
           )}
         </Box>

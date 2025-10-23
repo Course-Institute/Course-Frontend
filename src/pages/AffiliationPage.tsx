@@ -21,7 +21,7 @@ const AffiliationPage = () => {
           flex: 1, 
           py: 8, 
           background: `
-            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            linear-gradient(135deg, rgba(217, 217, 218, 0.9) 0%, rgba(198, 199, 199, 0.9) 100%),
             url('https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=2086&q=80')
           `,
           backgroundSize: 'cover',

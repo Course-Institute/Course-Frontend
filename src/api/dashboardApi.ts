@@ -3,6 +3,8 @@ export interface DashboardStats {
   totalPayments: number;
   pendingApprovals: number;
   activeCenters: number;
+  studentIncrease: number; // Monthly increase percentage
+  centerIncrease: number; // Monthly increase percentage
 }
 
 export interface DashboardApiResponse {
@@ -11,38 +13,10 @@ export interface DashboardApiResponse {
   message?: string;
 }
 
-// Mock API function - replace with real API endpoint
-export const getAdminDashboardData = async (): Promise<DashboardApiResponse> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate API call with some random data
-      const mockData: DashboardStats = {
-        studentCount: Math.floor(Math.random() * 5000) + 8000, // 8000-13000
-        totalPayments: Math.floor(Math.random() * 200000) + 400000, // 400000-600000
-        pendingApprovals: Math.floor(Math.random() * 50) + 20, // 20-70
-        activeCenters: Math.floor(Math.random() * 10) + 10, // 10-20
-      };
-
-      // Simulate 10% chance of API failure for testing error handling
-      if (Math.random() < 0.1) {
-        reject(new Error('API Error: Failed to fetch dashboard data'));
-        return;
-      }
-
-      resolve({
-        success: true,
-        data: mockData,
-        message: 'Dashboard data fetched successfully',
-      });
-    }, 800); // Simulate network delay
-  });
-};
-
-// Real API function (commented out - uncomment when backend is ready)
-/*
+// Real API function for dashboard stats
 export const getAdminDashboardData = async (): Promise<DashboardApiResponse> => {
   try {
-    const response = await fetch('/api/admin/dashboard', {
+    const response = await fetch('/api/admin/dashboardStats', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -60,4 +34,4 @@ export const getAdminDashboardData = async (): Promise<DashboardApiResponse> => 
     throw new Error(`Failed to fetch dashboard data: ${error}`);
   }
 };
-*/
+

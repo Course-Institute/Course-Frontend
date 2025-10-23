@@ -37,6 +37,7 @@ interface CenterFormData {
   panCard?: File | File[] | null;
   addressProof?: File | File[] | null;
   directorIdProof?: File | File[] | null;
+  signature?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -178,6 +179,11 @@ export const generateCenterFormPDF = (formData: CenterFormData): void => {
     (Array.isArray(formData.directorIdProof) ? 
       formData.directorIdProof.map(f => f.name).join(', ') : 
       formData.directorIdProof.name) : 
+    'No file uploaded');
+  addRow('Signature:', formData.signature ? 
+    (Array.isArray(formData.signature) ? 
+      formData.signature.map(f => f.name).join(', ') : 
+      formData.signature.name) : 
     'No file uploaded');
   
   // Check if we need a new page
@@ -537,6 +543,11 @@ export const generateCenterFormPreview = (formData: CenterFormData): string => {
           (Array.isArray(formData.directorIdProof) ? 
             formData.directorIdProof.map(f => f.name).join(', ') : 
             formData.directorIdProof.name) : 
+          'No file uploaded'}</td></tr>
+        <tr><td>Signature:</td><td>${formData.signature ? 
+          (Array.isArray(formData.signature) ? 
+            formData.signature.map(f => f.name).join(', ') : 
+            formData.signature.name) : 
           'No file uploaded'}</td></tr>
       </table>
       

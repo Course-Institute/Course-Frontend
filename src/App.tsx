@@ -33,11 +33,11 @@ function App() {
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/alumni" element={<AlumniPage />} />
           <Route path="/affiliation" element={<AffiliationPage />} />
-          <Route path="/contact" element={<ContactUsPage />} />
+          <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/login" element={<LoginPage />} />
           
           {/* Admin Routes with Layout */}

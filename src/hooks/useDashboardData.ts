@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { type DashboardStats } from '../api/dashboardApi';
+import axiosInstance from '../api/axiosInstance';
 
 interface UseDashboardDataReturn {
   data: DashboardStats;
@@ -9,21 +10,9 @@ interface UseDashboardDataReturn {
   refetch: () => void;
 }
 
-// Mock data for dashboard
-const mockDashboardData: DashboardStats = {
-  studentCount: 1247,
-  totalPayments: 2450000,
-  pendingApprovals: 23,
-  activeCenters: 8,
-};
-
-const fetchDashboardData = async (): Promise<{ data: DashboardStats }> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return {
-    data: mockDashboardData
-  };
+const fetchDashboardData = async (): Promise<DashboardStats> => {
+  const response = await axiosInstance.get('/api/admin/dashboardStats');
+  return response.data;
 };
 
 export const useDashboardData = (): UseDashboardDataReturn => {
@@ -48,10 +37,12 @@ export const useDashboardData = (): UseDashboardDataReturn => {
     totalPayments: 0,
     pendingApprovals: 0,
     activeCenters: 0,
+    studentIncrease: 0,
+    centerIncrease: 0,
   };
 
   return {
-    data: apiResponse?.data || defaultData,
+    data: apiResponse || defaultData,
     isLoading,
     isError,
     error: error as Error | null,
