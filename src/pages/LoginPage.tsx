@@ -19,6 +19,11 @@ import {
   Visibility,
   VisibilityOff,
   Business,
+  School,
+  AdminPanelSettings,
+  Person,
+  BusinessCenter,
+  Security,
 } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
 import { loginUser, type LoginResponse } from '../api/authApi';
@@ -149,6 +154,68 @@ const LoginPage = () => {
     }
   }, [role]);
 
+  const getThemeConfig = useCallback(() => {
+    switch (role.toLowerCase()) {
+      case 'student':
+        return {
+          background: `
+            linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(34, 197, 94, 0.6) 100%),
+            url('https://images.unsplash.com/photo-1523240798034-6c2165d3b3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          cardBackground: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          iconBackground: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+          icon: <School sx={{ fontSize: 40, color: 'white' }} />,
+          primaryColor: '#3b82f6',
+          secondaryColor: '#22c55e',
+          title: 'Student Portal',
+          description: 'Access your academic journey and educational resources'
+        };
+      case 'center':
+        return {
+          background: `
+            linear-gradient(135deg, rgba(34, 197, 94, 0.6) 0%, rgba(251, 191, 36, 0.6) 100%),
+            url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          cardBackground: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+          iconBackground: 'linear-gradient(135deg, #22c55e 0%, #fbbf24 100%)',
+          icon: <BusinessCenter sx={{ fontSize: 40, color: 'white' }} />,
+          primaryColor: '#22c55e',
+          secondaryColor: '#fbbf24',
+          title: 'Center Portal',
+          description: 'Manage your center operations and student services'
+        };
+      case 'admin':
+      case 'app':
+        return {
+          background: `
+            linear-gradient(135deg, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.6) 100%),
+            url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          cardBackground: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
+          iconBackground: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+          icon: <AdminPanelSettings sx={{ fontSize: 40, color: 'white' }} />,
+          primaryColor: '#6366f1',
+          secondaryColor: '#a855f7',
+          title: 'Admin Portal',
+          description: 'System administration and management dashboard'
+        };
+      default:
+        return {
+          background: `
+            linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(34, 197, 94, 0.6) 100%),
+            url('https://images.unsplash.com/photo-1523240798034-6c2165d3b3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          cardBackground: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          iconBackground: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+          icon: <Person sx={{ fontSize: 40, color: 'white' }} />,
+          primaryColor: '#3b82f6',
+          secondaryColor: '#22c55e',
+          title: 'Welcome Back',
+          description: 'Please sign in to your account'
+        };
+    }
+  }, [role]);
+
   return (
     <ErrorBoundary>
       <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -159,38 +226,71 @@ const LoginPage = () => {
       <Box
         sx={{
           flex: 1,
-          background: `linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)`,
+          background: getThemeConfig().background,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           py: 4,
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.05)',
+            zIndex: 1,
+          }
         }}
       >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
         <Card
           sx={{
             borderRadius: 4,
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.2)',
             overflow: 'hidden',
+            background: getThemeConfig().cardBackground,
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
           }}
         >
           <CardContent sx={{ p: 6 }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              {/* Logo/Icon */}
+              {/* Beautiful Icon */}
               <Box
                 sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 4,
+                  background: getThemeConfig().iconBackground,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 3,
+                  boxShadow: `0 8px 25px ${getThemeConfig().primaryColor}40`,
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -2,
+                    left: -2,
+                    right: -2,
+                    bottom: -2,
+                    background: getThemeConfig().iconBackground,
+                    borderRadius: 4,
+                    zIndex: -1,
+                    opacity: 0.3,
+                    filter: 'blur(8px)',
+                  }
                 }}
               >
-                <Business sx={{ fontSize: 40, color: 'white' }} />
+                {getThemeConfig().icon}
               </Box>
 
               {/* Title */}
@@ -198,32 +298,72 @@ const LoginPage = () => {
                 variant="h4"
                 sx={{
                   fontWeight: 'bold',
-                  color: '#2c3e50',
+                  background: `linear-gradient(135deg, ${getThemeConfig().primaryColor} 0%, ${getThemeConfig().secondaryColor} 100%)`,
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
                   mb: 1,
+                  fontSize: { xs: '1.8rem', sm: '2.2rem' },
                 }}
               >
-                {getTitle()}
+                {getThemeConfig().title}
               </Typography>
 
               {/* Subtitle */}
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#7f8c8d',
+                  color: '#64748b',
                   fontSize: '1.1rem',
+                  mb: 2,
                 }}
               >
-                {getSubtitle()}
+                {getThemeConfig().description}
               </Typography>
+
+              {/* Role Badge */}
+              <Box
+                sx={{
+                  display: 'inline-block',
+                  background: `linear-gradient(135deg, ${getThemeConfig().primaryColor}20 0%, ${getThemeConfig().secondaryColor}20 100%)`,
+                  borderRadius: '20px',
+                  px: 3,
+                  py: 1,
+                  border: `2px solid ${getThemeConfig().primaryColor}30`,
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: getThemeConfig().primaryColor,
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}
+                >
+                  {role.toUpperCase()} ACCESS
+                </Typography>
+              </Box>
             </Box>
 
               {/* Error Alert */}
               {error && (
-                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    mb: 3, 
+                    borderRadius: 3,
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    '& .MuiAlert-icon': {
+                      color: '#ef4444',
+                    }
+                  }}
+                >
                   {error}
                 </Alert>
               )}
-
 
             {/* Login Form */}
             <Box component="form" onSubmit={handleSubmit}>
@@ -238,8 +378,20 @@ const LoginPage = () => {
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: `2px solid ${getThemeConfig().primaryColor}20`,
+                        '&:hover': {
+                          border: `2px solid ${getThemeConfig().primaryColor}40`,
+                        },
+                        '&.Mui-focused': {
+                          border: `2px solid ${getThemeConfig().primaryColor}`,
+                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: getThemeConfig().primaryColor,
+                        fontWeight: '600',
                       },
                     }}
                     disabled={loginMutation.isPending}
@@ -259,8 +411,20 @@ const LoginPage = () => {
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: `2px solid ${getThemeConfig().primaryColor}20`,
+                        '&:hover': {
+                          border: `2px solid ${getThemeConfig().primaryColor}40`,
+                        },
+                        '&.Mui-focused': {
+                          border: `2px solid ${getThemeConfig().primaryColor}`,
+                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: getThemeConfig().primaryColor,
+                        fontWeight: '600',
                       },
                     }}
                   />
@@ -276,8 +440,20 @@ const LoginPage = () => {
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: `2px solid ${getThemeConfig().primaryColor}20`,
+                        '&:hover': {
+                          border: `2px solid ${getThemeConfig().primaryColor}40`,
+                        },
+                        '&.Mui-focused': {
+                          border: `2px solid ${getThemeConfig().primaryColor}`,
+                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: getThemeConfig().primaryColor,
+                        fontWeight: '600',
                       },
                     }}
                     disabled={loginMutation.isPending}
@@ -293,8 +469,20 @@ const LoginPage = () => {
                     sx={{
                       mb: 3,
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: `2px solid ${getThemeConfig().primaryColor}20`,
+                        '&:hover': {
+                          border: `2px solid ${getThemeConfig().primaryColor}40`,
+                        },
+                        '&.Mui-focused': {
+                          border: `2px solid ${getThemeConfig().primaryColor}`,
+                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: getThemeConfig().primaryColor,
+                        fontWeight: '600',
                       },
                     }}
                     disabled={loginMutation.isPending}
@@ -305,6 +493,7 @@ const LoginPage = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             edge="end"
                             disabled={loginMutation.isPending}
+                            sx={{ color: getThemeConfig().primaryColor }}
                           >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
                           </IconButton>
@@ -321,9 +510,12 @@ const LoginPage = () => {
                   <Button
                     variant="text"
                     sx={{
-                      color: theme.palette.primary.main,
+                      color: getThemeConfig().primaryColor,
                       textTransform: 'none',
-                      fontWeight: 'large',
+                      fontWeight: '600',
+                      '&:hover': {
+                        backgroundColor: `${getThemeConfig().primaryColor}10`,
+                      },
                     }}
                     disabled={loginMutation.isPending}
                   >
@@ -339,21 +531,25 @@ const LoginPage = () => {
                 variant="contained"
                 disabled={loginMutation.isPending}
                 sx={{
-                  py: 2,
-                  borderRadius: 2,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  py: 2.5,
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${getThemeConfig().primaryColor} 0%, ${getThemeConfig().secondaryColor} 100%)`,
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   textTransform: 'uppercase',
                   letterSpacing: 1,
+                  boxShadow: `0 8px 25px ${getThemeConfig().primaryColor}40`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 8px 25px ${theme.palette.primary.main}40`,
+                    background: `linear-gradient(135deg, ${getThemeConfig().secondaryColor} 0%, ${getThemeConfig().primaryColor} 100%)`,
+                    transform: 'translateY(-3px)',
+                    boxShadow: `0 12px 35px ${getThemeConfig().primaryColor}50`,
                   },
                   '&:disabled': {
                     background: '#bdc3c7',
+                    transform: 'none',
+                    boxShadow: 'none',
                   },
+                  transition: 'all 0.3s ease',
                 }}
               >
                 {loginMutation.isPending ? (
