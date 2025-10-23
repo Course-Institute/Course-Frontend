@@ -16,7 +16,20 @@ const AffiliationPage = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box sx={{ flex: 1, py: 8, backgroundColor: '#f8fafc' }}>
+      <Box 
+        sx={{ 
+          flex: 1, 
+          py: 8, 
+          background: `
+            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            url('https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=2086&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <Container maxWidth="lg">
           {/* Page Header */}
           <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -34,7 +47,7 @@ const AffiliationPage = () => {
             <Typography
               variant="h4"
               sx={{
-                color: '#3b82f6',
+                color: 'primary.main',
                 fontWeight: '600',
                 mb: 4
               }}
@@ -114,8 +127,8 @@ const AffiliationPage = () => {
                   }}
                 >
                   <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                      <Verified sx={{ color: '#10b981', fontSize: 40, mr: 2 }} />
+                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                       <Verified sx={{ color: 'secondary.main', fontSize: 40, mr: 2 }} />
                       <Typography
                         variant="h5"
                         sx={{
@@ -159,8 +172,8 @@ const AffiliationPage = () => {
                   }}
                 >
                   <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                      <Handshake sx={{ color: '#3b82f6', fontSize: 40, mr: 2 }} />
+                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                       <Handshake sx={{ color: 'primary.main', fontSize: 40, mr: 2 }} />
                       <Typography
                         variant="h5"
                         sx={{
@@ -198,7 +211,7 @@ const AffiliationPage = () => {
               border: '1px solid #e2e8f0',
               p: 6,
               textAlign: 'center',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+               background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
               color: 'white'
             }}
           >
@@ -242,54 +255,54 @@ const AffiliationPage = () => {
             </Typography>
             
             <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2 }}>
-              <Chip
-                label="Self-Recognized Institution"
-                sx={{
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  px: 3,
-                  py: 2,
-                  height: 'auto'
-                }}
-              />
-              <Chip
-                label="Industry-Relevant Curriculum"
-                sx={{
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  px: 3,
-                  py: 2,
-                  height: 'auto'
-                }}
-              />
-              <Chip
-                label="Quality Education Standards"
-                sx={{
-                  backgroundColor: '#8b5cf6',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  px: 3,
-                  py: 2,
-                  height: 'auto'
-                }}
-              />
-              <Chip
-                label="Recognized Certification"
-                sx={{
-                  backgroundColor: '#f59e0b',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  px: 3,
-                  py: 2,
-                  height: 'auto'
-                }}
-              />
+               <Chip
+                 label="Self-Recognized Institution"
+                 sx={{
+                   backgroundColor: 'secondary.main',
+                   color: 'white',
+                   fontWeight: 'bold',
+                   fontSize: '1rem',
+                   px: 3,
+                   py: 2,
+                   height: 'auto'
+                 }}
+               />
+               <Chip
+                 label="Industry-Relevant Curriculum"
+                 sx={{
+                   backgroundColor: 'primary.main',
+                   color: 'white',
+                   fontWeight: 'bold',
+                   fontSize: '1rem',
+                   px: 3,
+                   py: 2,
+                   height: 'auto'
+                 }}
+               />
+               <Chip
+                 label="Quality Education Standards"
+                 sx={{
+                   backgroundColor: 'info.main',
+                   color: 'white',
+                   fontWeight: 'bold',
+                   fontSize: '1rem',
+                   px: 3,
+                   py: 2,
+                   height: 'auto'
+                 }}
+               />
+               <Chip
+                 label="Recognized Certification"
+                 sx={{
+                   backgroundColor: 'primary.dark',
+                   color: 'white',
+                   fontWeight: 'bold',
+                   fontSize: '1rem',
+                   px: 3,
+                   py: 2,
+                   height: 'auto'
+                 }}
+               />
             </Box>
           </Box>
         </Container>

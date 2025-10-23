@@ -64,7 +64,20 @@ const ContactUsPage = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box sx={{ flex: 1, py: 8, backgroundColor: '#f8fafc' }}>
+      <Box 
+        sx={{ 
+          flex: 1, 
+          py: 8, 
+          background: `
+            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <Container maxWidth="lg">
           {/* Page Header */}
           <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -82,7 +95,7 @@ const ContactUsPage = () => {
             <Typography
               variant="h4"
               sx={{
-                color: '#3b82f6',
+                color: 'primary.main',
                 fontWeight: '600',
                 mb: 4
               }}
@@ -129,7 +142,7 @@ const ContactUsPage = () => {
                   {/* Address */}
                   <Box sx={{ mb: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                      <LocationOn sx={{ color: '#3b82f6', fontSize: 30, mr: 2, mt: 0.5 }} />
+                      <LocationOn sx={{ color: 'primary.main', fontSize: 30, mr: 2, mt: 0.5 }} />
                       <Box>
                         <Typography
                           variant="h6"
@@ -161,7 +174,7 @@ const ContactUsPage = () => {
                   {/* Email */}
                   <Box sx={{ mb: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Email sx={{ color: '#3b82f6', fontSize: 30, mr: 2 }} />
+                      <Email sx={{ color: 'primary.main', fontSize: 30, mr: 2 }} />
                       <Box>
                         <Typography
                           variant="h6"
@@ -198,7 +211,7 @@ const ContactUsPage = () => {
                   {/* Working Hours */}
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <AccessTime sx={{ color: '#3b82f6', fontSize: 30, mr: 2 }} />
+                      <AccessTime sx={{ color: 'primary.main', fontSize: 30, mr: 2 }} />
                       <Box>
                         <Typography
                           variant="h6"
@@ -364,9 +377,9 @@ const ContactUsPage = () => {
                           fullWidth
                           endIcon={<Send />}
                           sx={{
-                            backgroundColor: '#3b82f6',
+                            background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
                             '&:hover': {
-                              backgroundColor: '#2563eb'
+                              background: 'linear-gradient(135deg, #1d4ed8 0%, #059669 100%)',
                             },
                             textTransform: 'none',
                             borderRadius: 2,
@@ -381,7 +394,7 @@ const ContactUsPage = () => {
                     </Grid>
                   </Box>
 
-                  <Box sx={{ mt: 3, p: 2, backgroundColor: '#f1f5f9', borderRadius: 2 }}>
+                  <Box sx={{ mt: 3, p: 2, backgroundColor: 'info.light', borderRadius: 2, opacity: 0.1 }}>
                     <Typography
                       variant="body2"
                       sx={{

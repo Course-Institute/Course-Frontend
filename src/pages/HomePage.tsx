@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Box,
   Container,
@@ -10,55 +11,76 @@ import {
 import { ArrowForward, School, Work, TrendingUp, People } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
+import InquiryDialog from '../components/InquiryDialog';
 
 const HomePage = () => {
+  const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
+
   const programHighlights = [
     {
       title: "Paramedical Programs",
       description: "Step into the vital world of healthcare. Our paramedical courses train students in diagnostic, technical, and patient care skills through programs like DMLT, X-Ray Technician, ECG, and Operation Theatre Assistance.",
       icon: <Work sx={{ fontSize: 40 }} />,
-      color: "#ef4444"
+      color: "#2563eb"
     },
     {
       title: "Vocational Programs",
       description: "Learn high-demand, industry-relevant trades. Designed for students who want to build stable, well-paying careers in the industrial and service sectors.",
       icon: <School sx={{ fontSize: 40 }} />,
-      color: "#3b82f6"
+      color: "#10b981"
     },
     {
       title: "IT Programs",
       description: "Stay future-ready in a digital world. Covering fundamental to advanced topics like Computer Applications, Web Designing, Tally, Digital Marketing, and Office Productivity Tools.",
       icon: <TrendingUp sx={{ fontSize: 40 }} />,
-      color: "#8b5cf6"
+      color: "#0ea5e9"
     },
     {
       title: "Yoga & Naturopathy",
       description: "A perfect combination of traditional wisdom and modern wellness. Yoga programs focus on body, mind, and spirit. Preparing students to become certified Yoga Trainers, Naturopaths, and Wellness Therapists.",
       icon: <People sx={{ fontSize: 40 }} />,
-      color: "#10b981"
+      color: "#059669"
     }
   ];
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
+        <Navbar />
       
       {/* Hero Banner */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: `
+            linear-gradient(135deg, rgba(37, 99, 235, 0.5) 0%, rgba(16, 185, 129, 0.5) 100%),
+            url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           color: 'white',
           py: 12,
-          textAlign: 'center'
+          textAlign: 'center',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(16, 185, 129, 0.8) 100%)',
+            zIndex: 1,
+          }
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Typography
             variant="h1"
             sx={{
               fontWeight: 'bold',
               mb: 3,
-              fontSize: { xs: '2.5rem', md: '4rem' }
+              fontSize: { xs: '2.5rem', md: '4rem' },
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
             }}
           >
             Empowering Futures Through Vocational & Paramedical Excellence
@@ -69,7 +91,8 @@ const HomePage = () => {
             sx={{
               mb: 4,
               opacity: 0.9,
-              fontSize: { xs: '1.2rem', md: '1.5rem' }
+              fontSize: { xs: '1.2rem', md: '1.5rem' },
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
             }}
           >
             Welcome to Mahavir Institute of Vocational & Paramedical Association – Your Pathway to a Rewarding Career.
@@ -81,10 +104,10 @@ const HomePage = () => {
             endIcon={<ArrowForward />}
             sx={{
               backgroundColor: 'white',
-              color: '#667eea',
+              color: 'primary.main',
               '&:hover': {
-                backgroundColor: '#f8fafc',
-                color: '#667eea'
+                backgroundColor: 'grey.50',
+                color: 'primary.dark'
               },
               textTransform: 'none',
               borderRadius: 3,
@@ -100,7 +123,7 @@ const HomePage = () => {
       </Box>
 
       {/* Introduction Section */}
-      <Box sx={{ py: 8, backgroundColor: '#f8fafc' }}>
+      <Box sx={{ py: 8, backgroundColor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h3"
@@ -248,7 +271,7 @@ const HomePage = () => {
       {/* Quick Inquiry Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
           color: 'white',
           py: 8
         }}
@@ -278,12 +301,13 @@ const HomePage = () => {
             <Button
               variant="contained"
               size="large"
+              onClick={() => setInquiryDialogOpen(true)}
               sx={{
                 backgroundColor: 'white',
-                color: '#667eea',
+                color: 'primary.main',
                 '&:hover': {
-                  backgroundColor: '#f8fafc',
-                  color: '#667eea'
+                  backgroundColor: 'grey.50',
+                  color: 'primary.dark'
                 },
                 textTransform: 'none',
                 borderRadius: 3,
@@ -299,7 +323,13 @@ const HomePage = () => {
         </Container>
       </Box>
 
-      <FooterSection />
+        <FooterSection />
+      
+      {/* Inquiry Dialog */}
+      <InquiryDialog
+        open={inquiryDialogOpen}
+        onClose={() => setInquiryDialogOpen(false)}
+      />
     </Box>
   );
 };
