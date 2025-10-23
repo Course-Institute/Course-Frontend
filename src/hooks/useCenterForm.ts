@@ -58,6 +58,7 @@ interface CenterFormData {
   panCard?: File | File[] | null;
   addressProof?: File | File[] | null;
   directorIdProof?: File | File[] | null;
+  signature?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -110,6 +111,7 @@ export function useCenterForm(): {
     panCard: null,
     addressProof: null,
     directorIdProof: null,
+    signature: null,
     username: '',
     password: '',
     confirmPassword: '',
@@ -268,6 +270,9 @@ export function useCenterForm(): {
     const directorIdResult = validateFileField(formValues.directorIdProof);
     if (!directorIdResult.isValid) newErrors.directorIdProof = directorIdResult.error || '';
 
+    const signatureResult = validateFileField(formValues.signature);
+    if (!signatureResult.isValid) newErrors.signature = signatureResult.error || '';
+
     // Login Credentials
     const usernameResult = validateRequired(formValues.username || '');
     if (!usernameResult.isValid) newErrors.username = usernameResult.error || '';
@@ -323,6 +328,7 @@ export function useCenterForm(): {
       panCard: Array.isArray(data.panCard) ? data.panCard[0] : (data.panCard || undefined),
       addressProof: Array.isArray(data.addressProof) ? data.addressProof[0] : (data.addressProof || undefined),
       directorIdProof: Array.isArray(data.directorIdProof) ? data.directorIdProof[0] : (data.directorIdProof || undefined),
+      signature: Array.isArray(data.signature) ? data.signature[0] : (data.signature || undefined),
 
       // Login Credentials
       username: data.username,

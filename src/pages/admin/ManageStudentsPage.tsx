@@ -199,23 +199,6 @@ const ManageStudentsPage = () => {
       }}>
 
 
-      {/* Debug Info - Remove this after testing */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <strong>Scroll Debug:</strong>
-        <div>Students Count: {students.length}</div>
-        <div>Has Next Page: {isFetchingNextPage ? 'Yes' : 'No'}</div>
-        <div>Is Fetching Next: {isFetchingNextPage ? 'Yes' : 'No'}</div>
-        <Button 
-          variant="outlined" 
-          size="small" 
-          onClick={() => {
-            // Manual fetch test - functionality removed
-          }}
-          sx={{ mt: 1 }}
-        >
-          Test Fetch Next Page
-        </Button>
-      </Alert>
 
       {/* Error Alert */}
       {isError && (
@@ -239,9 +222,7 @@ const ManageStudentsPage = () => {
         </Alert>
       )}
 
-      {/* Three Action Cards */}
-      <Grid container spacing={3} sx={{ flexShrink: 0 }}>
-        {/* Student Status Update */}
+      {/* <Grid container spacing={3} sx={{ flexShrink: 0 }}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
@@ -314,7 +295,6 @@ const ManageStudentsPage = () => {
           </Card>
         </Grid>
 
-        {/* Results Management */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
@@ -383,7 +363,6 @@ const ManageStudentsPage = () => {
           </Card>
         </Grid>
 
-        {/* Student Details */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
@@ -451,7 +430,7 @@ const ManageStudentsPage = () => {
             </CardContent>
           </Card>
         </Grid>
-      </Grid>
+      </Grid> */}
 
       {/* Students Data Table - Takes remaining space */}
       <Box sx={{ }}>
@@ -462,14 +441,14 @@ const ManageStudentsPage = () => {
             alignItems: 'center',
             flexGrow: 1,
             p: 4 ,
-            height: '500px',
+            height: '90%',
           }}>
             <CircularProgress size={40} />
           </Box>
         ) : (
           <Box 
             ref={tableContainerRef}
-            sx={{    height: '500px', display: 'flex', flexDirection: 'column' }}
+            sx={{    height: '90%', display: 'flex', flexDirection: 'column' }}
           >
             <Table
               columns={columns}

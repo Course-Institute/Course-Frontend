@@ -13,11 +13,7 @@ import {
 import {
   Dashboard,
   People,
-  CreditCard,
-  Upload,
-  Payment,
   Business,
-  Assessment,
   Logout as LogoutIcon,
   PersonAdd,
 } from '@mui/icons-material';
@@ -54,12 +50,8 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
     { id: 1, label: 'Dashboard', icon: <Dashboard />, path: '/admin-dashboard' },
     { id: 2, label: 'Add Student', icon: <PersonAdd />, path: '/admin/add-student' },
     { id: 3, label: 'Manage Students', icon: <People />, path: '/admin/students' },
-    { id: 4, label: 'ID Card Management', icon: <CreditCard />, path: '/admin/id-cards' },
-    { id: 5, label: 'Upload Results', icon: <Upload />, path: '/admin/upload-results' },
-    { id: 6, label: 'Payment Tracking', icon: <Payment />, path: '/admin/payments' },
-    { id: 9, label: 'Add Center', icon: <Business />, path: '/admin/add-center' },
-    { id: 7, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
-    { id: 8, label: 'Reports', icon: <Assessment />, path: '/admin/reports' },
+    { id: 4, label: 'Add Center', icon: <Business />, path: '/admin/add-center' },
+    { id: 5, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
   ];
 
   const drawer = (

@@ -17,16 +17,11 @@ import {
   Email,
   Phone,
 } from '@mui/icons-material';
-import { useCenterAutoCompleteList, type CenterAutoCompleteItem } from '../hooks/useCenterAutoComplete';
+import { useCenterList, type Center, type CenterFilters } from '../hooks/useCenterList';
 
 interface CenterInfiniteListProps {
-  filters?: {
-    query?: string;
-    status?: string;
-    region?: string;
-    limit?: number;
-  };
-  onCenterSelect?: (center: CenterAutoCompleteItem) => void;
+  filters?: CenterFilters;
+  onCenterSelect?: (center: Center) => void;
   height?: string | number;
 }
 
@@ -36,19 +31,21 @@ const CenterInfiniteList: React.FC<CenterInfiniteListProps> = ({
   height = 400,
 }) => {
   const {
-    allCenters,
-    totalCount,
-    hasNextPage,
-    isFetchingNextPage,
+    data,
     isLoading,
     isError,
     error,
     fetchNextPage,
-  } = useCenterAutoCompleteList(filters);
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCenterList(filters);
+
+  const allCenters = data?.pages.flatMap(page => page.data.centers) || [];
+  const totalCount = data?.pages[0]?.data.totalCount || 0;
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const handleCenterClick = useCallback((center: CenterAutoCompleteItem) => {
+  const handleCenterClick = useCallback((center: Center) => {
     if (onCenterSelect) {
       onCenterSelect(center);
     }
@@ -117,7 +114,7 @@ const CenterInfiniteList: React.FC<CenterInfiniteListProps> = ({
           
           {allCenters.map((center, index) => (
             <Card
-              key={`${center.id}-${index}`}
+              key={`${center._id}-${index}`}
               ref={index === allCenters.length - 1 ? lastCenterElementRef : null}
               sx={{
                 m: 1,
@@ -139,7 +136,7 @@ const CenterInfiniteList: React.FC<CenterInfiniteListProps> = ({
                   <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                       <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                        {center.centerName}
+                        {center.centerDetails.centerName}
                       </Typography>
                       <Chip
                         label={center.status}
@@ -156,41 +153,37 @@ const CenterInfiniteList: React.FC<CenterInfiniteListProps> = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <Business sx={{ fontSize: 16, color: 'text.secondary' }} />
                       <Typography variant="body2" color="text.secondary">
-                        {center.centerId}
+                        {center.centerDetails.centerCode}
                       </Typography>
                     </Box>
                     
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <LocationOn sx={{ fontSize: 16, color: 'text.secondary' }} />
                       <Typography variant="body2" color="text.secondary">
-                        {center.location}
+                        {center.centerDetails.city}, {center.centerDetails.state}
                       </Typography>
                     </Box>
                     
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <Person sx={{ fontSize: 16, color: 'text.secondary' }} />
                       <Typography variant="body2" color="text.secondary">
-                        {center.contactPerson}
+                        {center.authorizedPersonDetails.authName} ({center.authorizedPersonDetails.designation})
                       </Typography>
                     </Box>
                     
-                    {center.email && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">
-                          {center.email}
-                        </Typography>
-                      </Box>
-                    )}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Typography variant="body2" color="text.secondary">
+                        {center.authorizedPersonDetails.email}
+                      </Typography>
+                    </Box>
                     
-                    {center.phone && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">
-                          {center.phone}
-                        </Typography>
-                      </Box>
-                    )}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Typography variant="body2" color="text.secondary">
+                        {center.authorizedPersonDetails.contactNo}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </CardContent>

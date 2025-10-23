@@ -43,6 +43,7 @@ interface CenterFormData {
   panCard?: File;
   addressProof?: File;
   directorIdProof?: File;
+  signature?: File;
 
   // Login Credentials
   username: string;
@@ -51,8 +52,9 @@ interface CenterFormData {
 }
 
 interface SaveCenterResponse {
-  id: string;
+  success: boolean;
   message: string;
+  data?: any;
 }
 
 const saveCenter = async (data: CenterFormData): Promise<SaveCenterResponse> => {
@@ -64,8 +66,8 @@ const saveCenter = async (data: CenterFormData): Promise<SaveCenterResponse> => 
       if (key === 'photo' && value instanceof File) {
         formData.append('photo', value);
       } else if (key === 'infraPhotos' && Array.isArray(value)) {
-        value.forEach((file, index) => {
-          formData.append(`infraPhotos[${index}]`, file);
+        value.forEach((file) => {
+          formData.append('infraPhotos', file);
         });
       } else if (key === 'documents' && Array.isArray(value)) {
         value.forEach((file, index) => {
@@ -73,18 +75,68 @@ const saveCenter = async (data: CenterFormData): Promise<SaveCenterResponse> => 
         });
       } else if (key === 'cancelledCheque' && value instanceof File) {
         formData.append('cancelledCheque', value);
+      } else if (key === 'gstCertificate' && value instanceof File) {
+        formData.append('gstCertificate', value);
+      } else if (key === 'panCard' && value instanceof File) {
+        formData.append('panCard', value);
+      } else if (key === 'addressProof' && value instanceof File) {
+        formData.append('addressProof', value);
+      } else if (key === 'directorIdProof' && value instanceof File) {
+        formData.append('directorIdProof', value);
+      } else if (key === 'signature' && value instanceof File) {
+        formData.append('signature', value);
       } else if (typeof value === 'string') {
         formData.append(key, value);
       }
     }
   });
 
-  const response = await axiosInstance.post<SaveCenterResponse>('/api/admin/register-center', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+  try {
+    const response = await axiosInstance.post('/api/admin/register-center', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    // Check if the response indicates success
+    if (response.data.status === true) {
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data.data
+      };
+    } else {
+      // Handle validation errors
+      throw new Error(JSON.stringify({
+        status: false,
+        message: response.data.message,
+        errors: response.data.errors
+      }));
+    }
+  } catch (error: any) {
+    // Handle axios errors or validation errors
+    if (error.response?.data) {
+      const errorData = error.response.data;
+      if (errorData.status === false && errorData.errors) {
+        // Format validation errors
+        const errorMessage = errorData.errors.join(', ');
+        throw new Error(errorMessage);
+      } else {
+        throw new Error(errorData.message || 'Failed to register center');
+      }
+    } else if (error.message && error.message.includes('[')) {
+      // Handle our custom formatted error
+      try {
+        const parsedError = JSON.parse(error.message);
+        if (parsedError.errors) {
+          throw new Error(parsedError.errors.join(', '));
+        }
+      } catch {
+        throw error;
+      }
+    }
+    throw error;
+  }
 };
 
 export const useSaveCenter = () => {
@@ -94,8 +146,8 @@ export const useSaveCenter = () => {
 
   const mutation = useMutation<SaveCenterResponse, Error, CenterFormData>({
     mutationFn: saveCenter,
-    onSuccess: () => {
-      showToast('Center registered successfully!', 'success');
+    onSuccess: (data) => {
+      showToast(data.message || 'Center registered successfully!', 'success');
       queryClient.invalidateQueries({ queryKey: ['centers'] });
       navigate('/admin/centers');
     },

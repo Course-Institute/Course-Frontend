@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -11,8 +11,6 @@ import {
   MenuItem,
   CircularProgress,
   Alert,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 import {
   Search,
@@ -20,19 +18,159 @@ import {
   PendingActions,
   CheckCircle,
   Cancel,
-  ViewList,
-  ViewModule,
 } from '@mui/icons-material';
 import { useCenterStats } from '../../hooks/useCenterStats';
-import { useCenterList, type CenterFilters, type Center } from '../../hooks/useCenterList';
-import CenterTable from '../../components/CenterTable';
-import CenterInfiniteList from '../../components/CenterInfiniteList';
+import { useCenterList, type CenterFilters } from '../../hooks/useCenterList';
+import Table, { type Column } from '../../components/core-components/Table';
 
 const CenterManagementPage = () => {
   const [filters, setFilters] = useState<CenterFilters>({});
-  const [viewMode, setViewMode] = useState<'table' | 'infinite'>('infinite');
   const { data: stats, isLoading: statsLoading } = useCenterStats();
-  const { data: centerData, isLoading: centerLoading, isError, error } = useCenterList(filters);
+  const { 
+    data, 
+    isError, 
+    error, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage 
+  } = useCenterList(filters);
+
+  const allCenters = data?.pages.flatMap(page => page.data.centers) || [];
+  const totalCount = data?.pages[0]?.data.totalCount || 0;
+
+  // Frontend filtering logic
+  const filteredCenters = allCenters.filter((center) => {
+    // Search filter
+    if (filters.query) {
+      const searchTerm = filters.query.toLowerCase();
+      const matchesSearch = 
+        center.centerDetails?.centerCode?.toLowerCase().includes(searchTerm) ||
+        center.centerDetails?.centerName?.toLowerCase().includes(searchTerm) ||
+        center.centerDetails?.city?.toLowerCase().includes(searchTerm) ||
+        center.centerDetails?.state?.toLowerCase().includes(searchTerm) ||
+        center.authorizedPersonDetails?.authName?.toLowerCase().includes(searchTerm) ||
+        center.authorizedPersonDetails?.contactNo?.includes(searchTerm) ||
+        center.authorizedPersonDetails?.email?.toLowerCase().includes(searchTerm);
+      
+      if (!matchesSearch) return false;
+    }
+
+    // Status filter
+    if (filters.status) {
+      if (center.status !== filters.status) return false;
+    }
+
+    // Center type filter
+    if (filters.centerType) {
+      if (center.centerDetails?.centerType !== filters.centerType) return false;
+    }
+
+    // State filter
+    if (filters.state) {
+      if (center.centerDetails?.state !== filters.state) return false;
+    }
+
+    return true;
+  });
+
+  // Define table columns for centers
+  const columns: Column[] = [
+    {
+      field: 'centerCode',
+      headerName: 'Center Code',
+      width: '140px',
+      renderCell: (_, row: any) => row.centerDetails?.centerCode || 'N/A',
+    },
+    {
+      field: 'centerName',
+      headerName: 'Center Name',
+      minWidth: '200px',
+      renderCell: (_, row: any) => row.centerDetails?.centerName || 'N/A',
+    },
+    {
+      field: 'centerType',
+      headerName: 'Type',
+      width: '120px',
+      align: 'center',
+      renderCell: (_, row: any) => row.centerDetails?.centerType || 'N/A',
+    },
+    {
+      field: 'city',
+      headerName: 'City',
+      width: '120px',
+      renderCell: (_, row: any) => row.centerDetails?.city || 'N/A',
+    },
+    {
+      field: 'state',
+      headerName: 'State',
+      width: '120px',
+      renderCell: (_, row: any) => row.centerDetails?.state || 'N/A',
+    },
+    {
+      field: 'contactPerson',
+      headerName: 'Contact Person',
+      minWidth: '150px',
+      renderCell: (_, row: any) => row.authorizedPersonDetails?.authName || 'N/A',
+    },
+    {
+      field: 'contactNo',
+      headerName: 'Contact No.',
+      width: '130px',
+      align: 'center',
+      renderCell: (_, row: any) => row.authorizedPersonDetails?.contactNo || 'N/A',
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: '100px',
+      align: 'center',
+      renderCell: (value: string) => {
+        const getStatusColor = (status: string) => {
+          switch (status) {
+            case 'pending': return '#f59e0b';
+            case 'approved': return '#10b981';
+            case 'rejected': return '#ef4444';
+            default: return '#6b7280';
+          }
+        };
+        return (
+          <Box
+            sx={{
+              backgroundColor: getStatusColor(value),
+              color: 'white',
+              padding: '4px 8px',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              textTransform: 'capitalize',
+            }}
+          >
+            {value}
+          </Box>
+        );
+      },
+    },
+  ];
+
+  // Infinite scroll logic
+  const lastElementRef = useRef<HTMLTableRowElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (lastElementRef.current) {
+      observer.observe(lastElementRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleFilterChange = (key: keyof CenterFilters, value: string) => {
     setFilters((prev: CenterFilters) => ({
@@ -44,14 +182,10 @@ const CenterManagementPage = () => {
   const handleSearch = (searchTerm: string) => {
     setFilters((prev: CenterFilters) => ({
       ...prev,
-      search: searchTerm || undefined,
+      query: searchTerm || undefined,
     }));
   };
 
-  const handleCenterAction = (action: string, center: Center) => {
-    console.log(`${action} for center:`, center.centerId);
-    // Handle different actions like approve, edit, deactivate, etc.
-  };
 
   const statsCards = [
     {
@@ -163,7 +297,7 @@ const CenterManagementPage = () => {
             <TextField
               placeholder="Search by Center ID / Name / Location"
               fullWidth
-              value={filters.search || ''}
+              value={filters.query || ''}
               onChange={(e) => handleSearch(e.target.value)}
               InputProps={{
                 startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />,
@@ -186,67 +320,47 @@ const CenterManagementPage = () => {
                     label="Status"
                   >
                     <MenuItem value="">All Status</MenuItem>
-                    <MenuItem value="Approve">Approve</MenuItem>
-                    <MenuItem value="Published">Published</MenuItem>
-                    <MenuItem value="Active">Active</MenuItem>
-                    <MenuItem value="Pending">Pending</MenuItem>
-                    <MenuItem value="Deactivated">Deactivated</MenuItem>
-                    <MenuItem value="Refenisted">Refenisted</MenuItem>
-                    <MenuItem value="Renning">Renning</MenuItem>
+                    <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="approved">Approved</MenuItem>
+                    <MenuItem value="rejected">Rejected</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Region</InputLabel>
+                  <InputLabel>Center Type</InputLabel>
                   <Select
-                    value={filters.region || ''}
-                    onChange={(e) => handleFilterChange('region', e.target.value)}
-                    label="Region"
+                    value={filters.centerType || ''}
+                    onChange={(e) => handleFilterChange('centerType', e.target.value)}
+                    label="Center Type"
                   >
-                    <MenuItem value="">All Regions</MenuItem>
+                    <MenuItem value="">All Types</MenuItem>
+                    <MenuItem value="franchise">Franchise</MenuItem>
+                    <MenuItem value="company">Company</MenuItem>
+                    <MenuItem value="partner">Partner</MenuItem>
+                    <MenuItem value="own">Own</MenuItem>
+                    <MenuItem value="other">Other</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>State</InputLabel>
+                  <Select
+                    value={filters.state || ''}
+                    onChange={(e) => handleFilterChange('state', e.target.value)}
+                    label="State"
+                  >
+                    <MenuItem value="">All States</MenuItem>
                     <MenuItem value="Delhi">Delhi</MenuItem>
-                    <MenuItem value="Mumbai">Mumbai</MenuItem>
-                    <MenuItem value="Jaipur">Jaipur</MenuItem>
-                    <MenuItem value="Kolkata">Kolkata</MenuItem>
-                    <MenuItem value="Bangalore">Bangalore</MenuItem>
-                    <MenuItem value="Chennai">Chennai</MenuItem>
-                    <MenuItem value="Pune">Pune</MenuItem>
-                    <MenuItem value="Hyderabad">Hyderabad</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Date</InputLabel>
-                  <Select
-                    value={filters.date || ''}
-                    onChange={(e) => handleFilterChange('date', e.target.value)}
-                    label="Date"
-                  >
-                    <MenuItem value="">All Dates</MenuItem>
-                    <MenuItem value="2025-01-01">January 2025</MenuItem>
-                    <MenuItem value="2025-01-15">Mid January 2025</MenuItem>
-                    <MenuItem value="2025-02-01">February 2025</MenuItem>
+                    <MenuItem value="Maharashtra">Maharashtra</MenuItem>
+                    <MenuItem value="Rajasthan">Rajasthan</MenuItem>
+                    <MenuItem value="West Bengal">West Bengal</MenuItem>
+                    <MenuItem value="Karnataka">Karnataka</MenuItem>
+                    <MenuItem value="Tamil Nadu">Tamil Nadu</MenuItem>
+                    <MenuItem value="Uttar Pradesh">Uttar Pradesh</MenuItem>
+                    <MenuItem value="Telangana">Telangana</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
-
-              {/* View Mode Toggle */}
-              <ToggleButtonGroup
-                value={viewMode}
-                exclusive
-                onChange={(_, newView) => newView && setViewMode(newView)}
-                size="small"
-                sx={{ ml: 'auto' }}
-              >
-                <ToggleButton value="infinite">
-                  <ViewModule sx={{ mr: 1 }} />
-                  Infinite Scroll
-                </ToggleButton>
-                <ToggleButton value="table">
-                  <ViewList sx={{ mr: 1 }} />
-                  Table View
-                </ToggleButton>
-              </ToggleButtonGroup>
             </Box>
           </Box>
         </CardContent>
@@ -266,36 +380,63 @@ const CenterManagementPage = () => {
         flexDirection: 'column',
         minHeight: 500,
       }}>
-        {viewMode === 'infinite' ? (
-          <CenterInfiniteList
-            filters={{
-              query: filters.search,
-              status: filters.status,
-              region: filters.region,
-              limit: 20,
-            }}
-            onCenterSelect={(center) => {
-              console.log('Selected center:', center);
-            }}
-            height="100%"
-          />
+        {!data && filteredCenters.length === 0 ? (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            flexGrow: 1,
+            p: 4 
+          }}>
+            <CircularProgress size={40} />
+          </Box>
+        ) : filteredCenters.length === 0 && allCenters.length > 0 ? (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            flexGrow: 1,
+            p: 4 
+          }}>
+            <Typography variant="h6" color="text.secondary">
+              No centers found matching your filters
+            </Typography>
+          </Box>
         ) : (
-          centerLoading ? (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center',
-              flexGrow: 1,
-              p: 4 
-            }}>
-              <CircularProgress size={40} />
-            </Box>
-          ) : (
-            <CenterTable
-              centers={centerData?.centers || []}
-              onCenterAction={handleCenterAction}
-            />
-          )
+          <Table
+            columns={columns}
+            rows={filteredCenters}
+            lastRowRef={lastElementRef as React.RefObject<HTMLTableRowElement>}
+            tableContainerSx={{
+              height: '90%',
+              maxHeight: '70vh',
+            }}
+          />
+        )}
+        
+        {/* Loading indicator for next page */}
+        {isFetchingNextPage && (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            p: 2 
+          }}>
+            <CircularProgress size={24} />
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              Loading more centers...
+            </Typography>
+          </Box>
+        )}
+        
+        {/* Total count display */}
+        {totalCount > 0 && (
+          <Typography variant="body2" color="text.secondary" sx={{ p: 2, pt: 1 }}>
+            Showing {filteredCenters.length} of {allCenters.length} centers
+            {filteredCenters.length !== allCenters.length && (
+              <span> (filtered from {totalCount} total)</span>
+            )}
+          </Typography>
         )}
       </Box>
     </Box>

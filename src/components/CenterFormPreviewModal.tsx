@@ -49,6 +49,7 @@ interface CenterFormData {
   panCard?: File | File[] | null;
   addressProof?: File | File[] | null;
   directorIdProof?: File | File[] | null;
+  signature?: File | File[] | null;
 
   // Login Credentials
   username: string;
@@ -269,6 +270,14 @@ const CenterFormPreviewModal: React.FC<CenterFormPreviewModalProps> = ({
                         (Array.isArray(formData.directorIdProof) ? 
                           formData.directorIdProof.map(f => f.name).join(', ') : 
                           formData.directorIdProof.name) : 
+                        'No file uploaded'}
+                    </Box>
+                    <Box>Signature:</Box>
+                    <Box sx={{ fontWeight: 'bold' }}>
+                      {formData.signature ? 
+                        (Array.isArray(formData.signature) ? 
+                          formData.signature.map(f => f.name).join(', ') : 
+                          formData.signature.name) : 
                         'No file uploaded'}
                     </Box>
                   </Box>
