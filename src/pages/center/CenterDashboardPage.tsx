@@ -3,31 +3,25 @@ import {
   Typography,
   Card,
   CardContent,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   People,
   School,
   CreditCard,
   Upload,
-  Assessment,
   Payment,
   PendingActions,
   TrendingUp,
   TrendingDown,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useCenterDashboardStats } from '../../hooks/useCenterDashboardStats';
 
 const CenterDashboardPage = () => {
-
-  // Mock data - replace with real API calls
-  const stats = {
-    totalStudents: 1247,
-    activeStudents: 1156,
-    pendingApprovals: 23,
-    completedPayments: 89,
-    totalRevenue: 456789,
-    monthlyTarget: 500000,
-  };
-
+  const navigate = useNavigate();
+  const { data: stats, isLoading, isError, error } = useCenterDashboardStats();
 
   const quickActions = [
     {
@@ -35,35 +29,28 @@ const CenterDashboardPage = () => {
       description: 'Register a new student',
       icon: <People sx={{ fontSize: 40, color: '#10b981' }} />,
       color: '#10b981',
-      action: () => console.log('Add student'),
+      action: () => navigate('/center/add-student'),
     },
     {
       title: 'Upload Results',
       description: 'Upload student results',
       icon: <Upload sx={{ fontSize: 40, color: '#3b82f6' }} />,
       color: '#3b82f6',
-      action: () => console.log('Upload results'),
+      action: () => navigate('/center/upload-results'),
     },
     {
       title: 'Generate ID Cards',
       description: 'Generate student ID cards',
       icon: <CreditCard sx={{ fontSize: 40, color: '#f59e0b' }} />,
       color: '#f59e0b',
-      action: () => console.log('Generate ID cards'),
-    },
-    {
-      title: 'View Reports',
-      description: 'Access center reports',
-      icon: <Assessment sx={{ fontSize: 40, color: '#8b5cf6' }} />,
-      color: '#8b5cf6',
-      action: () => console.log('View reports'),
+      action: () => navigate('/admin/id-card-management'),
     },
   ];
 
   const statsCards = [
     {
       title: 'Total Students',
-      value: stats.totalStudents.toLocaleString(),
+      value: stats?.totalStudents?.toLocaleString() || '0',
       icon: <People sx={{ fontSize: 40, color: '#3b82f6' }} />,
       color: '#3b82f6',
       trend: '+12%',
@@ -71,7 +58,7 @@ const CenterDashboardPage = () => {
     },
     {
       title: 'Active Students',
-      value: stats.activeStudents.toLocaleString(),
+      value: stats?.activeStudents?.toLocaleString() || '0',
       icon: <School sx={{ fontSize: 40, color: '#10b981' }} />,
       color: '#10b981',
       trend: '+8%',
@@ -79,7 +66,7 @@ const CenterDashboardPage = () => {
     },
     {
       title: 'Pending Approvals',
-      value: stats.pendingApprovals.toLocaleString(),
+      value: stats?.pendingApprovals?.toLocaleString() || '0',
       icon: <PendingActions sx={{ fontSize: 40, color: '#f59e0b' }} />,
       color: '#f59e0b',
       trend: '-3%',
@@ -87,7 +74,7 @@ const CenterDashboardPage = () => {
     },
     {
       title: 'Completed Payments',
-      value: stats.completedPayments.toLocaleString(),
+      value: stats?.completedPayments?.toLocaleString() || '0',
       icon: <Payment sx={{ fontSize: 40, color: '#8b5cf6' }} />,
       color: '#8b5cf6',
       trend: '+15%',
@@ -104,6 +91,13 @@ const CenterDashboardPage = () => {
       gap: 3,
       boxSizing: 'border-box',
     }}>
+      {/* Error Alert */}
+      {isError && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Failed to load dashboard data: {error?.message || 'Unknown error'}
+        </Alert>
+      )}
+
       {/* Page Title */}
       <Typography
         variant="h4"
@@ -118,63 +112,69 @@ const CenterDashboardPage = () => {
 
       {/* Statistics Cards */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3 }}>
-        {statsCards.map((stat, index) => (
-          <Box key={index}>
-            <Card
-              sx={{
-                height: '100%',
-                background: 'white',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                border: '1px solid rgba(0,0,0,0.05)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-                },
-              }}
-            >
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: stat.color,
-                      fontSize: '1.8rem',
-                    }}
-                  >
-                    {stat.value}
-                  </Typography>
-                  {stat.icon}
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {stat.title}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    {stat.trendIcon}
+        {isLoading ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', gridColumn: '1 / -1', py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          statsCards.map((stat, index) => (
+            <Box key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  background: 'white',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 'bold',
+                        color: stat.color,
+                        fontSize: '1.8rem',
+                      }}
+                    >
+                      {stat.value}
+                    </Typography>
+                    {stat.icon}
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography
                       variant="body2"
                       sx={{
-                        color: stat.trend.startsWith('+') ? '#10b981' : '#ef4444',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                        fontWeight: 500,
                       }}
                     >
-                      {stat.trend}
+                      {stat.title}
                     </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {stat.trendIcon}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: stat.trend.startsWith('+') ? '#10b981' : '#ef4444',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        {stat.trend}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-            </CardContent>
-          </Card>
-        </Box>
-        ))}
+              </CardContent>
+            </Card>
+          </Box>
+          ))
+        )}
       </Box>
 
       {/* Main Content Grid */}
