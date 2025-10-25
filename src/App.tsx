@@ -27,6 +27,7 @@ import CenterDashboardPage from './pages/center/CenterDashboardPage';
 import CenterAddStudentPage from './pages/center/CenterAddStudentPage';
 import CenterCreateBillPage from './pages/center/CenterCreateBillPage';
 import CenterManageBillsPage from './pages/center/CenterManageBillsPage';
+import CenterUploadResultsPage from './pages/center/CenterUploadResultsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
 
@@ -115,6 +116,11 @@ function App() {
           <Route path="/center/add-student" element={
             <CenterLayout title="ADD STUDENT">
               <CenterAddStudentPage />
+            </CenterLayout>
+          } />
+          <Route path="/center/upload-results" element={
+            <CenterLayout title="UPLOAD RESULTS">
+              <CenterUploadResultsPage />
             </CenterLayout>
           } />
           <Route path="/center/create-bill" element={
