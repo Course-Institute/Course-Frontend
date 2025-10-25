@@ -16,6 +16,8 @@ import {
   Business,
   Logout as LogoutIcon,
   PersonAdd,
+  Receipt,
+  Payment,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -52,6 +54,8 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
     { id: 3, label: 'Manage Students', icon: <People />, path: '/admin/students' },
     { id: 4, label: 'Add Center', icon: <Business />, path: '/admin/add-center' },
     { id: 5, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
+    { id: 6, label: 'Create Bill', icon: <Receipt />, path: '/admin/create-bill' },
+    { id: 7, label: 'Manage Bills', icon: <Payment />, path: '/admin/bills' },
   ];
 
   const drawer = (

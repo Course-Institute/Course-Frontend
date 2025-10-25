@@ -21,6 +21,8 @@ import CenterManagementPage from './pages/admin/CenterManagementPage';
 import ReportsDashboardPage from './pages/admin/ReportsDashboardPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import AddCenterPage from './pages/admin/AddCenterPage';
+import CreateBillReceiptPage from './pages/admin/CreateBillReceiptPage';
+import ManageBillsPage from './pages/admin/ManageBillsPage';
 import CenterDashboardPage from './pages/center/CenterDashboardPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
@@ -85,6 +87,16 @@ function App() {
           <Route path="/admin/reports" element={
             <AdminLayout title="REPORTS DASHBOARD">
               <ReportsDashboardPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/create-bill" element={
+            <AdminLayout title="CREATE BILL RECEIPT">
+              <CreateBillReceiptPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/bills" element={
+            <AdminLayout title="MANAGE BILLS">
+              <ManageBillsPage />
             </AdminLayout>
           } />
 
