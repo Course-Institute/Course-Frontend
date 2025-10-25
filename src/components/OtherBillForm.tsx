@@ -26,9 +26,14 @@ interface OtherBillFormData {
   status: string;
   billType: string;
   category: string;
+  centerId?: string;
 }
 
-const OtherBillForm: React.FC = () => {
+interface OtherBillFormProps {
+  centerId?: string;
+}
+
+const OtherBillForm: React.FC<OtherBillFormProps> = ({ centerId }) => {
   const [formData, setFormData] = useState<OtherBillFormData>({
     recipientName: '',
     recipientType: '',
@@ -41,6 +46,7 @@ const OtherBillForm: React.FC = () => {
     status: 'pending',
     billType: 'other',
     category: '',
+    centerId: centerId || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

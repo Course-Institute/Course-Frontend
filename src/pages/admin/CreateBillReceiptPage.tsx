@@ -5,7 +5,11 @@ import BillForm from '../../components/BillForm';
 import CenterBillForm from '../../components/CenterBillForm';
 import OtherBillForm from '../../components/OtherBillForm';
 
-const CreateBillReceiptPage: React.FC = () => {
+interface CreateBillReceiptPageProps {
+  centerId?: string;
+}
+
+const CreateBillReceiptPage: React.FC<CreateBillReceiptPageProps> = ({ centerId }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -13,15 +17,18 @@ const CreateBillReceiptPage: React.FC = () => {
   };
 
   const renderForm = () => {
-    switch (activeTab) {
+    // If centerId is provided (center user), hide center bill tab
+    const adjustedTab = centerId ? (activeTab === 1 ? 2 : activeTab) : activeTab;
+    
+    switch (adjustedTab) {
       case 0:
-        return <BillForm />;
+        return <BillForm centerId={centerId} />;
       case 1:
-        return <CenterBillForm />;
+        return centerId ? <OtherBillForm centerId={centerId} /> : <CenterBillForm centerId={centerId} />;
       case 2:
-        return <OtherBillForm />;
+        return <OtherBillForm centerId={centerId} />;
       default:
-        return <BillForm />;
+        return <BillForm centerId={centerId} />;
     }
   };
 
@@ -86,12 +93,14 @@ const CreateBillReceiptPage: React.FC = () => {
                 label="Student Bill"
                 sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}
               />
-              <Tab
-                icon={<Business />}
-                iconPosition="start"
-                label="Center Bill"
-                sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}
-              />
+              {!centerId && (
+                <Tab
+                  icon={<Business />}
+                  iconPosition="start"
+                  label="Center Bill"
+                  sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}
+                />
+              )}
               <Tab
                 icon={<Category />}
                 iconPosition="start"

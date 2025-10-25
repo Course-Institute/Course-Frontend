@@ -66,6 +66,12 @@ const LoginPage = () => {
         localStorage.setItem('studentRegistrationNumber', formData.registrationNumber.toString());
       }
       
+      // Store center information if center login
+      if (userRole.toLowerCase() === 'center' && data.data.user.centerId && data.data.user.centerName) {
+        localStorage.setItem('centerId', data.data.user.centerId);
+        localStorage.setItem('centerName', data.data.user.centerName);
+      }
+      
       // Navigate to appropriate dashboard based on role from response
       switch (userRole.toLowerCase()) {
         case 'student':

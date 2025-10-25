@@ -32,6 +32,7 @@ export interface BillFilters {
   status?: string;
   paymentMethod?: string;
   course?: string;
+  centerId?: string;
 }
 
 const fetchBillList = async ({ pageParam = 1, filters = {} }: { pageParam?: number; filters?: BillFilters }): Promise<BillListResponse> => {
