@@ -2,36 +2,27 @@ import { useState } from 'react';
 import {
   Box,
   Typography,
-  Card,
-  CardContent,
-  TextField,
   Button,
-  Switch,
-  FormControlLabel,
   IconButton,
   CircularProgress,
   Alert,
-  InputAdornment,
-  Grid,
-  Snackbar,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useStudentsData } from '../../hooks/useStudentsData';
-import { useStudentStatusUpdate } from '../../hooks/useStudentStatusUpdate';
+import { useApproveStudent } from '../../hooks/useApproveStudent';
+import { useToast } from '../../contexts/ToastContext';
+import { useQueryClient } from '@tanstack/react-query';
 import Table, { type Column } from '../../components/core-components/Table';
+import ConfirmationDialog from '../../components/ConfirmationDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 const ManageStudentsPage = () => {
   const [searchTerm] = useState('');
-  const [registrationNo, setRegistrationNo] = useState('');
-  const [fullPayment, setFullPayment] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
   
   const { 
     students, 
@@ -42,10 +33,11 @@ const ManageStudentsPage = () => {
     isFetchingNextPage
   } = useStudentsData({ limit: 10 });
 
-  const { 
-    updateStudentStatus, 
-    isUpdating
-  } = useStudentStatusUpdate();
+
+  const approveStudentMutation = useApproveStudent();
+  const queryClient = useQueryClient();
+
+  const { showToast } = useToast();
 
   // Filter students based on search term
   const filteredStudents = students.filter(student =>
@@ -54,38 +46,39 @@ const ManageStudentsPage = () => {
     student.emailAddress.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle status update
-  const handleStatusUpdate = () => {
-    if (!registrationNo.trim()) {
-      setSnackbarMessage('Please enter registration number');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
 
-    updateStudentStatus({
-      registrationNo: registrationNo.trim(),
-      fullPayment,
-    }, {
-      onSuccess: () => {
-        setSnackbarMessage('Student status updated successfully!');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-        // Reset form
-        setRegistrationNo('');
-        setFullPayment(false);
-      },
-      onError: (error: any) => {
-        setSnackbarMessage(error?.message || 'Failed to update student status');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-      }
-    });
+
+  // Handle approve student
+  const handleApproveClick = (student: any) => {
+    setSelectedStudent(student);
+    setApproveDialogOpen(true);
   };
 
-  // Handle snackbar close
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+  const handleApproveConfirm = () => {
+    if (selectedStudent) {
+      approveStudentMutation.mutate(
+        { registrationNo: selectedStudent.registrationNo },
+        {
+          onSuccess: (data: any) => {
+            showToast(data.message || 'Student approved successfully!', 'success');
+            // Refetch the students data to get updated isApprovedByAdmin status
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            setApproveDialogOpen(false);
+            setSelectedStudent(null);
+          },
+          onError: (error: any) => {
+            showToast(error?.message || 'Failed to approve student', 'error');
+            setApproveDialogOpen(false);
+            setSelectedStudent(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleApproveCancel = () => {
+    setApproveDialogOpen(false);
+    setSelectedStudent(null);
   };
 
 
@@ -161,10 +154,60 @@ const ManageStudentsPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: '120px',
+      width: '180px',
       align: 'center',
-      getActions: (_row: any) => (
+      getActions: (row: any) => (
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+          {row.isApprovedByAdmin ? (
+            <Button
+              size="small"
+              variant="contained"
+              disabled
+              sx={{
+                backgroundColor: '#10b981',
+                color: 'white',
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                px: 2,
+                py: 0.5,
+                borderRadius: 2,
+                '&:disabled': {
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  opacity: 0.8,
+                },
+              }}
+            >
+              APPROVED
+            </Button>
+          ) : (
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => handleApproveClick(row)}
+              disabled={approveStudentMutation.isPending}
+              sx={{
+                backgroundColor: '#f59e0b',
+                color: 'white',
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                px: 2,
+                py: 0.5,
+                borderRadius: 2,
+                '&:hover': {
+                  backgroundColor: '#d97706',
+                },
+                '&:disabled': {
+                  backgroundColor: '#9ca3af',
+                  color: 'white',
+                },
+              }}
+            >
+              APPROVE
+            </Button>
+          )}
           <IconButton
             size="small"
             sx={{
@@ -448,7 +491,7 @@ const ManageStudentsPage = () => {
         ) : (
           <Box 
             ref={tableContainerRef}
-            sx={{    height: '90%', display: 'flex', flexDirection: 'column' }}
+            sx={{ height: '95%', display: 'flex', flexDirection: 'column' }}
           >
             <Table
               columns={columns}
@@ -522,21 +565,19 @@ const ManageStudentsPage = () => {
         )}
       </Box>
 
-      {/* Success/Error Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+
+      {/* Approve Student Confirmation Dialog */}
+      <ConfirmationDialog
+        open={approveDialogOpen}
+        onClose={handleApproveCancel}
+        onConfirm={handleApproveConfirm}
+        title="Approve Student"
+        message={`Are you sure you want to approve student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})? This action cannot be undone.`}
+        confirmText="Approve"
+        cancelText="Cancel"
+        isLoading={approveStudentMutation.isPending}
+        severity="warning"
+      />
     </Box>
     </ErrorBoundary>
   );
