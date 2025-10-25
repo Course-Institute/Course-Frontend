@@ -25,9 +25,14 @@ interface CenterBillFormData {
   description: string;
   status: string;
   billType: string;
+  centerId?: string;
 }
 
-const CenterBillForm: React.FC = () => {
+interface CenterBillFormProps {
+  centerId?: string;
+}
+
+const CenterBillForm: React.FC<CenterBillFormProps> = ({ centerId }) => {
   const [formData, setFormData] = useState<CenterBillFormData>({
     centerName: '',
     centerCode: '',
@@ -39,6 +44,7 @@ const CenterBillForm: React.FC = () => {
     description: '',
     status: 'pending',
     billType: 'center_fee',
+    centerId: centerId || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

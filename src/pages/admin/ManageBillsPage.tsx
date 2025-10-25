@@ -20,7 +20,11 @@ import Table, { type Column } from '../../components/core-components/Table';
 import BillReceiptDialog from '../../components/BillReceiptDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
-const ManageBillsPage = () => {
+interface ManageBillsPageProps {
+  centerId?: string;
+}
+
+const ManageBillsPage: React.FC<ManageBillsPageProps> = ({ centerId }) => {
   const [filters, setFilters] = useState<BillFilters>({});
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
@@ -33,7 +37,7 @@ const ManageBillsPage = () => {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useBillList(filters);
+  } = useBillList({ ...filters, ...(centerId && { centerId }) });
 
   const allBills = data?.pages.flatMap(page => page.data.bills) || [];
   const totalCount = data?.pages[0]?.data.totalCount || 0;

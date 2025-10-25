@@ -24,9 +24,14 @@ interface BillFormData {
   dueDate: string;
   description: string;
   status: string;
+  centerId?: string;
 }
 
-const BillForm: React.FC = () => {
+interface BillFormProps {
+  centerId?: string;
+}
+
+const BillForm: React.FC<BillFormProps> = ({ centerId }) => {
   const [formData, setFormData] = useState<BillFormData>({
     studentName: '',
     registrationNo: '',
@@ -37,6 +42,7 @@ const BillForm: React.FC = () => {
     dueDate: new Date().toISOString().split('T')[0],
     description: '',
     status: 'pending',
+    centerId: centerId || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

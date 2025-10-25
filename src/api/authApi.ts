@@ -20,6 +20,8 @@ export interface LoginResponse {
       role: string;
       registrationNo?: string;
       dob?: string;
+      centerId?: string;
+      centerName?: string;
     };
     token: string;
   };
@@ -87,6 +89,8 @@ export const centerLogin = async (credentials: { email: string; password: string
           name: 'Demo Center',
           email: 'center@demo.com',
           role: 'center',
+          centerId: 'CENTER001',
+          centerName: 'Demo Center Name',
         },
         token: 'center-jwt-token-' + Date.now(),
       },

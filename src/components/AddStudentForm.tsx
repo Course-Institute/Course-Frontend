@@ -23,6 +23,11 @@ interface AddStudentFormProps {
   onClose: () => void;
   onNext?: (data: AddStudentData) => void;
   isStepMode?: boolean;
+  preFilledCenter?: {
+    centerId: string;
+    centerName: string;
+    name: string;
+  };
 }
 
 interface FormData {
@@ -107,11 +112,23 @@ const initialFormData: FormData = {
   centerId: '',
 };
 
-const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormProps) => {
+const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }: AddStudentFormProps) => {
   const { addStudent, isSubmitting, error: submitError } = useAddStudent();
   const { showSuccess, showError } = useToast();
   
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [formData, setFormData] = useState<FormData>(() => {
+    if (preFilledCenter) {
+      return {
+        ...initialFormData,
+        centerId: preFilledCenter.centerId,
+        center: {
+          centerId: preFilledCenter.centerId,
+          name: preFilledCenter.centerName
+        }
+      };
+    }
+    return initialFormData;
+  });
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPreview, setShowPreview] = useState(false);
 
@@ -343,22 +360,41 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false }: AddStudentFormP
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1e293b' }}>
               Center Information
             </Typography>
-            <ApiBasedAutoComplete
-              label="Select Center *"
-              apiPath="/api/center/getCenterAutoCompleteList"
-              searchKey="query"
-              keyToPick="name"
-              idKey="centerId"
-              customActionMethod="GET"
-              onSelect={(opt) => {
-                handleInputChange('centerId', opt?.centerId ? opt.centerId : '');
-                handleInputChange('center', opt);
-              }}
-              selectedOptions={formData?.center ?? null}
-              error={!!errors.centerId}
-              helperText={errors.centerId}
-              required
-            />
+            {preFilledCenter ? (
+              <Box sx={{ 
+                p: 2, 
+                border: '1px solid #e5e7eb', 
+                borderRadius: 2, 
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}>
+                <Typography variant="body1" sx={{ fontWeight: 'medium', color: '#374151' }}>
+                  Selected Center: <strong>{preFilledCenter.centerName}</strong>
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                  (Pre-filled from your center login)
+                </Typography>
+              </Box>
+            ) : (
+              <ApiBasedAutoComplete
+                label="Select Center *"
+                apiPath="/api/center/getCenterAutoCompleteList"
+                searchKey="query"
+                keyToPick="name"
+                idKey="centerId"
+                customActionMethod="GET"
+                onSelect={(opt) => {
+                  handleInputChange('centerId', opt?.centerId ? opt.centerId : '');
+                  handleInputChange('center', opt);
+                }}
+                selectedOptions={formData?.center ?? null}
+                error={!!errors.centerId}
+                helperText={errors.centerId}
+                required
+              />
+            )}
           </Box>
         </Grid>
 
