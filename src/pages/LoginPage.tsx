@@ -10,7 +10,6 @@ import {
   CardContent,
   InputAdornment,
   IconButton,
-  useTheme,
   Alert,
   CircularProgress,
   Grid,
@@ -18,12 +17,10 @@ import {
 import {
   Visibility,
   VisibilityOff,
-  Business,
   School,
   AdminPanelSettings,
   Person,
   BusinessCenter,
-  Security,
 } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
 import { loginUser, type LoginResponse } from '../api/authApi';
@@ -32,7 +29,6 @@ import DateInput from '../components/DateInput';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const LoginPage = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') || 'Student';
@@ -133,32 +129,6 @@ const LoginPage = () => {
 
     loginMutation.mutate(credentials);
   }, [formData, role, loginMutation]);
-
-  const getTitle = useCallback(() => {
-    switch (role.toLowerCase()) {
-      case 'student':
-        return 'Student Login';
-      case 'center':
-        return 'Center Login';
-      case 'admin':
-        return 'Admin Login';
-      default:
-        return 'Welcome Back';
-    }
-  }, [role]);
-
-  const getSubtitle = useCallback(() => {
-    switch (role.toLowerCase()) {
-      case 'student':
-        return 'Please sign in to your student account';
-      case 'center':
-        return 'Please sign in to your center account';
-      case 'admin':
-        return 'Please sign in to your admin account';
-      default:
-        return 'Please sign in to your corporate account';
-    }
-  }, [role]);
 
   const getThemeConfig = useCallback(() => {
     switch (role.toLowerCase()) {

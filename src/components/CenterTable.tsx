@@ -47,20 +47,12 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
 
   const getStatusColor = (status: Center['status']) => {
     switch (status) {
-      case 'Approve':
+      case 'approved':
+        return 'success';
+      case 'pending':
         return 'warning';
-      case 'Published':
-        return 'success';
-      case 'Active':
-        return 'success';
-      case 'Pending':
-        return 'info';
-      case 'Deactivated':
+      case 'rejected':
         return 'error';
-      case 'Refenisted':
-        return 'default';
-      case 'Renning':
-        return 'default';
       default:
         return 'default';
     }
@@ -68,20 +60,12 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
 
   const getStatusLabel = (status: Center['status']) => {
     switch (status) {
-      case 'Approve':
-        return 'Approve';
-      case 'Published':
-        return 'Published';
-      case 'Active':
-        return 'Active';
-      case 'Pending':
+      case 'approved':
+        return 'Approved';
+      case 'pending':
         return 'Pending';
-      case 'Deactivated':
-        return 'Deactivated';
-      case 'Refenisted':
-        return 'Refenisted';
-      case 'Renning':
-        return 'Renning';
+      case 'rejected':
+        return 'Rejected';
       default:
         return status;
     }
@@ -91,36 +75,23 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
     const actions = [];
     
     switch (center.status) {
-      case 'Approve':
+      case 'pending':
         actions.push(
           { label: 'Approve', icon: <CheckCircle />, color: 'success' },
-          { label: 'Reject', icon: <Cancel />, color: 'error' }
-        );
-        break;
-      case 'Published':
-      case 'Active':
-        actions.push(
-          { label: 'Edit', icon: <Edit />, color: 'primary' },
-          { label: 'Deactivate', icon: <PowerSettingsNew />, color: 'warning' }
-        );
-        break;
-      case 'Pending':
-        actions.push(
-          { label: 'Approve', icon: <CheckCircle />, color: 'success' },
+          { label: 'Reject', icon: <Cancel />, color: 'error' },
           { label: 'Edit', icon: <Edit />, color: 'primary' }
         );
         break;
-      case 'Deactivated':
-        actions.push(
-          { label: 'Activate', icon: <PowerSettingsNew />, color: 'success' },
-          { label: 'Delete', icon: <Delete />, color: 'error' }
-        );
-        break;
-      case 'Refenisted':
-      case 'Renning':
+      case 'approved':
         actions.push(
           { label: 'Edit', icon: <Edit />, color: 'primary' },
           { label: 'Deactivate', icon: <PowerSettingsNew />, color: 'warning' }
+        );
+        break;
+      case 'rejected':
+        actions.push(
+          { label: 'Edit', icon: <Edit />, color: 'primary' },
+          { label: 'Delete', icon: <Delete />, color: 'error' }
         );
         break;
     }
@@ -162,7 +133,7 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
           <Table stickyHeader>
             <TableHead>
               <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Center ID</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Center Code</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Center Name</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Location</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Contact Person</TableCell>
@@ -183,7 +154,7 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
               ) : (
                 centers.map((center) => (
                   <TableRow
-                    key={center.id}
+                    key={center._id}
                     hover
                     sx={{
                       '&:hover': {
@@ -193,19 +164,19 @@ const CenterTable = ({ centers, onCenterAction }: CenterTableProps) => {
                   >
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {center.centerId}
+                        {center.centerDetails.centerCode}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {center.centerName}
+                        {center.centerDetails.centerName}
                       </Typography>
                     </TableCell>
-                    <TableCell>{center.location}</TableCell>
-                    <TableCell>{center.contactPerson}</TableCell>
+                    <TableCell>{center.centerDetails.city}, {center.centerDetails.state}</TableCell>
+                    <TableCell>{center.authorizedPersonDetails.authName}</TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {center.students}
+                        {center.infrastructureDetails.seatingCapacity}
                       </Typography>
                     </TableCell>
                     <TableCell>
