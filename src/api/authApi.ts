@@ -100,6 +100,27 @@ export const centerLogin = async (credentials: { email: string; password: string
   // Real credentials - make API call to backend
   try {
     const response = await axiosInstance.post('/api/user/center-login', credentials);
+    
+    // Transform the backend response to match the expected format
+    const backendData = response.data;
+    if (backendData.status && backendData.data) {
+      return {
+        status: backendData.status,
+        message: backendData.message,
+        data: {
+          user: {
+            id: backendData.data.centerId || '',
+            name: backendData.data.centerName || '',
+            email: credentials.email,
+            role: 'center',
+            centerId: backendData.data.centerId,
+            centerName: backendData.data.centerName,
+          },
+          token: backendData.data.token,
+        },
+      };
+    }
+    
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.message) {

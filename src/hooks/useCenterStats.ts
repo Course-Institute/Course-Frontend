@@ -8,12 +8,6 @@ interface CenterStats {
   deactivatedCenters: number;
 }
 
-interface CenterDynamicsResponse {
-  status: boolean;
-  message: string;
-  data: CenterStats;
-}
-
 const fetchCenterStats = async (): Promise<CenterStats> => {
   const response = await axiosInstance.get('/api/admin/centerdynamics');
   return response.data.data;
