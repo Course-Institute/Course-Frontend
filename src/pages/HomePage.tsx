@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -15,6 +16,7 @@ import InquiryDialog from '../components/InquiryDialog';
 
 const HomePage = () => {
   const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const programHighlights = [
     {
@@ -102,6 +104,7 @@ const HomePage = () => {
             variant="contained"
             size="large"
             endIcon={<ArrowForward />}
+            onClick={() => navigate('/programs')}
             sx={{
               backgroundColor: 'white',
               color: 'primary.main',
