@@ -69,7 +69,7 @@ const Navbar = () => {
           display: 'flex', 
           alignItems: 'center', 
           p: 3, 
-          background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
+          // background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
           cursor: 'pointer',
           '&:hover': {
             opacity: 0.9,
@@ -82,7 +82,7 @@ const Navbar = () => {
           sx={{
             p: 1.5,
             borderRadius: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            // backgroundColor: 'rgba(255, 255, 255, 0.2)',
             mr: 2,
             display: 'flex',
             alignItems: 'center',
@@ -211,14 +211,43 @@ const Navbar = () => {
 
   return (
     <>
+      {/* Header Image */}
+      <Box
+        sx={{
+          width: '100%',
+          height: '350px',
+          backgroundImage: 'url(/images/header/header-banner.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.1)',
+          }
+        }}
+      >
+        {/* Optional: Add text content here if needed */}
+        <Box sx={{ position: 'relative' }}>
+          {/* You can add header text or logo here if needed */}
+        </Box>
+      </Box>
+
       <AppBar
-        position="fixed"
+        position="static"
         sx={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-          zIndex: theme.zIndex.drawer + 1,
         }}
       >
         <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
@@ -239,15 +268,15 @@ const Navbar = () => {
               sx={{
                 p: 1.5,
                 borderRadius: 3,
-                background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
+                // background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
                 mr: 2,
-                boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+                // boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <InstituteLogo width={32} height={32} sx={{ color: 'white' }} />
+              <InstituteLogo width={60} height={60} sx={{ color: 'white' }} />
             </Box>
             <Box>
               <Typography
