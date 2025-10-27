@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -9,14 +9,50 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { ArrowForward, School, Work, TrendingUp, People } from '@mui/icons-material';
+import { School, Work, TrendingUp, People, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import InquiryDialog from '../components/InquiryDialog';
 
 const HomePage = () => {
   const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+
+  // Hero images array
+  const heroImages = [
+    '/images/hero/hero-image-1.png',
+    '/images/hero/hero-image-2.png'
+  ];
+
+  // Auto-rotate carousel every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  // Navigation functions
+  const goToPrevious = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 0 ? heroImages.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  // Handle program highlight click
+  const handleProgramClick = () => {
+    navigate('/programs');
+  };
 
   const programHighlights = [
     {
@@ -47,35 +83,144 @@ const HomePage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar />
+      <Navbar />
       
-      {/* Hero Banner */}
+      {/* Hero Banner with Carousel */}
       <Box
         sx={{
-          background: `
-            linear-gradient(135deg, rgba(37, 99, 235, 0.5) 0%, rgba(16, 185, 129, 0.5) 100%),
-            url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          color: 'white',
-          py: 12,
-          textAlign: 'center',
+          height: '90vh',
+          minHeight: '600px',
           position: 'relative',
-          '&::before': {
-            content: '""',
+          overflow: 'hidden',
+          color: 'white',
+          display: 'flex',
+
+          alignItems: 'center',
+          justifyContent: 'center'
+          // No margin needed since navbar is now positioned below header
+        }}
+      >
+        {/* Carousel Images */}
+        {heroImages.map((image, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: `url(${image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              opacity: currentImageIndex === index ? 1 : 0,
+              transition: 'opacity 1s ease-in-out',
+              zIndex: 1
+            }}
+          />
+        ))}
+
+        {/* Overlay */}
+        <Box
+          sx={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(16, 185, 129, 0.8) 100%)',
-            zIndex: 1,
-          }
-        }}
-      >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.7) 0%, rgba(16, 185, 129, 0.7) 100%)',
+            zIndex: 2,
+          }}
+        />
+
+        {/* Previous Button */}
+        <Button
+          onClick={goToPrevious}
+          sx={{
+            position: 'absolute',
+            left: 20,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            borderRadius: '50%',
+            width: 60,
+            height: 60,
+            minWidth: 'auto',
+            zIndex: 3,
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              transform: 'translateY(-50%) scale(1.1)'
+            },
+            transition: 'all 0.3s ease'
+          }}
+        >
+          <ChevronLeft sx={{ fontSize: 30 }} />
+        </Button>
+
+        {/* Next Button */}
+        <Button
+          onClick={goToNext}
+          sx={{
+            position: 'absolute',
+            right: 20,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            borderRadius: '50%',
+            width: 60,
+            height: 60,
+            minWidth: 'auto',
+            zIndex: 3,
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              transform: 'translateY(-50%) scale(1.1)'
+            },
+            transition: 'all 0.3s ease'
+          }}
+        >
+          <ChevronRight sx={{ fontSize: 30 }} />
+        </Button>
+
+        {/* Carousel Indicators */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 30,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 2,
+            zIndex: 3
+          }}
+        >
+          {heroImages.map((_, index) => (
+            <Box
+              key={index}
+              onClick={() => setCurrentImageIndex(index)}
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                backgroundColor: currentImageIndex === index ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: 'white',
+                  transform: 'scale(1.2)'
+                }
+              }}
+            />
+          ))}
+        </Box>
+        {/* Content */}
+        {/* <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, textAlign: 'center' }}>
           <Typography
             variant="h1"
             sx={{
@@ -122,7 +267,7 @@ const HomePage = () => {
           >
             Explore Our 9 Program Categories
           </Button>
-        </Container>
+        </Container> */}
       </Box>
 
       {/* Introduction Section */}
@@ -218,12 +363,14 @@ const HomePage = () => {
             {programHighlights.map((program, index) => (
               <Grid size={{ xs: 12, sm: 6 }} key={index}>
                 <Card
+                  onClick={handleProgramClick}
                   sx={{
                     height: '100%',
                     borderRadius: 3,
                     boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                     border: '1px solid #e2e8f0',
                     transition: 'transform 0.2s ease-in-out',
+                    cursor: 'pointer',
                     '&:hover': {
                       transform: 'translateY(-5px)',
                       boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
