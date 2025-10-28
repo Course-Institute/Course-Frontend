@@ -1,24 +1,8 @@
 import { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Divider,
-} from '@mui/material';
-import { Email, LocationOn, AccessTime, Send } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import LayoutWrapper from '../components/LayoutWrapper';
-import { layoutConfig } from '../theme/layout';
+import { programsData } from '../constants/programsData';
 
 const ContactUsPage = () => {
   const [inquiryForm, setInquiryForm] = useState({
@@ -29,18 +13,6 @@ const ContactUsPage = () => {
     message: ''
   });
 
-  const programs = [
-    'Paramedical Programs',
-    'Vocational Programs',
-    'Yoga & Naturopathy',
-    'IT Programmes',
-    'Fire Safety',
-    'NTT (Nursery Teacher Training)',
-    'Beauty & Wellness',
-    'Apparel & Fashion',
-    'Agriculture'
-  ];
-
   const handleInputChange = (field: string) => (event: any) => {
     setInquiryForm(prev => ({
       ...prev,
@@ -50,9 +22,8 @@ const ContactUsPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Inquiry submitted:', inquiryForm);
-    // Reset form
+    console.log('Inquiry Form Submitted:', inquiryForm);
+    alert('Your inquiry has been submitted!');
     setInquiryForm({
       fullName: '',
       email: '',
@@ -63,362 +34,496 @@ const ContactUsPage = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
       <LayoutWrapper backgroundColor="transparent">
-        <Box 
-          sx={{ 
-            flex: 1, 
-            py: 8, 
-            background: `
-              linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
-              url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
-            `,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed'
-          }}
-        >
-          <Container sx={layoutConfig.getContainerStyles()}>
-          {/* Page Header */}
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography
-              variant="h2"
-              sx={{
+        <div style={{ 
+          flex: 1, 
+          padding: '64px 0', 
+          background: `
+            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          width: '100%'
+        }}>
+          <div style={{ 
+            maxWidth: '1200px', 
+            margin: '0 auto', 
+            padding: '0 32px' 
+          }}>
+            {/* Page Header */}
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h1 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 3,
-                fontSize: { xs: '2rem', md: '3rem' }
-              }}
-            >
-              Contact Us
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{
-                color: 'primary.main',
-                fontWeight: '600',
-                mb: 4
-              }}
-            >
-              Connect with Mahavir Institute of Vocational & Paramedical Association
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: '1.1rem',
-                lineHeight: 1.8,
-                color: '#64748b',
+                marginBottom: '16px',
+                fontSize: '3rem'
+              }}>
+                Get in Touch
+              </h1>
+              <p style={{
+                color: '#475569',
+                fontSize: '1.25rem',
                 maxWidth: '800px',
-                mx: 'auto'
-              }}
-            >
-              We're here to help you make informed decisions about your future. Whether you want to explore courses, seek admission guidance, or get more information, our admissions team is just a call or message away.
-            </Typography>
-          </Box>
+                margin: '0 auto',
+                lineHeight: 1.6
+              }}>
+                We're here to answer your questions and help you start your journey. Reach out to us through any of the methods below.
+              </p>
+            </div>
 
-          <Grid container spacing={6}>
-            {/* Contact Information */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
-                }}
-              >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: '#1e293b',
-                      mb: 4
-                    }}
-                  >
-                    Get in Touch
-                  </Typography>
-
-                  {/* Address */}
-                  <Box sx={{ mb: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                      <LocationOn sx={{ color: 'primary.main', fontSize: 30, mr: 2, mt: 0.5 }} />
-                      <Box>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#1e293b',
-                            mb: 1
-                          }}
-                        >
-                          Address
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: '#64748b',
-                            lineHeight: 1.6
-                          }}
-                        >
-                          Mahavir Institute of Vocational & Paramedical Association<br />
-                          First Floor, Parmal 14, near SBI South<br />
-                          Badarpur Village, New Delhi, Delhi 110044
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ mb: 4 }} />
-
-                  {/* Email */}
-                  <Box sx={{ mb: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Email sx={{ color: 'primary.main', fontSize: 30, mr: 2 }} />
-                      <Box>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#1e293b',
-                            mb: 1
-                          }}
-                        >
-                          Email
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: '#64748b'
-                          }}
-                        >
-                          admissions@mivpsa.in
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: '#64748b'
-                          }}
-                        >
-                          info@mivpsa.in
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ mb: 4 }} />
-
-                  {/* Working Hours */}
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <AccessTime sx={{ color: 'primary.main', fontSize: 30, mr: 2 }} />
-                      <Box>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#1e293b',
-                            mb: 1
-                          }}
-                        >
-                          Working Hours
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: '#64748b'
-                          }}
-                        >
-                          Monday - Friday: 9:00 AM – 5:00 PM
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: '#64748b'
-                          }}
-                        >
-                          Saturday: 9:00 AM – 1:00 PM
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Inquiry Form */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
-                }}
-              >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: '#1e293b',
-                      mb: 2
-                    }}
-                  >
-                    Submit Your Detailed Query
-                  </Typography>
-                  
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: '#64748b',
-                      mb: 4
-                    }}
-                  >
-                    Ready to start your journey? Take the first step toward a brighter future.
-                  </Typography>
-
-                  <Box component="form" onSubmit={handleSubmit}>
-                    <Grid container spacing={3}>
-                      {/* Full Name */}
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          fullWidth
-                          label="Full Name"
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+              gap: '32px',
+              justifyContent: 'center',
+              alignItems: 'start'
+            }}>
+              {/* Contact Form */}
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                padding: '32px'
+              }}>
+                <h2 style={{
+                  fontWeight: 'bold',
+                  marginBottom: '24px',
+                  color: '#1e293b',
+                  fontSize: '2rem',
+                  textAlign: 'center'
+                }}>
+                  Send Us a Message
+                </h2>
+                <form onSubmit={handleSubmit}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          marginBottom: '8px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
                           value={inquiryForm.fullName}
                           onChange={handleInputChange('fullName')}
                           required
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2
-                            }
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            transition: 'border-color 0.3s ease',
+                            boxSizing: 'border-box'
                           }}
+                          onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
-                      </Grid>
-
-                      {/* Email */}
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          fullWidth
-                          label="Email Address"
+                      </div>
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          marginBottom: '8px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>
+                          Email Address *
+                        </label>
+                        <input
                           type="email"
                           value={inquiryForm.email}
                           onChange={handleInputChange('email')}
                           required
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2
-                            }
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            transition: 'border-color 0.3s ease',
+                            boxSizing: 'border-box'
                           }}
+                          onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
-                      </Grid>
+                      </div>
+                    </div>
 
-                      {/* Phone */}
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          fullWidth
-                          label="Phone Number"
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          marginBottom: '8px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
                           value={inquiryForm.phone}
                           onChange={handleInputChange('phone')}
-                          required
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2
-                            }
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            transition: 'border-color 0.3s ease',
+                            boxSizing: 'border-box'
                           }}
+                          onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
-                      </Grid>
-
-                      {/* Program of Interest */}
-                      <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth required>
-                          <InputLabel>Program of Interest</InputLabel>
-                          <Select
-                            value={inquiryForm.programOfInterest}
-                            onChange={handleInputChange('programOfInterest')}
-                            label="Program of Interest"
-                            sx={{
-                              borderRadius: 2
-                            }}
-                          >
-                            {programs.map((program) => (
-                              <MenuItem key={program} value={program}>
-                                {program}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-
-                      {/* Message */}
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          fullWidth
-                          label="Your Message"
-                          multiline
-                          rows={4}
-                          value={inquiryForm.message}
-                          onChange={handleInputChange('message')}
-                          placeholder="Tell us about your goals and any specific questions you have..."
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2
-                            }
+                      </div>
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          marginBottom: '8px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>
+                          Program of Interest
+                        </label>
+                        <select
+                          value={inquiryForm.programOfInterest}
+                          onChange={handleInputChange('programOfInterest')}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            transition: 'border-color 0.3s ease',
+                            boxSizing: 'border-box',
+                            backgroundColor: 'white'
                           }}
-                        />
-                      </Grid>
-
-                      {/* Submit Button */}
-                      <Grid size={{ xs: 12 }}>
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          size="large"
-                          fullWidth
-                          endIcon={<Send />}
-                          sx={{
-                            background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                            '&:hover': {
-                              background: 'linear-gradient(135deg, #1d4ed8 0%, #059669 100%)',
-                            },
-                            textTransform: 'none',
-                            borderRadius: 2,
-                            py: 2,
-                            fontSize: '1.1rem',
-                            fontWeight: 'bold'
-                          }}
+                          onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         >
-                          Submit Inquiry
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Box>
+                          <option value="">Select a program</option>
+                          {programsData.map((program) => (
+                            <option key={program.id} value={program.category}>
+                              {program.category}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                  <Box sx={{ mt: 3, p: 2, backgroundColor: 'rgb(97, 152, 230)', borderRadius: 2,  }}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgb(185, 235, 175)',
-                        fontStyle: 'italic',
-                        textAlign: 'center'
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontWeight: '600',
+                        color: '#374151'
+                      }}>
+                        Your Message *
+                      </label>
+                      <textarea
+                        value={inquiryForm.message}
+                        onChange={handleInputChange('message')}
+                        required
+                        rows={5}
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          transition: 'border-color 0.3s ease',
+                          boxSizing: 'border-box',
+                          resize: 'vertical',
+                          fontFamily: 'inherit'
+                        }}
+                        onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                        onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      style={{
+                        background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '16px 32px',
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.9';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 12px 25px rgba(37, 99, 235, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.3)';
                       }}
                     >
-                      Note: Tuition and registration fees are shared upon inquiry or by contacting the admissions office directly.
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Container>
-        </Box>
-      </LayoutWrapper>
+                      📧 Send Message
+                    </button>
+                  </div>
+                </form>
+              </div>
 
+              {/* Contact Info */}
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                padding: '32px',
+                height: 'fit-content'
+              }}>
+                <h2 style={{
+                  fontWeight: 'bold',
+                  marginBottom: '24px',
+                  color: '#1e293b',
+                  fontSize: '2rem',
+                  textAlign: 'center'
+                }}>
+                  Our Details
+                </h2>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{
+                      backgroundColor: '#2563eb',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: '16px',
+                      fontSize: '20px'
+                    }}>
+                      📍
+                    </div>
+                    <div>
+                      <h3 style={{
+                        fontWeight: 'bold',
+                        color: '#1e293b',
+                        margin: '0 0 4px 0',
+                        fontSize: '1.1rem'
+                      }}>
+                        Address
+                      </h3>
+                      <p style={{
+                        color: '#64748b',
+                        margin: 0,
+                        fontSize: '1rem',
+                        lineHeight: 1.5,
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        hyphens: 'auto'
+                      }}>
+                       Mahavir Institute of Vocational & Paramedical Science
+Near Railway Station, Main Road
+Delhi, India - 110001
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: '16px',
+                      fontSize: '20px'
+                    }}>
+                      ✉️
+                    </div>
+                    <div>
+                      <h3 style={{
+                        fontWeight: 'bold',
+                        color: '#1e293b',
+                        margin: '0 0 4px 0',
+                        fontSize: '1.1rem'
+                      }}>
+                        Email
+                      </h3>
+                      <p style={{
+                        color: '#64748b',
+                        margin: 0,
+                        fontSize: '1rem',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word'
+                      }}>
+                        info@mahavirinstitute.com
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{
+                      backgroundColor: '#f59e0b',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: '16px',
+                      fontSize: '20px'
+                    }}>
+                      🕒
+                    </div>
+                    <div>
+                      <h3 style={{
+                        fontWeight: 'bold',
+                        color: '#1e293b',
+                        margin: '0 0 4px 0',
+                        fontSize: '1.1rem'
+                      }}>
+                        Hours
+                      </h3>
+                      <p style={{
+                        color: '#64748b',
+                        margin: 0,
+                        fontSize: '1rem',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word'
+                      }}>
+                        Mon - Sat: 9:00 AM - 7:00 PM
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ 
+                    height: '1px', 
+                    backgroundColor: '#e5e7eb', 
+                    margin: '16px 0' 
+                  }} />
+
+                  <div>
+                    <h3 style={{
+                      fontWeight: 'bold',
+                      color: '#1e293b',
+                      marginBottom: '16px',
+                      fontSize: '1.25rem',
+                      textAlign: 'center'
+                    }}>
+                      Follow Us
+                    </h3>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      gap: '12px' 
+                    }}>
+                      <button style={{
+                        backgroundColor: '#1877F2',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '48px',
+                        height: '48px',
+                        cursor: 'pointer',
+                        fontSize: '20px',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#145CB3';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#1877F2';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      >
+                        📘
+                      </button>
+                      <button style={{
+                        backgroundColor: '#1DA1F2',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '48px',
+                        height: '48px',
+                        cursor: 'pointer',
+                        fontSize: '20px',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0C85D0';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#1DA1F2';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      >
+                        🐦
+                      </button>
+                      <button style={{
+                        backgroundColor: '#0077B5',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '48px',
+                        height: '48px',
+                        cursor: 'pointer',
+                        fontSize: '20px',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#005582';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0077B5';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      >
+                        💼
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </LayoutWrapper>
+      
       <FooterSection />
-    </Box>
+    </div>
   );
 };
 
