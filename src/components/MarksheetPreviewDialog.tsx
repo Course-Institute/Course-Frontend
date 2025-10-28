@@ -51,7 +51,7 @@ const MarksheetPreviewDialog = ({ open, onClose, marksheetId }: MarksheetPreview
               <TextField
                 fullWidth
                 label="Registration Number"
-                value={marksheet.registrationNo}
+                value={marksheet.studentId.registrationNo}
                 disabled
                 size="small"
               />
@@ -76,8 +76,8 @@ const MarksheetPreviewDialog = ({ open, onClose, marksheetId }: MarksheetPreview
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {marksheet.subjects.map((subject) => (
-                      <TableRow key={subject.id}>
+                    {marksheet.subjects.map((subject, index) => (
+                      <TableRow key={subject.id || index}>
                         <TableCell>{subject.subjectName}</TableCell>
                         <TableCell align="right">{subject.marks}</TableCell>
                         <TableCell align="right">{subject.internal}</TableCell>
