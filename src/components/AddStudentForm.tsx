@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   TextField,
@@ -18,6 +18,7 @@ import { useToast } from '../contexts/ToastContext';
 import DateInput from './DateInput';
 import StudentFormPreviewDialog from './StudentFormPreviewDialog';
 import ApiBasedAutoComplete from './core-components/apiBasedAutoComplete';
+import { programsData } from '../constants/programsData';
 
 interface AddStudentFormProps {
   onClose: () => void;
@@ -131,6 +132,39 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPreview, setShowPreview] = useState(false);
+
+  // Function to get unique course types from programsData
+  const getCourseTypes = (): string[] => {
+    const courseTypes = new Set<string>();
+    programsData.forEach(program => {
+      courseTypes.add(program.category);
+    });
+    return Array.from(courseTypes).sort();
+  };
+
+  // Function to get courses for the selected course type
+  const getCoursesForType = (courseType: string): string[] => {
+    if (!courseType) return [];
+    
+    const courses = new Set<string>();
+    const selectedProgram = programsData.find(program => program.category === courseType);
+    
+    if (selectedProgram) {
+      selectedProgram.levels.forEach(level => {
+        level.courses.forEach(course => {
+          courses.add(course.name);
+        });
+      });
+    }
+    
+    return Array.from(courses).sort();
+  };
+
+  // Memoized course types
+  const courseTypes = useMemo(() => getCourseTypes(), []);
+  
+  // Get courses for current course type
+  const availableCourses = useMemo(() => getCoursesForType(formData.courseType), [formData.courseType]);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -608,14 +642,19 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
                   <InputLabel>Course Type *</InputLabel>
                   <Select
                     value={formData.courseType}
-                    onChange={(e) => handleInputChange('courseType', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('courseType', e.target.value);
+                      // Clear course field when course type changes
+                      handleInputChange('course', '');
+                    }}
                     label="Course Type *"
                   >
                     <MenuItem value="">Select course Type</MenuItem>
-                    <MenuItem value="Undergraduate">Undergraduate</MenuItem>
-                    <MenuItem value="Postgraduate">Postgraduate</MenuItem>
-                    <MenuItem value="Diploma">Diploma</MenuItem>
-                    <MenuItem value="Certificate">Certificate</MenuItem>
+                    {courseTypes.map((courseType) => (
+                      <MenuItem key={courseType} value={courseType}>
+                        {courseType}
+                      </MenuItem>
+                    ))}
                   </Select>
                   {errors.courseType && <FormHelperText>{errors.courseType}</FormHelperText>}
                 </FormControl>
@@ -623,19 +662,21 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
 
               {/* Course */}
               <Grid size={12}>
-                <FormControl fullWidth error={!!errors.course}>
+                <FormControl fullWidth error={!!errors.course} disabled={!formData.courseType}>
                   <InputLabel>Course *</InputLabel>
                   <Select
                     value={formData.course}
                     onChange={(e) => handleInputChange('course', e.target.value)}
                     label="Course *"
                   >
-                    <MenuItem value="">Select Course</MenuItem>
-                    <MenuItem value="B.Tech">B.Tech</MenuItem>
-                    <MenuItem value="B.Sc">B.Sc</MenuItem>
-                    <MenuItem value="MBA">MBA</MenuItem>
-                    <MenuItem value="MCA">MCA</MenuItem>
-                    <MenuItem value="BBA">BBA</MenuItem>
+                    <MenuItem value="">
+                      {formData.courseType ? 'Select Course' : 'Select Course Type First'}
+                    </MenuItem>
+                    {availableCourses.map((course) => (
+                      <MenuItem key={course} value={course}>
+                        {course}
+                      </MenuItem>
+                    ))}
                   </Select>
                   {errors.course && <FormHelperText>{errors.course}</FormHelperText>}
                 </FormControl>

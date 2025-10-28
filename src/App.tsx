@@ -32,6 +32,9 @@ import CenterManageStudentsPage from './pages/center/CenterManageStudentsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
 import CenterUploadResultsPage from './pages/center/CenterUploadResultsPage';
+import AddMarksheetPageAdmin from './pages/admin/AddMarksheetPage';
+import AddMarksheetPageCenter from './pages/center/AddMarksheetPage';
+import EnquiryListPage from './pages/admin/EnquiryListPage';
 
 function App() {
   return (
@@ -106,6 +109,16 @@ function App() {
               <ManageBillsPage />
             </AdminLayout>
           } />
+          <Route path="/admin/add-marksheet" element={
+            <AdminLayout title="ADD MARKSHEET">
+              <AddMarksheetPageAdmin />
+            </AdminLayout>
+          } />
+          <Route path="/admin/enquiry-list" element={
+            <AdminLayout title="ENQUIRY LIST">
+              <EnquiryListPage />
+            </AdminLayout>
+          } />
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
@@ -141,6 +154,13 @@ function App() {
               <CenterManageStudentsPage />
             </CenterLayout>
           } />
+          <Route path="/center/add-marksheet" element={
+            <CenterLayout title="ADD MARKSHEET">
+              <AddMarksheetPageCenter />
+            </CenterLayout>
+          } />
+
+       
           
           {/* 404 Route - Must be last */}
           <Route path="*" element={<NotFoundPage />} />

@@ -18,6 +18,8 @@ import {
   PersonAdd,
   Receipt,
   Payment,
+  Assignment,
+  ContactMail,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -56,6 +58,8 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
     { id: 5, label: 'Manage Centers', icon: <Business />, path: '/admin/centers' },
     { id: 6, label: 'Create Bill', icon: <Receipt />, path: '/admin/create-bill' },
     { id: 7, label: 'Manage Bills', icon: <Payment />, path: '/admin/bills' },
+    { id: 8, label: 'Add Marksheet', icon: <Assignment />, path: '/admin/add-marksheet' },
+    { id: 9, label: 'Enquiry List', icon: <ContactMail />, path: '/admin/enquiry-list' },
   ];
 
   const drawer = (
