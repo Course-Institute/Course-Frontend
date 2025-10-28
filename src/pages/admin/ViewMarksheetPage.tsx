@@ -1,28 +1,25 @@
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Fragment, useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
 import {
   Box,
   Typography,
   CircularProgress,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
-  Chip,
   Button,
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { ArrowBack, Download } from '@mui/icons-material';
 import { useGetMarksheet } from '../../hooks/useGetMarksheet';
 
 const AdminMarksheetPage = () => {
-  const { registrationNo } = useParams<{ registrationNo: string }>();
+  const { marksheetId } = useParams<{ marksheetId: string }>();
   const navigate = useNavigate();
+  const marksheetRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   
-  const { data: marksheet, isLoading, error } = useGetMarksheet(registrationNo || '', !!registrationNo);
+  const { data: marksheet, isLoading, error } = useGetMarksheet(marksheetId || '', !!marksheetId);
 
   if (isLoading) {
     return (
@@ -66,69 +63,196 @@ const AdminMarksheetPage = () => {
     );
   }
 
+  const handleDownload = async () => {
+    if (marksheetRef.current && marksheet) {
+      setIsDownloading(true);
+      try {
+        // Additional wait to ensure everything is rendered
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const canvas = await html2canvas(marksheetRef.current, {
+          backgroundColor: '#ffffff',
+          scale: 2, // Higher scale for better quality
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          windowWidth: marksheetRef.current.scrollWidth,
+          windowHeight: marksheetRef.current.scrollHeight,
+        });
+        
+        const link = document.createElement('a');
+        link.download = `marksheet-${marksheet.studentId.registrationNo}-${marksheet.studentId.candidateName.replace(/\s+/g, '-')}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      } catch (error) {
+        console.error('Error generating marksheet image:', error);
+        alert('Error generating marksheet image. Please try again.');
+      } finally {
+        setIsDownloading(false);
+      }
+    }
+  };
+
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Button
           variant="outlined"
           startIcon={<ArrowBack />}
           onClick={() => navigate('/admin/students')}
-          sx={{ mb: 2 }}
         >
           Back to Students
         </Button>
         
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 1 }}>
-            Marksheet
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Registration No: {marksheet.registrationNo}
-          </Typography>
-          {marksheet.isMarksheetApproved && (
-            <Chip
-              label="Approved"
-              color="success"
-              sx={{ mt: 1 }}
-            />
-          )}
-        </Box>
+        <Button
+          variant="contained"
+          startIcon={<Download />}
+          onClick={handleDownload}
+          disabled={isDownloading}
+          sx={{
+            backgroundColor: '#10b981',
+            '&:hover': { backgroundColor: '#059669' },
+          }}
+        >
+          {isDownloading ? 'Generating...' : 'Download Marksheet'}
+        </Button>
       </Box>
 
-      {marksheet.subjects && marksheet.subjects.length > 0 ? (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Subject Name</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Marks</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Internal</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Total</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Min Marks</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Max Marks</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {marksheet.subjects.map((subject) => (
-                <TableRow key={subject.id} hover>
-                  <TableCell>{subject.subjectName}</TableCell>
-                  <TableCell align="right">{subject.marks}</TableCell>
-                  <TableCell align="right">{subject.internal}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>{subject.total}</TableCell>
-                  <TableCell align="right">{subject.minMarks}</TableCell>
-                  <TableCell align="right">{subject.maxMarks}</TableCell>
-                </TableRow>
+      <Paper 
+        ref={marksheetRef}
+        sx={{ 
+          p: 4, 
+          textAlign: 'center', 
+          minHeight: '800px', 
+          width: { xs: '100%', md: '1056px' },
+          height: { xs: 'auto', md: '1494px' },
+          aspectRatio: { md: '1056/1494' },
+          display: 'flex', 
+          flexDirection: 'column',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* SVG Background */}
+        <Box
+          component="img"
+          src="/mivps-marksheet.svg"
+          alt="Marksheet Template"
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: 'auto',
+            zIndex: 0,
+            objectFit: 'contain',
+          }}
+        />
+        {/* Student Details Overlay - Only Values with Absolute Positioning */}
+        <Box sx={{ position: 'relative', height: '100%', zIndex: 1 }}>
+          {/* Left Column */}
+          <Box sx={{ position: 'absolute', left: '257px', top: '478px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.candidateName}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ position: 'absolute', left: '260px', top: '514px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.fatherName}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ position: 'absolute', left: '264px', top: '551px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.motherName}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ position: 'absolute', left: '250px', top: '588px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.course} - {marksheet.studentId.stream}
+            </Typography>
+          </Box>
+
+          {/* Right Column */}
+          <Box sx={{ position: 'absolute', left: '775px', top: '478px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.registrationNo}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ position: 'absolute', left: '775px', top: '514px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {new Date(marksheet.studentId.dateOfBirth).toLocaleDateString('en-GB')}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ position: 'absolute', left: '726px', top: '551px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.2rem' }}>
+              {marksheet.studentId.session}
+            </Typography>
+          </Box>
+
+          {/* Subjects Table with Absolute Positioning */}
+          {marksheet.subjects && marksheet.subjects.length > 0 && (
+            <>
+              {marksheet.subjects.map((subject, index) => (
+                <Fragment key={index}>
+                  {/* Subject Name */}
+                  <Box sx={{ position: 'absolute', left: '185px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem' }}>
+                      {subject.subjectName}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Marks */}
+                  <Box sx={{ position: 'absolute', left: '553px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center'}}>
+                      {subject.marks}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Internal */}
+                  <Box sx={{ position: 'absolute', left: '620px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                      {subject.internal}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Total */}
+                  <Box sx={{ position: 'absolute', left: '688px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                      {subject.total}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Min Marks */}
+                  <Box sx={{ position: 'absolute', left: '763px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                      {subject.minMarks}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Max Marks */}
+                  <Box sx={{ position: 'absolute', left: '826px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                      {subject.maxMarks}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Grade */}
+                  <Box sx={{ position: 'absolute', left: '910px', top: `${777 + index * 50}px` }}>
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                      {subject.grade}
+                    </Typography>
+                  </Box>
+                </Fragment>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
-            No subjects found in marksheet.
-          </Typography>
-        </Paper>
-      )}
+            </>
+          )}
+        </Box>
+      </Paper>
     </Box>
   );
 };
