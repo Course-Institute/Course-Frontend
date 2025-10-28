@@ -11,7 +11,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
 } from '@mui/material';
 import { useGetMarksheet } from '../../hooks/useGetMarksheet';
 
@@ -54,15 +53,8 @@ const StudentMarksheetPage = () => {
           Marksheet
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Registration No: {marksheet.registrationNo}
+          Registration No: {marksheet.studentId.registrationNo}
         </Typography>
-        {marksheet.isMarksheetApproved && (
-          <Chip
-            label="Approved"
-            color="success"
-            sx={{ mt: 1 }}
-          />
-        )}
       </Box>
 
       {marksheet.subjects && marksheet.subjects.length > 0 ? (
@@ -79,8 +71,8 @@ const StudentMarksheetPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {marksheet.subjects.map((subject) => (
-                <TableRow key={subject.id} hover>
+              {marksheet.subjects.map((subject, index) => (
+                <TableRow key={subject.id || index} hover>
                   <TableCell>{subject.subjectName}</TableCell>
                   <TableCell align="right">{subject.marks}</TableCell>
                   <TableCell align="right">{subject.internal}</TableCell>
