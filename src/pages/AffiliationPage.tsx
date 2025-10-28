@@ -1,25 +1,67 @@
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Chip,
-} from '@mui/material';
-import { Verified, School, Handshake } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
+import LayoutWrapper from '../components/LayoutWrapper';
 
 const AffiliationPage = () => {
+  const affiliations = [
+    {
+      name: "National Council for Vocational Training (NCVT)",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/NCVT_Logo.png/220px-NCVT_Logo.png",
+      description: "NCVT is an advisory body set up by the Government of India. It provides accreditation to various vocational training institutes and ensures quality standards.",
+      type: "Government Body",
+      status: "Approved",
+      color: "#2563eb"
+    },
+    {
+      name: "Skill India (National Skill Development Corporation)",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b1/Skill_India_logo.png/220px-Skill_India_logo.png",
+      description: "Skill India is a government initiative to empower the youth of the country with skill sets which make them more employable and more productive in their work environment.",
+      type: "Government Initiative",
+      status: "Partner",
+      color: "#10b981"
+    },
+    {
+      name: "University Grants Commission (UGC)",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a3/University_Grants_Commission_logo.svg/1200px-University_Grants_Commission_logo.svg.png",
+      description: "The UGC is a statutory body set up by the Indian Union government in accordance to the UGC Act 1956 under Ministry of Education, and is charged with coordination, determination and maintenance of standards of higher education.",
+      type: "Regulatory Body",
+      status: "Recognized",
+      color: "#f59e0b"
+    },
+    {
+      name: "All India Council for Technical Education (AICTE)",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/All_India_Council_for_Technical_Education_logo.png/220px-All_India_Council_for_Technical_Education_logo.png",
+      description: "AICTE is the statutory body and a national-level council for technical education, under Department of Higher Education, Ministry of Education. It is responsible for proper planning and coordinated development of the technical education and management education system in India.",
+      type: "Regulatory Body",
+      status: "Approved",
+      color: "#ef4444"
+    },
+    {
+      name: "Ministry of Health & Family Welfare",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ministry_of_Health_and_Family_Welfare_logo.svg/1200px-Ministry_of_Health_and_Family_Welfare_logo.svg.png",
+      description: "The Ministry of Health and Family Welfare is responsible for formulation and implementation of various health programmes in India. Our paramedical programs are recognized by this ministry.",
+      type: "Government Ministry",
+      status: "Recognized",
+      color: "#8b5cf6"
+    },
+    {
+      name: "Indian Nursing Council (INC)",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/8a/Indian_Nursing_Council_logo.png/220px-Indian_Nursing_Council_logo.png",
+      description: "The Indian Nursing Council is a statutory body that regulates nursing education in India. Our nursing and paramedical programs follow INC guidelines and standards.",
+      type: "Professional Council",
+      status: "Approved",
+      color: "#06b6d4"
+    }
+  ];
+
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box 
-        sx={{ 
+      <LayoutWrapper backgroundColor="transparent">
+        <div style={{ 
           flex: 1, 
-          py: 8, 
+          padding: '64px 0', 
           background: `
             linear-gradient(135deg, rgba(217, 217, 218, 0.9) 0%, rgba(198, 199, 199, 0.9) 100%),
             url('https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=2086&q=80')
@@ -27,289 +69,316 @@ const AffiliationPage = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <Container maxWidth="lg">
-          {/* Page Header */}
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography
-              variant="h2"
-              sx={{
+          backgroundAttachment: 'fixed',
+          width: '100%'
+        }}>
+          <div style={{ 
+            maxWidth: '1200px', 
+            margin: '0 auto', 
+            padding: '0 32px' 
+          }}>
+            {/* Page Header */}
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h1 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 3,
-                fontSize: { xs: '2rem', md: '3rem' }
-              }}
-            >
-              Affiliation & Recognition
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{
-                color: 'primary.main',
-                fontWeight: '600',
-                mb: 4
-              }}
-            >
-              Quality Assured: Recognized by Mahavir Institute of Vocational & Paramedical Association
-            </Typography>
-          </Box>
-
-          {/* Introduction Section */}
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-              border: '1px solid #e2e8f0',
-              p: 4,
-              mb: 6
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: '1.1rem',
-                lineHeight: 1.8,
+                marginBottom: '24px',
+                fontSize: '3rem'
+              }}>
+                Affiliation & Recognition
+              </h1>
+              <p style={{
                 color: '#475569',
-                textAlign: 'justify',
-                mb: 3
-              }}
-            >
-              The Mahavir Institute of Vocational & Paramedical Association is a{' '}
-              <strong>self-recognized</strong> and <strong>credible educational institution</strong>{' '}
-              that ensures academic programs meet <strong>high educational standards</strong> and{' '}
-              <strong>industry relevance</strong>.
-            </Typography>
-            
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: '1.1rem',
-                lineHeight: 1.8,
-                color: '#475569',
-                textAlign: 'justify'
-              }}
-            >
-              An internal academic board regularly reviews and enhances the curriculum to meet modern industry expectations, ensuring programs deliver{' '}
-              <strong>quality education, practical knowledge,</strong> and <strong>recognized certification</strong>.
-            </Typography>
-          </Card>
-
-          {/* Key Recognition Section */}
-          <Box sx={{ mb: 8 }}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 'bold',
-                color: '#1e293b',
-                mb: 6,
-                textAlign: 'center'
-              }}
-            >
-              Key Recognition
-            </Typography>
-
-            <Grid container spacing={4}>
-              {/* Academic Council */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderRadius: 3,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                    border: '1px solid #e2e8f0',
-                    transition: 'transform 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                       <Verified sx={{ color: 'secondary.main', fontSize: 40, mr: 2 }} />
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b'
-                        }}
-                      >
-                        Academic Council
-                      </Typography>
-                    </Box>
-                    
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontSize: '1.1rem',
-                        lineHeight: 1.8,
-                        color: '#475569',
-                        textAlign: 'justify'
-                      }}
-                    >
-                      <strong>Mahavir Institute of Vocational & Paramedical Association – Academic Council</strong>{' '}
-                      Our in-house board guarantees academic integrity, updated curriculum, and credible assessments.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Knowledge Partner */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderRadius: 3,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                    border: '1px solid #e2e8f0',
-                    transition: 'transform 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                       <Handshake sx={{ color: 'primary.main', fontSize: 40, mr: 2 }} />
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b'
-                        }}
-                      >
-                        Knowledge Partner
-                      </Typography>
-                    </Box>
-                    
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontSize: '1.1rem',
-                        lineHeight: 1.8,
-                        color: '#475569',
-                        textAlign: 'justify'
-                      }}
-                    >
-                      <strong>Knowledge Partner: OM Sterling Global University</strong>{' '}
-                      We collaborate with OM Sterling Global University to strengthen our academic base and create more learning opportunities, adding value to our vocational education framework.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {/* Quality Assurance Statement */}
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-              border: '1px solid #e2e8f0',
-              p: 6,
-              textAlign: 'center',
-               background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-              color: 'white'
-            }}
-          >
-            <School sx={{ fontSize: 60, mb: 3 }} />
-            
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 'bold',
-                mb: 4
-              }}
-            >
-              Quality Assurance Statement
-            </Typography>
-            
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: '1.2rem',
-                lineHeight: 1.8,
-                fontStyle: 'italic',
+                fontSize: '1.25rem',
                 maxWidth: '800px',
-                mx: 'auto'
-              }}
-            >
-              "Our programs are structured to meet professional standards, ensuring students graduate with skills that are relevant, practical, and widely accepted in the job market."
-            </Typography>
-          </Card>
+                margin: '0 auto',
+                lineHeight: 1.6
+              }}>
+                We are proud to be affiliated with leading government bodies and professional organizations that recognize our commitment to quality education and training.
+              </p>
+            </div>
 
-          {/* Recognition Badges */}
-          <Box sx={{ mt: 8, textAlign: 'center' }}>
-            <Typography
-              variant="h4"
-              sx={{
+            {/* Introduction Section */}
+            <div style={{ 
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '48px',
+              marginBottom: '48px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                backgroundColor: '#2563eb',
+                color: 'white',
+                borderRadius: '50%',
+                width: '80px',
+                height: '80px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                fontSize: '32px'
+              }}>
+                ✅
+              </div>
+              <h2 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 4
-              }}
-            >
-              Our Credentials
-            </Typography>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2 }}>
-               <Chip
-                 label="Self-Recognized Institution"
-                 sx={{
-                   backgroundColor: 'secondary.main',
-                   color: 'white',
-                   fontWeight: 'bold',
-                   fontSize: '1rem',
-                   px: 3,
-                   py: 2,
-                   height: 'auto'
-                 }}
-               />
-               <Chip
-                 label="Industry-Relevant Curriculum"
-                 sx={{
-                   backgroundColor: 'primary.main',
-                   color: 'white',
-                   fontWeight: 'bold',
-                   fontSize: '1rem',
-                   px: 3,
-                   py: 2,
-                   height: 'auto'
-                 }}
-               />
-               <Chip
-                 label="Quality Education Standards"
-                 sx={{
-                   backgroundColor: 'info.main',
-                   color: 'white',
-                   fontWeight: 'bold',
-                   fontSize: '1rem',
-                   px: 3,
-                   py: 2,
-                   height: 'auto'
-                 }}
-               />
-               <Chip
-                 label="Recognized Certification"
-                 sx={{
-                   backgroundColor: 'primary.dark',
-                   color: 'white',
-                   fontWeight: 'bold',
-                   fontSize: '1rem',
-                   px: 3,
-                   py: 2,
-                   height: 'auto'
-                 }}
-               />
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+                marginBottom: '16px',
+                fontSize: '2rem'
+              }}>
+                Trusted & Recognized
+              </h2>
+              <p style={{
+                fontSize: '1.1rem',
+                lineHeight: 1.8,
+                color: '#475569',
+                maxWidth: '600px',
+                margin: '0 auto',
+                textAlign: 'center',
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                hyphens: 'auto'
+              }}>
+                Our affiliations with government bodies and professional councils ensure that our programs meet the highest standards and provide students with recognized qualifications.
+              </p>
+            </div>
 
+            {/* Affiliations Grid */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+              gap: '32px',
+              marginBottom: '48px',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              {affiliations.map((affiliation, index) => (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: 'white',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    border: '1px solid #e2e8f0',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                  }}
+                >
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div style={{
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '80px'
+                    }}>
+                      <div style={{
+                        backgroundColor: affiliation.color,
+                        color: 'white',
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        fontSize: '0.85rem',
+                        fontWeight: 'bold',
+                        marginBottom: '12px',
+                        display: 'inline-block'
+                      }}>
+                        {affiliation.status}
+                      </div>
+                    </div>
+                    <h3 style={{
+                      fontWeight: 'bold',
+                      color: '#1e293b',
+                      marginBottom: '8px',
+                      fontSize: '1.25rem',
+                      lineHeight: 1.3,
+                      textAlign: 'center',
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      hyphens: 'auto'
+                    }}>
+                      {affiliation.name}
+                    </h3>
+                    <div style={{
+                      backgroundColor: affiliation.color,
+                      color: 'white',
+                      borderRadius: '20px',
+                      padding: '4px 12px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      display: 'inline-block',
+                      marginBottom: '16px'
+                    }}>
+                      {affiliation.type}
+                    </div>
+                  </div>
+                  
+                  <p style={{
+                    color: '#64748b',
+                    lineHeight: 1.6,
+                    fontSize: '1rem',
+                    flex: 1,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    {affiliation.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Benefits Section */}
+            <div style={{ 
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '48px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            }}>
+              <h2 style={{
+                fontWeight: 'bold',
+                color: '#1e293b',
+                marginBottom: '32px',
+                fontSize: '2rem',
+                textAlign: 'center'
+              }}>
+                Why Our Affiliations Matter
+              </h2>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                gap: '32px',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#2563eb',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '80px',
+                    height: '80px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '32px'
+                  }}>
+                    🎓
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '12px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Recognized Certificates
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    All our certificates are recognized by government bodies and professional councils.
+                  </p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '80px',
+                    height: '80px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '32px'
+                  }}>
+                    🏆
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '12px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Quality Assurance
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    Our programs meet the highest standards set by regulatory authorities.
+                  </p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#f59e0b',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '80px',
+                    height: '80px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '32px'
+                  }}>
+                    💼
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '12px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Career Opportunities
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    Recognized qualifications open doors to better job opportunities and career growth.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </LayoutWrapper>
+      
       <FooterSection />
-    </Box>
+    </div>
   );
 };
 

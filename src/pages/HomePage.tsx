@@ -1,18 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-} from '@mui/material';
-import { School, Work, TrendingUp, People, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import InquiryDialog from '../components/InquiryDialog';
+import LayoutWrapper from '../components/LayoutWrapper';
+import { layoutConfig } from '../theme/layout';
 
 const HomePage = () => {
   const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
@@ -25,10 +17,10 @@ const HomePage = () => {
     '/images/hero/hero-image-2.png'
   ];
 
-  // Auto-rotate carousel every 5 seconds
+  // Auto-rotate carousel every 15 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
+      setCurrentImageIndex((prevIndex) =>
         prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
       );
     }, 15000);
@@ -38,13 +30,13 @@ const HomePage = () => {
 
   // Navigation functions
   const goToPrevious = () => {
-    setCurrentImageIndex((prevIndex) => 
+    setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? heroImages.length - 1 : prevIndex - 1
     );
   };
 
   const goToNext = () => {
-    setCurrentImageIndex((prevIndex) => 
+    setCurrentImageIndex((prevIndex) =>
       prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
     );
   };
@@ -58,53 +50,48 @@ const HomePage = () => {
     {
       title: "Paramedical Programs",
       description: "Step into the vital world of healthcare. Our paramedical courses train students in diagnostic, technical, and patient care skills through programs like DMLT, X-Ray Technician, ECG, and Operation Theatre Assistance.",
-      icon: <Work sx={{ fontSize: 40 }} />,
+      icon: "🏥",
       color: "#2563eb"
     },
     {
-      title: "Vocational Programs",
+      title: "Vocational Programs", 
       description: "Learn high-demand, industry-relevant trades. Designed for students who want to build stable, well-paying careers in the industrial and service sectors.",
-      icon: <School sx={{ fontSize: 40 }} />,
+      icon: "🎓",
       color: "#10b981"
     },
     {
       title: "IT Programs",
       description: "Stay future-ready in a digital world. Covering fundamental to advanced topics like Computer Applications, Web Designing, Tally, Digital Marketing, and Office Productivity Tools.",
-      icon: <TrendingUp sx={{ fontSize: 40 }} />,
+      icon: "💻",
       color: "#0ea5e9"
     },
     {
       title: "Yoga & Naturopathy",
       description: "A perfect combination of traditional wisdom and modern wellness. Yoga programs focus on body, mind, and spirit. Preparing students to become certified Yoga Trainers, Naturopaths, and Wellness Therapists.",
-      icon: <People sx={{ fontSize: 40 }} />,
+      icon: "🧘",
       color: "#059669"
     }
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      
-      {/* Hero Banner with Carousel */}
-      <Box
-        sx={{
-          height: '90vh',
-          minHeight: '600px',
-          position: 'relative',
-          overflow: 'hidden',
-          color: 'white',
-          display: 'flex',
+      <LayoutWrapper>
 
-          alignItems: 'center',
-          justifyContent: 'center'
-          // No margin needed since navbar is now positioned below header
-        }}
-      >
+      {/* Hero Banner with Carousel - Simple HTML approach */}
+      <div style={{
+        height: '60vh',
+        minHeight: '400px',
+        position: 'relative',
+        overflow: 'hidden',
+        width: '100%',
+        background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.7) 0%, rgba(16, 185, 129, 0.7) 100%)'
+      }}>
         {/* Carousel Images */}
         {heroImages.map((image, index) => (
-          <Box
+          <div
             key={index}
-            sx={{
+            style={{
               position: 'absolute',
               top: 0,
               left: 0,
@@ -121,366 +108,320 @@ const HomePage = () => {
           />
         ))}
 
-        {/* Overlay */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.7) 0%, rgba(16, 185, 129, 0.7) 100%)',
-            zIndex: 2,
-          }}
-        />
-
-        {/* Previous Button */}
-        <Button
+        {/* Navigation Buttons */}
+        <button
           onClick={goToPrevious}
-          sx={{
+          style={{
             position: 'absolute',
-            left: 20,
+            left: '20px',
             top: '50%',
             transform: 'translateY(-50%)',
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             color: 'white',
+            border: 'none',
             borderRadius: '50%',
-            width: 60,
-            height: 60,
-            minWidth: 'auto',
+            width: '60px',
+            height: '60px',
+            cursor: 'pointer',
             zIndex: 3,
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              transform: 'translateY(-50%) scale(1.1)'
-            },
-            transition: 'all 0.3s ease'
+            fontSize: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          <ChevronLeft sx={{ fontSize: 30 }} />
-        </Button>
+          ‹
+        </button>
 
-        {/* Next Button */}
-        <Button
+        <button
           onClick={goToNext}
-          sx={{
+          style={{
             position: 'absolute',
-            right: 20,
+            right: '20px',
             top: '50%',
             transform: 'translateY(-50%)',
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             color: 'white',
+            border: 'none',
             borderRadius: '50%',
-            width: 60,
-            height: 60,
-            minWidth: 'auto',
+            width: '60px',
+            height: '60px',
+            cursor: 'pointer',
             zIndex: 3,
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              transform: 'translateY(-50%) scale(1.1)'
-            },
-            transition: 'all 0.3s ease'
+            fontSize: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          <ChevronRight sx={{ fontSize: 30 }} />
-        </Button>
+          ›
+        </button>
 
         {/* Carousel Indicators */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 30,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            gap: 2,
-            zIndex: 3
-          }}
-        >
+        <div style={{
+          position: 'absolute',
+          bottom: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '8px',
+          zIndex: 3
+        }}>
           {heroImages.map((_, index) => (
-            <Box
+            <div
               key={index}
               onClick={() => setCurrentImageIndex(index)}
-              sx={{
-                width: 12,
-                height: 12,
+              style={{
+                width: '12px',
+                height: '12px',
                 borderRadius: '50%',
                 backgroundColor: currentImageIndex === index ? 'white' : 'rgba(255, 255, 255, 0.5)',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: 'white',
-                  transform: 'scale(1.2)'
-                }
+                transition: 'all 0.3s ease'
               }}
             />
           ))}
-        </Box>
-        {/* Content */}
-        {/* <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, textAlign: 'center' }}>
-          <Typography
-            variant="h1"
-            sx={{
-              fontWeight: 'bold',
-              mb: 3,
-              fontSize: { xs: '2.5rem', md: '4rem' },
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
-            }}
-          >
-            Empowering Futures Through Vocational & Paramedical Excellence
-          </Typography>
-          
-          <Typography
-            variant="h4"
-            sx={{
-              mb: 4,
-              opacity: 0.9,
-              fontSize: { xs: '1.2rem', md: '1.5rem' },
-              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
-            }}
-          >
-            Welcome to Mahavir Institute of Vocational & Paramedical Association – Your Pathway to a Rewarding Career.
-          </Typography>
-          
-          <Button
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}
-            onClick={() => navigate('/programs')}
-            sx={{
-              backgroundColor: 'white',
-              color: 'primary.main',
-              '&:hover': {
-                backgroundColor: 'grey.50',
-                color: 'primary.dark'
-              },
-              textTransform: 'none',
-              borderRadius: 3,
-              px: 6,
-              py: 2,
-              fontSize: '1.2rem',
-              fontWeight: 'bold'
-            }}
-          >
-            Explore Our 9 Program Categories
-          </Button>
-        </Container> */}
-      </Box>
+        </div>
+      </div>
 
+      {/* Main Content Container */}
+      
       {/* Introduction Section */}
-      <Box sx={{ py: 8, backgroundColor: 'background.paper' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 'bold',
-              color: '#1e293b',
-              mb: 6,
-              textAlign: 'center'
-            }}
-          >
+      <div style={{ 
+        padding: '64px 0', 
+        backgroundColor: '#f8fafc',
+        width: '100%'
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 32px' 
+        }}>
+          <h2 style={{ 
+            fontWeight: 'bold', 
+            color: '#1e293b', 
+            marginBottom: '48px', 
+            fontSize: '2.5rem',
+            textAlign: 'center'
+          }}>
             Introduction
-          </Typography>
+          </h2>
           
-          <Grid container spacing={4}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify',
-                  mb: 3
-                }}
-              >
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: '32px' 
+          }}>
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                fontSize: '1.1rem', 
+                lineHeight: 1.8, 
+                color: '#475569', 
+                marginBottom: '24px'
+              }}>
                 At Mahavir Institute of Vocational & Paramedical Association, we are committed to bridging the gap between education and employability. Our focus goes beyond classroom teaching — we emphasize hands-on practical training, modern learning techniques, and industry-relevant curriculum.
-              </Typography>
+              </p>
               
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify'
-                }}
-              >
+              <p style={{ 
+                fontSize: '1.1rem', 
+                lineHeight: 1.8, 
+                color: '#475569'
+              }}>
                 Our institute offers over 100 specialized programs across 9 major streams, including Paramedical Science, Vocational Trades, Information Technology, Yoga & Naturopathy, Fire Safety, Nursery Teacher Training (NTT), Beauty & Wellness, Apparel Design, and Agriculture.
-              </Typography>
-            </Grid>
+              </p>
+            </div>
             
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify',
-                  mb: 3
-                }}
-              >
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                fontSize: '1.1rem', 
+                lineHeight: 1.8, 
+                color: '#475569', 
+                marginBottom: '24px'
+              }}>
                 We believe that skill-based education has the power to transform lives. That's why we provide an inclusive learning environment where students from different backgrounds can gain the knowledge, confidence, and technical expertise required to succeed in today's competitive job market.
-              </Typography>
+              </p>
               
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify',
-                  fontWeight: 'bold'
-                }}
-              >
+              <p style={{ 
+                fontSize: '1.1rem', 
+                lineHeight: 1.8, 
+                color: '#475569', 
+                fontWeight: 'bold'
+              }}>
                 Our goal is simple: to shape individuals into professionals who create impact.
-              </Typography>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Program Highlights */}
-      <Box sx={{ py: 8, backgroundColor: 'white' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 'bold',
-              color: '#1e293b',
-              mb: 6,
-              textAlign: 'center'
-            }}
-          >
+      <div style={{ 
+        padding: '64px 0', 
+        backgroundColor: 'white',
+        width: '100%'
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 32px' 
+        }}>
+          <h2 style={{ 
+            fontWeight: 'bold', 
+            color: '#1e293b', 
+            fontSize: '2.5rem',
+            textAlign: 'center',
+            marginBottom: '48px'
+          }}>
             Career Pathways for Every Ambition
-          </Typography>
+          </h2>
           
-          <Grid container spacing={4}>
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '24px',
+            alignItems: 'center'
+          }}>
             {programHighlights.map((program, index) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                <Card
-                  onClick={handleProgramClick}
-                  sx={{
-                    height: '100%',
-                    borderRadius: 3,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                    border: '1px solid #e2e8f0',
-                    transition: 'transform 0.2s ease-in-out',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                      <Box
-                        sx={{
-                          backgroundColor: program.color,
-                          color: 'white',
-                          borderRadius: 2,
-                          p: 2,
-                          mr: 3
-                        }}
-                      >
-                        {program.icon}
-                      </Box>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b'
-                        }}
-                      >
-                        {program.title}
-                      </Typography>
-                    </Box>
-                    
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: '#64748b',
-                        lineHeight: 1.6
-                      }}
-                    >
-                      {program.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <div
+                key={index}
+                onClick={handleProgramClick}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  border: '1px solid #e2e8f0',
+                  padding: '32px',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out',
+                  width: '100%'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                }}
+              >
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  marginBottom: '24px',
+                  flexWrap: 'wrap',
+                  gap: '16px',
+                  justifyContent: 'center'
+                }}>
+                  <div
+                    style={{
+                      backgroundColor: program.color,
+                      color: 'white',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '60px',
+                      minHeight: '60px',
+                      fontSize: '24px'
+                    }}
+                  >
+                    {program.icon}
+                  </div>
+                  <h3 style={{ 
+                    fontWeight: 'bold', 
+                    color: '#1e293b', 
+                    fontSize: '1.5rem', 
+                    margin: 0,
+                    flex: 1,
+                    minWidth: '200px'
+                  }}>
+                    {program.title}
+                  </h3>
+                </div>
+                
+                <p style={{ 
+                  color: '#64748b', 
+                  lineHeight: 1.6, 
+                  fontSize: '1rem', 
+                  margin: 0,
+                  textAlign: 'center'
+                }}>
+                  {program.description}
+                </p>
+              </div>
             ))}
-          </Grid>
-        </Container>
-      </Box>
+          </div>
+        </div>
+      </div>
 
       {/* Quick Inquiry Section */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-          color: 'white',
-          py: 8
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 'bold',
-                mb: 3
-              }}
-            >
-              Ready to Start Your Journey?
-            </Typography>
-            
-            <Typography
-              variant="h5"
-              sx={{
-                mb: 4,
-                opacity: 0.9
-              }}
-            >
-              Take the first step toward a brighter future. Connect with our admissions team to explore your best-fit program and career opportunities.
-            </Typography>
-            
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => setInquiryDialogOpen(true)}
-              sx={{
-                backgroundColor: 'white',
-                color: 'primary.main',
-                '&:hover': {
-                  backgroundColor: 'grey.50',
-                  color: 'primary.dark'
-                },
-                textTransform: 'none',
-                borderRadius: 3,
-                px: 6,
-                py: 2,
-                fontSize: '1.1rem',
-                fontWeight: 'bold'
-              }}
-            >
-              Submit Inquiry
-            </Button>
-          </Box>
-        </Container>
-      </Box>
+      <div style={{ 
+        background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', 
+        color: 'white', 
+        padding: '64px 0',
+        width: '100%'
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 32px',
+          textAlign: 'center'
+        }}>
+          <h2 style={{ 
+            fontWeight: 'bold', 
+            marginBottom: '24px', 
+            fontSize: '2.5rem', 
+            color: 'white'
+          }}>
+            Ready to Start Your Journey?
+          </h2>
+          
+          <p style={{ 
+            marginBottom: '32px', 
+            opacity: 0.9, 
+            fontSize: '1.5rem', 
+            color: 'white'
+          }}>
+            Take the first step toward a brighter future. Connect with our admissions team to explore your best-fit program and career opportunities.
+          </p>
+          
+          <button
+            onClick={() => setInquiryDialogOpen(true)}
+            style={{
+              backgroundColor: 'white',
+              color: '#2563eb',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '16px 48px',
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f8fafc';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            Submit Inquiry
+          </button>
+        </div>
+      </div>
 
-        <FooterSection />
       
       {/* Inquiry Dialog */}
       <InquiryDialog
         open={inquiryDialogOpen}
         onClose={() => setInquiryDialogOpen(false)}
       />
-    </Box>
+      </LayoutWrapper>
+      <FooterSection />
+    </div>
   );
 };
 

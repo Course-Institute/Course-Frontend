@@ -1,23 +1,16 @@
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-} from '@mui/material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
+import LayoutWrapper from '../components/LayoutWrapper';
 
 const AboutUsPage = () => {
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box 
-        sx={{ 
+      <LayoutWrapper backgroundColor="transparent">
+        <div style={{ 
           flex: 1, 
-          py: 8, 
+          padding: '64px 0', 
           background: `
             linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%),
             url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2022&q=80')
@@ -25,496 +18,427 @@ const AboutUsPage = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <Container maxWidth="lg">
-          {/* Page Header */}
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography
-              variant="h2"
-              sx={{
+          backgroundAttachment: 'fixed',
+          width: '100%'
+        }}>
+          <div style={{ 
+            maxWidth: '1200px', 
+            margin: '0 auto', 
+            padding: '0 32px' 
+          }}>
+            {/* Page Header */}
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h1 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 3,
-                fontSize: { xs: '2rem', md: '3rem' }
-              }}
-            >
-              About Us
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{
-                color: 'primary.main',
-                fontWeight: '600',
-                mb: 2
-              }}
-            >
-              Our Commitment to Excellence
-            </Typography>
-          </Box>
+                marginBottom: '24px',
+                fontSize: '3rem'
+              }}>
+                About Us
+              </h1>
+              <h2 style={{
+                color: '#475569',
+                fontSize: '1.5rem',
+                fontWeight: 'normal',
+                maxWidth: '800px',
+                margin: '0 auto',
+                lineHeight: 1.6
+              }}>
+                Empowering futures through vocational and paramedical excellence
+              </h2>
+            </div>
 
-          <Grid container spacing={6}>
             {/* Mission Section */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 4,
-                  boxShadow: '0 20px 40px rgba(37, 99, 235, 0.15)',
-                  border: '2px solid transparent',
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '6px',
-                    background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: -50,
-                    right: -50,
-                    width: '100px',
-                    height: '100px',
-                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                    borderRadius: '50%',
-                    zIndex: 0,
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 25px 50px rgba(37, 99, 235, 0.25)',
-                    '&::after': {
-                      transform: 'scale(1.2)',
-                      transition: 'transform 0.3s ease',
-                    }
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-                  <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mx: 'auto',
-                        mb: 2,
-                        boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
-                      }}
-                    >
-                      <Typography sx={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
-                        🎯
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 'bold',
-                        color: '#1e293b',
-                        background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}
-                    >
-                      Our Mission
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontSize: '1.1rem',
-                      lineHeight: 1.8,
-                      color: '#475569',
-                      textAlign: 'justify'
-                    }}
-                  >
-                    The mission of Mahavir Institute of Vocational & Paramedical Association is to{' '}
-                    <strong>develop, train, and empower students through skill-based education.</strong>{' '}
-                    We are dedicated to offering structured academic programs, practical exposure, and soft skills training that prepare individuals to become{' '}
-                    <strong>competent professionals.</strong>{' '}
-                    Our focus is on{' '}
-                    <strong>real-world readiness,</strong>{' '}
-                    ensuring that each student can confidently step into their chosen industry.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Vision Section */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 4,
-                  boxShadow: '0 20px 40px rgba(16, 185, 129, 0.15)',
-                  border: '2px solid transparent',
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '6px',
-                    background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: -50,
-                    right: -50,
-                    width: '100px',
-                    height: '100px',
-                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%)',
-                    borderRadius: '50%',
-                    zIndex: 0,
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 25px 50px rgba(16, 185, 129, 0.25)',
-                    '&::after': {
-                      transform: 'scale(1.2)',
-                      transition: 'transform 0.3s ease',
-                    }
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-                  <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mx: 'auto',
-                        mb: 2,
-                        boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)',
-                      }}
-                    >
-                      <Typography sx={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
-                        👁️
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 'bold',
-                        color: '#1e293b',
-                        background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}
-                    >
-                      Our Vision
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontSize: '1.1rem',
-                      lineHeight: 1.8,
-                      color: '#475569',
-                      textAlign: 'justify'
-                    }}
-                  >
-                    Our vision is to build a generation of skilled individuals who{' '}
-                    <strong>lead industries, innovate solutions, and contribute meaningfully to society.</strong>{' '}
-                    We aspire to be recognized as a{' '}
-                    <strong>premier institution in India</strong>{' '}
-                    for quality vocational and paramedical education, setting benchmarks for academic excellence, industry partnerships, and employability.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          {/* What We Do Section */}
-          <Box sx={{ mt: 8 }}>
-            <Typography
-              variant="h3"
-              sx={{
+            <div style={{ 
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '48px',
+              marginBottom: '48px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            }}>
+              <h2 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 2,
+                marginBottom: '24px',
+                fontSize: '2rem',
                 textAlign: 'center'
-              }}
-            >
-              What We Do
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                color: '#3b82f6',
-                fontWeight: '600',
-                mb: 4,
+              }}>
+                Our Mission
+              </h2>
+              <p style={{
+                fontSize: '1.1rem',
+                lineHeight: 1.8,
+                color: '#475569',
+                textAlign: 'center',
+                maxWidth: '800px',
+                margin: '0 auto'
+              }}>
+                To bridge the gap between education and employability by providing industry-relevant vocational and paramedical training that empowers students to build successful careers and contribute meaningfully to society.
+              </p>
+            </div>
+
+            {/* Values Section */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+              gap: '32px',
+              marginBottom: '48px',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                padding: '32px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                 textAlign: 'center'
-              }}
-            >
-              Cultivating Talent, Building Careers
-            </Typography>
-            
-                  <Card
-                    sx={{
-                      borderRadius: 4,
-                      boxShadow: '0 20px 40px rgba(59, 130, 246, 0.15)',
-                      border: '2px solid transparent',
-                      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-                      p: 4,
-                      position: 'relative',
-                      overflow: 'hidden',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '6px',
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-                      },
-                      '&::after': {
-                        content: '""',
-                        position: 'absolute',
-                        top: -30,
-                        right: -30,
-                        width: '80px',
-                        height: '80px',
-                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%)',
-                        borderRadius: '50%',
-                        zIndex: 0,
-                      },
-                      '&:hover': {
-                        transform: 'translateY(-5px)',
-                        boxShadow: '0 25px 50px rgba(59, 130, 246, 0.25)',
-                        '&::after': {
-                          transform: 'scale(1.1)',
-                          transition: 'transform 0.3s ease',
-                        }
-                      },
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
+              }}>
+                <div style={{
+                  backgroundColor: '#2563eb',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 24px',
+                  fontSize: '32px'
+                }}>
+                  🎯
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  color: '#1e293b',
+                  marginBottom: '16px',
+                  fontSize: '1.5rem'
+                }}>
+                  Excellence
+                </h3>
+                <p style={{
+                  fontSize: '1rem',
+                  lineHeight: 1.6,
                   color: '#475569',
-                  mb: 4,
-                  textAlign: 'justify'
-                }}
-              >
-                We offer a learner-centric model that blends theory with practical experience. Our programs are designed to mirror the evolving needs of industries, ensuring students graduate with skills that are immediately applicable in the workforce.
-              </Typography>
+                  textAlign: 'center',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  hyphens: 'auto'
+                }}>
+                  We maintain the highest standards in education and training, ensuring our students receive world-class instruction.
+                </p>
+              </div>
 
-              <Box component="ul" sx={{ pl: 3, mb: 4 }}>
-                <Typography component="li" sx={{ mb: 2, fontSize: '1.1rem', color: '#475569' }}>
-                  Regular workshops and industrial visits expose students to real-world environments.
-                </Typography>
-                <Typography component="li" sx={{ mb: 2, fontSize: '1.1rem', color: '#475569' }}>
-                  Modern labs and equipment provide hands-on experience.
-                </Typography>
-                <Typography component="li" sx={{ mb: 2, fontSize: '1.1rem', color: '#475569' }}>
-                  Industry tie-ups and partnerships strengthen placement opportunities.
-                </Typography>
-                <Typography component="li" sx={{ mb: 2, fontSize: '1.1rem', color: '#475569' }}>
-                  Faculty members with deep industry experience offer guidance and mentorship.
-                </Typography>
-              </Box>
-
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                padding: '32px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 24px',
+                  fontSize: '32px'
+                }}>
+                  🤝
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  color: '#1e293b',
+                  marginBottom: '16px',
+                  fontSize: '1.5rem'
+                }}>
+                  Integrity
+                </h3>
+                <p style={{
+                  fontSize: '1rem',
+                  lineHeight: 1.6,
                   color: '#475569',
-                  textAlign: 'justify'
-                }}
-              >
-                Whether a student aims to work in healthcare, IT, beauty, agriculture, or education — we provide the right foundation to build a stable, respected, and rewarding career.
-              </Typography>
-            </Card>
-          </Box>
+                  textAlign: 'center',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  hyphens: 'auto'
+                }}>
+                  We conduct all our activities with honesty, transparency, and ethical practices.
+                </p>
+              </div>
 
-          {/* Why Choose Us Section */}
-          <Box sx={{ mt: 8 }}>
-            <Typography
-              variant="h3"
-              sx={{
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                padding: '32px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  backgroundColor: '#f59e0b',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 24px',
+                  fontSize: '32px'
+                }}>
+                  🌟
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  color: '#1e293b',
+                  marginBottom: '16px',
+                  fontSize: '1.5rem'
+                }}>
+                  Innovation
+                </h3>
+                <p style={{
+                  fontSize: '1rem',
+                  lineHeight: 1.6,
+                  color: '#475569',
+                  textAlign: 'center',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  hyphens: 'auto'
+                }}>
+                  We continuously evolve our curriculum and teaching methods to stay ahead of industry trends.
+                </p>
+              </div>
+            </div>
+
+            {/* Statistics Section */}
+            <div style={{ 
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '48px',
+              marginBottom: '48px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            }}>
+              <h2 style={{
                 fontWeight: 'bold',
                 color: '#1e293b',
-                mb: 2,
+                marginBottom: '32px',
+                fontSize: '2rem',
                 textAlign: 'center'
-              }}
-            >
-              Why Choose Mahavir Institute?
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                color: '#3b82f6',
-                fontWeight: '600',
-                mb: 6,
+              }}>
+                Our Impact
+              </h2>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                gap: '32px' 
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    fontWeight: 'bold',
+                    color: '#2563eb',
+                    marginBottom: '8px'
+                  }}>
+                    10,000+
+                  </div>
+                  <div style={{
+                    fontSize: '1.1rem',
+                    color: '#475569',
+                    fontWeight: '600'
+                  }}>
+                    Students Trained
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    fontWeight: 'bold',
+                    color: '#10b981',
+                    marginBottom: '8px'
+                  }}>
+                    95%
+                  </div>
+                  <div style={{
+                    fontSize: '1.1rem',
+                    color: '#475569',
+                    fontWeight: '600'
+                  }}>
+                    Placement Rate
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    fontWeight: 'bold',
+                    color: '#f59e0b',
+                    marginBottom: '8px'
+                  }}>
+                    100+
+                  </div>
+                  <div style={{
+                    fontSize: '1.1rem',
+                    color: '#475569',
+                    fontWeight: '600'
+                  }}>
+                    Programs Offered
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    fontWeight: 'bold',
+                    color: '#8b5cf6',
+                    marginBottom: '8px'
+                  }}>
+                    15+
+                  </div>
+                  <div style={{
+                    fontSize: '1.1rem',
+                    color: '#475569',
+                    fontWeight: '600'
+                  }}>
+                    Years Experience
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Team Section */}
+            <div style={{ 
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '48px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            }}>
+              <h2 style={{
+                fontWeight: 'bold',
+                color: '#1e293b',
+                marginBottom: '32px',
+                fontSize: '2rem',
                 textAlign: 'center'
-              }}
-            >
-              Your Future Starts Here
-            </Typography>
-
-            <Grid container spacing={4}>
-              {[
-                {
-                  title: "Industry-Relevant Curriculum",
-                  description: "Our programs are developed to match current trends and job demands, making you career-ready from day one."
-                },
-                {
-                  title: "Experienced Faculty",
-                  description: "Learn from professionals who bring years of practical experience and industry knowledge."
-                },
-                {
-                  title: "Strong Practical Training",
-                  description: "From clinical exposure in paramedical courses to on-field practice in agriculture — we emphasize learning by doing."
-                },
-                {
-                  title: "Wide Range of Programs",
-                  description: "With 9 major streams and 100+ courses, students can choose their ideal career path."
-                },
-                {
-                  title: "Career Development Support",
-                  description: "We provide guidance for interviews, job placements, and career growth."
-                },
-                {
-                  title: "Accessible Education",
-                  description: "Our programs are structured to support students from diverse educational backgrounds, starting from 10th pass level."
-                }
-                      ].map((item, index) => {
-                        const colors = [
-                          { primary: '#2563eb', secondary: '#3b82f6', light: '#dbeafe' },
-                          { primary: '#10b981', secondary: '#34d399', light: '#d1fae5' },
-                          { primary: '#7c3aed', secondary: '#a855f7', light: '#ede9fe' },
-                          { primary: '#dc2626', secondary: '#ef4444', light: '#fee2e2' },
-                          { primary: '#ea580c', secondary: '#f97316', light: '#fed7aa' },
-                          { primary: '#0891b2', secondary: '#06b6d4', light: '#cffafe' }
-                        ];
-                        const colorSet = colors[index % colors.length];
-                        
-                        return (
-                        <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                          <Card
-                            sx={{
-                              height: '100%',
-                              borderRadius: 4,
-                              boxShadow: `0 15px 35px ${colorSet.primary}20`,
-                              border: '2px solid transparent',
-                              background: `linear-gradient(135deg, #ffffff 0%, ${colorSet.light} 100%)`,
-                              position: 'relative',
-                              overflow: 'hidden',
-                              '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '4px',
-                                background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
-                              },
-                              '&::after': {
-                                content: '""',
-                                position: 'absolute',
-                                top: -20,
-                                right: -20,
-                                width: '60px',
-                                height: '60px',
-                                background: `linear-gradient(135deg, ${colorSet.primary}20 0%, ${colorSet.secondary}20 100%)`,
-                                borderRadius: '50%',
-                                zIndex: 0,
-                              },
-                              transition: 'all 0.3s ease',
-                              '&:hover': {
-                                transform: 'translateY(-8px)',
-                                boxShadow: `0 20px 40px ${colorSet.primary}30`,
-                                '&::after': {
-                                  transform: 'scale(1.3)',
-                                  transition: 'transform 0.3s ease',
-                                }
-                              }
-                            }}
-                          >
-                            <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                                <Box
-                                  sx={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: '50%',
-                                    background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mr: 2,
-                                    flexShrink: 0,
-                                    boxShadow: `0 4px 12px ${colorSet.primary}40`,
-                                  }}
-                                >
-                                  <Typography sx={{ color: 'white', fontSize: '18px' }}>
-                                    {['🎓', '👨‍🏫', '🔬', '📚', '💼', '🌱'][index % 6]}
-                                  </Typography>
-                                </Box>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 'bold',
-                                    color: '#1e293b',
-                                    background: `linear-gradient(135deg, ${colorSet.primary} 0%, ${colorSet.secondary} 100%)`,
-                                    backgroundClip: 'text',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                  }}
-                                >
-                                  {item.title}
-                                </Typography>
-                              </Box>
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  color: '#64748b',
-                                  lineHeight: 1.6,
-                                  pl: 6
-                                }}
-                              >
-                                {item.description}
-                              </Typography>
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                        );
-                      })}
-                    </Grid>
-          </Box>
-        </Container>
-      </Box>
-
+              }}>
+                Our Team
+              </h2>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                gap: '32px',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#e2e8f0',
+                    borderRadius: '50%',
+                    width: '120px',
+                    height: '120px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '48px'
+                  }}>
+                    👨‍🏫
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '8px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Expert Faculty
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    Industry professionals with years of experience in their respective fields.
+                  </p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#e2e8f0',
+                    borderRadius: '50%',
+                    width: '120px',
+                    height: '120px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '48px'
+                  }}>
+                    🎓
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '8px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Academic Excellence
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    Qualified educators committed to student success and learning outcomes.
+                  </p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    backgroundColor: '#e2e8f0',
+                    borderRadius: '50%',
+                    width: '120px',
+                    height: '120px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    fontSize: '48px'
+                  }}>
+                    🏥
+                  </div>
+                  <h3 style={{
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    marginBottom: '8px',
+                    fontSize: '1.25rem'
+                  }}>
+                    Industry Partners
+                  </h3>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#475569',
+                    lineHeight: 1.6,
+                    textAlign: 'center',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                  }}>
+                    Collaborations with leading hospitals and healthcare institutions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </LayoutWrapper>
+      
       <FooterSection />
-    </Box>
+    </div>
   );
 };
 

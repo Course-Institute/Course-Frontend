@@ -17,6 +17,7 @@ import {
   Instagram,
 } from '@mui/icons-material';
 import InstituteLogo from './InstituteLogo';
+import LayoutWrapper from './LayoutWrapper';
 
 const FooterSection = () => {
   const theme = useTheme();
@@ -81,6 +82,7 @@ const FooterSection = () => {
   };
 
   return (
+    <LayoutWrapper>
     <Box
       sx={{
         background: `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)`,
@@ -539,6 +541,7 @@ const FooterSection = () => {
         </Box>
       </Container>
     </Box>
+    </LayoutWrapper>
   );
 };
 

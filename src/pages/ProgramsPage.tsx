@@ -1,19 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Button,
-  Chip,
-} from '@mui/material';
-import { ArrowForward } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import InquiryDialog from '../components/InquiryDialog';
+import LayoutWrapper from '../components/LayoutWrapper';
 import { programsData } from '../constants/programsData';
 
 const ProgramsPage = () => {
@@ -21,13 +11,13 @@ const ProgramsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box 
-        sx={{ 
+      <LayoutWrapper backgroundColor="transparent">
+        <div style={{ 
           flex: 1, 
-          py: 8, 
+          padding: '64px 0', 
           background: `
             linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
             url('https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
@@ -35,370 +25,220 @@ const ProgramsPage = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <Container maxWidth="lg">
-          {/* Page Header */}
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Box
-              sx={{
+          backgroundAttachment: 'fixed',
+          width: '100%'
+        }}>
+          <div style={{ 
+            maxWidth: '1200px', 
+            margin: '0 auto', 
+            padding: '0 32px' 
+          }}>
+            {/* Page Header */}
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <div style={{
                 display: 'inline-block',
                 background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
                 borderRadius: '50px',
-                px: 4,
-                py: 1,
-                mb: 3,
-                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
+                padding: '8px 32px',
+                marginBottom: '24px',
+                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)'
+              }}>
+                <span style={{
                   color: 'white',
                   fontWeight: 'bold',
                   fontSize: '1rem',
                   textTransform: 'uppercase',
                   letterSpacing: '1px'
-                }}
-              >
-                🎓 Educational Excellence
-              </Typography>
-            </Box>
-            
-            <Typography
-              variant="h2"
-              sx={{
+                }}>
+                  🎓 Educational Excellence
+                </span>
+              </div>
+
+              <h1 style={{
                 fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 3,
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
-                textShadow: '0 4px 8px rgba(0,0,0,0.1)'
-              }}
-            >
-              Our Programs
-            </Typography>
-            
-            <Typography
-              variant="h4"
-              sx={{
-                color: '#3b82f6',
-                fontWeight: '600',
-                mb: 4,
-                fontSize: { xs: '1.5rem', md: '2rem' }
-              }}
-            >
-              Our Diverse Range of Vocational & Paramedical Programs
-            </Typography>
-            
-            <Box
-              sx={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%)',
-                borderRadius: 4,
-                p: 4,
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                maxWidth: '900px',
-                mx: 'auto',
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                  borderRadius: '4px 4px 0 0',
-                }
-              }}
-            >
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: '1.2rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify',
-                  mb: 2
-                }}
-              >
-                Mahavir Institute of Vocational & Paramedical Association offers a comprehensive portfolio of diploma and certificate courses that open doors to multiple industries. Each program is designed to enhance employability, build confidence, and provide a clear career pathway.
-              </Typography>
-              
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#2563eb' }} />
-                  <Typography variant="body2" sx={{ color: '#64748b', fontWeight: '600' }}>
-                    9 Program Categories
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10b981' }} />
-                  <Typography variant="body2" sx={{ color: '#64748b', fontWeight: '600' }}>
-                    100+ Courses
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#3b82f6' }} />
-                  <Typography variant="body2" sx={{ color: '#64748b', fontWeight: '600' }}>
-                    Industry Ready
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+                color: '#1e293b',
+                marginBottom: '16px',
+                fontSize: '3.5rem',
+                lineHeight: 1.2
+              }}>
+                Explore Our Diverse Programs
+              </h1>
 
-          {/* Programs Grid */}
-          <Grid container spacing={4}>
-            {programsData.map((program, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                 <Card
-                   sx={{
-                     height: '100%',
-                     borderRadius: 3,
-                     boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                     border: '1px solid #e2e8f0',
-                     transition: 'transform 0.2s ease-in-out',
-                     overflow: 'hidden',
-                     cursor: 'pointer',
-                     '&:hover': {
-                       transform: 'translateY(-5px)',
-                       boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
-                     }
-                   }}
-                   onClick={() => navigate(`/programs/${program.id}`)}
-                 >
-                   {/* Program Image */}
-                   <Box
-                     sx={{
-                       height: 200,
-                       backgroundImage: `url(${program.image})`,
-                       backgroundSize: 'cover',
-                       backgroundPosition: 'center',
-                       position: 'relative',
-                       '&::before': {
-                         content: '""',
-                         position: 'absolute',
-                         top: 0,
-                         left: 0,
-                         right: 0,
-                         bottom: 0,
-                         background: `linear-gradient(135deg, ${program.color}40 0%, ${program.color}80 100%)`,
-                       }
-                     }}
-                   />
-                   <CardContent sx={{ p: 4 }}>
-                    {/* Category Header */}
-                    <Box sx={{ mb: 3 }}>
-                      <Chip
-                        label={program.category}
-                        sx={{
-                          backgroundColor: program.color,
-                          color: 'white',
-                          fontWeight: 'bold',
-                          fontSize: '0.9rem',
-                          mb: 2
-                        }}
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b',
-                          mb: 1
-                        }}
-                      >
-                        {program.focusArea}
-                      </Typography>
-                    </Box>
+              <p style={{
+                color: '#475569',
+                fontSize: '1.25rem',
+                maxWidth: '800px',
+                margin: '0 auto',
+                lineHeight: 1.6
+              }}>
+                Discover a wide range of vocational and paramedical courses designed to equip you with in-demand skills and open doors to rewarding career opportunities.
+              </p>
+            </div>
 
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: '#64748b',
-                        lineHeight: 1.6,
-                        mb: 3
+            {/* Programs Grid */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+              gap: '32px',
+              marginBottom: '80px',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              {programsData.map((program) => (
+                <div
+                  key={program.id}
+                  onClick={() => navigate(`/programs/${program.id}`)}
+                  style={{
+                    backgroundColor: 'white',
+                    borderRadius: '16px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                  }}
+                >
+                  <div style={{
+                    height: '200px',
+                    backgroundImage: `url(${program.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderRadius: '16px 16px 0 0'
+                  }} />
+                  
+                  <div style={{ padding: '32px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                      backgroundColor: program.color,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '0.85rem',
+                      marginBottom: '16px',
+                      display: 'inline-block',
+                      width: 'fit-content'
+                    }}>
+                      {program.category}
+                    </div>
+                    
+                    <h3 style={{
+                      fontWeight: 'bold',
+                      color: '#1e293b',
+                      marginBottom: '12px',
+                      fontSize: '1.5rem',
+                      lineHeight: 1.3
+                    }}>
+                      {program.category} Programs
+                    </h3>
+                    
+                    <p style={{
+                      color: '#64748b',
+                      lineHeight: 1.6,
+                      marginBottom: '24px',
+                      flex: 1,
+                      fontSize: '1rem',
+                      textAlign: 'center',
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      hyphens: 'auto'
+                    }}>
+                      {program.description}
+                    </p>
+                    
+                    <button
+                      style={{
+                        backgroundColor: program.color,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px 24px',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        marginTop: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.9';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      {program.description}
-                    </Typography>
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-                    {/* Program Levels */}
-                    <Box sx={{ mb: 3 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: '#1e293b',
-                          mb: 1
-                        }}
-                      >
-                        Available Programs:
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {program.levels.map((level, levelIndex) => (
-                          <Chip
-                            key={levelIndex}
-                            label={`${level.level} (${level.eligibility})`}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              borderColor: program.color,
-                              color: program.color,
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Detailed Program Example Section */}
-          <Box sx={{ mt: 8 }}>
-            <Card
-              sx={{
-                borderRadius: 4,
-                boxShadow: '0 20px 40px rgba(37, 99, 235, 0.15)',
-                border: '2px solid transparent',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-                p: 6,
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '6px',
+            {/* Call to Action */}
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{
+                fontWeight: 'bold',
+                color: '#1e293b',
+                marginBottom: '24px',
+                fontSize: '2.5rem'
+              }}>
+                Can't find what you're looking for?
+              </h2>
+              <p style={{
+                color: '#475569',
+                marginBottom: '32px',
+                fontSize: '1.2rem',
+                maxWidth: '600px',
+                margin: '0 auto 32px'
+              }}>
+                Our team is ready to assist you in finding the perfect program to match your career aspirations.
+              </p>
+              <button
+                onClick={() => setInquiryDialogOpen(true)}
+                style={{
                   background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                },
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: -50,
-                  right: -50,
-                  width: '120px',
-                  height: '120px',
-                  background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)',
-                  borderRadius: '50%',
-                  zIndex: 0,
-                },
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 25px 50px rgba(37, 99, 235, 0.25)',
-                  '&::after': {
-                    transform: 'scale(1.2)',
-                    transition: 'transform 0.3s ease',
-                  }
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <Box sx={{ textAlign: 'center', mb: 4, position: 'relative', zIndex: 1 }}>
-                <Box
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mx: 'auto',
-                    mb: 3,
-                    boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)',
-                  }}
-                >
-                  <Typography sx={{ color: 'white', fontSize: '32px' }}>
-                    🏥
-                  </Typography>
-                </Box>
-                
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 'bold',
-                    background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    mb: 2
-                  }}
-                >
-                  Detailed Program Example – Paramedical
-                </Typography>
-                
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: '600',
-                    color: '#3b82f6',
-                    mb: 3
-                  }}
-                >
-                  Overview:
-                </Typography>
-              </Box>
-              
-              <Typography
-                variant="body1"
-                sx={{
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '16px 48px',
                   fontSize: '1.2rem',
-                  lineHeight: 1.8,
-                  color: '#475569',
-                  textAlign: 'justify',
-                  position: 'relative',
-                  zIndex: 1
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(37, 99, 235, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(37, 99, 235, 0.3)';
                 }}
               >
-                The Paramedical stream is one of the most sought-after fields for students looking for stable, impactful careers. It focuses on diagnostic procedures, patient care, and clinical skills required in hospitals and medical facilities.
-              </Typography>
-            </Card>
-          </Box>
-
-          {/* Call to Action */}
-          <Box sx={{ textAlign: 'center', mt: 8 }}>
-            <Button
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForward />}
-              onClick={() => setInquiryDialogOpen(true)}
-              sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #059669 100%)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 15px 35px rgba(37, 99, 235, 0.4)',
-                },
-                textTransform: 'none',
-                borderRadius: 4,
-                px: 8,
-                py: 3,
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Learn More
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-
-      <FooterSection />
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+      </LayoutWrapper>
       
+      <FooterSection />
+
       {/* Inquiry Dialog */}
       <InquiryDialog
         open={inquiryDialogOpen}
@@ -406,7 +246,7 @@ const ProgramsPage = () => {
         title="Explore Our Programs"
         subtitle="Get detailed information about our programs and career opportunities. Our admissions team is here to help you choose the right path."
       />
-    </Box>
+    </div>
   );
 };
 
