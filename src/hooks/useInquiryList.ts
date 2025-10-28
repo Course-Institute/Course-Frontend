@@ -10,6 +10,7 @@ export interface Inquiry {
   message: string;
   createdAt: string;
   status?: string;
+  inquiryType?: 'student' | 'center';
 }
 
 export interface InquiryResponse {

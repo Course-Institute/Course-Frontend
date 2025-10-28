@@ -3,6 +3,9 @@ import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import LayoutWrapper from '../components/LayoutWrapper';
 import { programsData } from '../constants/programsData';
+import { useSubmitInquiry } from '../hooks/useSubmitInquiry';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 const ContactUsPage = () => {
   const [inquiryForm, setInquiryForm] = useState({
@@ -10,8 +13,14 @@ const ContactUsPage = () => {
     email: '',
     phone: '',
     programOfInterest: '',
-    message: ''
+    message: '',
+    inquiryType: 'student' as 'student' | 'center'
   });
+  
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  
+  const submitInquiryMutation = useSubmitInquiry();
 
   const handleInputChange = (field: string) => (event: any) => {
     setInquiryForm(prev => ({
@@ -22,14 +31,21 @@ const ContactUsPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Inquiry Form Submitted:', inquiryForm);
-    alert('Your inquiry has been submitted!');
-    setInquiryForm({
-      fullName: '',
-      email: '',
-      phone: '',
-      programOfInterest: '',
-      message: ''
+    submitInquiryMutation.mutate(inquiryForm, {
+      onSuccess: () => {
+        setShowSuccess(true);
+        setInquiryForm({
+          fullName: '',
+          email: '',
+          phone: '',
+          programOfInterest: '',
+          message: '',
+          inquiryType: 'student'
+        });
+      },
+      onError: () => {
+        setShowError(true);
+      },
     });
   };
 
@@ -159,6 +175,38 @@ const ContactUsPage = () => {
                       </div>
                     </div>
 
+                    {/* Inquiry Type */}
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontWeight: '600',
+                        color: '#374151'
+                      }}>
+                        Inquiry Type *
+                      </label>
+                      <select
+                        value={inquiryForm.inquiryType}
+                        onChange={handleInputChange('inquiryType')}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          transition: 'border-color 0.3s ease',
+                          boxSizing: 'border-box',
+                          backgroundColor: 'white'
+                        }}
+                        onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                        onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                      >
+                        <option value="student">Student</option>
+                        <option value="center">Center</option>
+                      </select>
+                    </div>
+
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                       <div>
                         <label style={{
@@ -253,34 +301,42 @@ const ContactUsPage = () => {
 
                     <button
                       type="submit"
+                      disabled={submitInquiryMutation.isPending}
                       style={{
-                        background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
+                        background: submitInquiryMutation.isPending 
+                          ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                          : 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
                         padding: '16px 32px',
                         fontSize: '1.1rem',
                         fontWeight: 'bold',
-                        cursor: 'pointer',
+                        cursor: submitInquiryMutation.isPending ? 'not-allowed' : 'pointer',
                         boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
                         transition: 'all 0.3s ease',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        opacity: submitInquiryMutation.isPending ? 0.7 : 1
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = '0.9';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 12px 25px rgba(37, 99, 235, 0.4)';
+                        if (!submitInquiryMutation.isPending) {
+                          e.currentTarget.style.opacity = '0.9';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 12px 25px rgba(37, 99, 235, 0.4)';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = '1';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.3)';
+                        if (!submitInquiryMutation.isPending) {
+                          e.currentTarget.style.opacity = '1';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.3)';
+                        }
                       }}
                     >
-                      📧 Send Message
+                      {submitInquiryMutation.isPending ? '⏳ Submitting...' : '📧 Send Message'}
                     </button>
                   </div>
                 </form>
@@ -523,6 +579,30 @@ Delhi, India - 110001
       </LayoutWrapper>
       
       <FooterSection />
+      
+      {/* Success Snackbar */}
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={4000}
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setShowSuccess(false)}>
+          🎉 Your inquiry has been submitted successfully!
+        </Alert>
+      </Snackbar>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={showError}
+        autoHideDuration={4000}
+        onClose={() => setShowError(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="error" onClose={() => setShowError(false)}>
+          ❌ Failed to submit inquiry. Please try again.
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

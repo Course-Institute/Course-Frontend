@@ -19,6 +19,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Close, Send, School, CheckCircle, Error } from '@mui/icons-material';
+import { useSubmitInquiry } from '../hooks/useSubmitInquiry';
 
 interface InquiryDialogProps {
   open: boolean;
@@ -33,7 +34,8 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
     email: '',
     phone: '',
     programOfInterest: '',
-    message: ''
+    message: '',
+    inquiryType: 'student' as 'student' | 'center'
   });
 
   const [errors, setErrors] = useState({
@@ -41,12 +43,15 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
     email: '',
     phone: '',
     programOfInterest: '',
-    message: ''
+    message: '',
+    inquiryType: ''
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const submitInquiryMutation = useSubmitInquiry();
 
   const programs = [
     'Paramedical Programs',
@@ -77,7 +82,8 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
       email: '',
       phone: '',
       programOfInterest: '',
-      message: ''
+      message: '',
+      inquiryType: ''
     };
 
     let isValid = true;
@@ -161,60 +167,61 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
     
     if (!validateForm()) {
       setShowError(true);
+      setErrorMessage('Please fill in all required fields correctly');
       return;
     }
 
-    setIsSubmitting(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('Inquiry submitted:', formData);
-      setShowSuccess(true);
-      
-      // Reset form after successful submission
-      setTimeout(() => {
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          programOfInterest: '',
-          message: ''
-        });
-        setErrors({
-          fullName: '',
-          email: '',
-          phone: '',
-          programOfInterest: '',
-          message: ''
-        });
-        setIsSubmitting(false);
-        onClose();
-      }, 2000);
-      
-    } catch (error) {
-      console.error('Submission error:', error);
-      setShowError(true);
-      setIsSubmitting(false);
-    }
+    submitInquiryMutation.mutate(formData, {
+      onSuccess: (data) => {
+        console.log('Inquiry submitted successfully:', data);
+        setShowSuccess(true);
+        
+        // Reset form after successful submission
+        setTimeout(() => {
+          setFormData({
+            fullName: '',
+            email: '',
+            phone: '',
+            programOfInterest: '',
+            message: '',
+            inquiryType: 'student'
+          });
+          setErrors({
+            fullName: '',
+            email: '',
+            phone: '',
+            programOfInterest: '',
+            message: '',
+            inquiryType: ''
+          });
+          onClose();
+        }, 2000);
+      },
+      onError: (error: any) => {
+        console.error('Submission error:', error);
+        setErrorMessage(error?.response?.data?.message || 'Failed to submit inquiry. Please try again.');
+        setShowError(true);
+      },
+    });
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!submitInquiryMutation.isPending) {
       setFormData({
         fullName: '',
         email: '',
         phone: '',
         programOfInterest: '',
-        message: ''
+        message: '',
+        inquiryType: 'student'
       });
       setErrors({
         fullName: '',
         email: '',
         phone: '',
         programOfInterest: '',
-        message: ''
+        message: '',
+        inquiryType: ''
       });
       onClose();
     }
@@ -304,7 +311,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
             </Box>
             <IconButton
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={submitInquiryMutation.isPending}
               sx={{
                 color: '#64748b',
                 backgroundColor: 'rgba(100, 116, 139, 0.1)',
@@ -338,7 +345,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
                 onChange={handleInputChange('fullName')}
                 error={!!errors.fullName}
                 helperText={errors.fullName}
-                disabled={isSubmitting}
+                disabled={submitInquiryMutation.isPending}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
@@ -375,7 +382,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
                 onChange={handleInputChange('email')}
                 error={!!errors.email}
                 helperText={errors.email}
-                disabled={isSubmitting}
+                disabled={submitInquiryMutation.isPending}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
@@ -404,6 +411,41 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
               />
             </Box>
 
+            {/* Inquiry Type */}
+            <FormControl fullWidth error={!!errors.inquiryType} disabled={submitInquiryMutation.isPending} sx={{ mb: 3 }}>
+              <InputLabel>Inquiry Type</InputLabel>
+              <Select
+                value={formData.inquiryType}
+                onChange={handleInputChange('inquiryType')}
+                label="Inquiry Type"
+                sx={{
+                  borderRadius: 3,
+                  backgroundColor: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                  },
+                  '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#dc2626',
+                    borderWidth: 2,
+                  },
+                }}
+              >
+                <MenuItem value="student">Student</MenuItem>
+                <MenuItem value="center">Center</MenuItem>
+              </Select>
+              {errors.inquiryType && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                  {errors.inquiryType}
+                </Typography>
+              )}
+            </FormControl>
+
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3, mb: 3 }}>
               {/* Phone */}
               <TextField
@@ -413,7 +455,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
                 onChange={handleInputChange('phone')}
                 error={!!errors.phone}
                 helperText={errors.phone || "Enter 10-digit phone number"}
-                disabled={isSubmitting}
+                disabled={submitInquiryMutation.isPending}
                 inputProps={{ maxLength: 10 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -443,7 +485,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
               />
 
               {/* Program of Interest */}
-              <FormControl fullWidth error={!!errors.programOfInterest} disabled={isSubmitting}>
+              <FormControl fullWidth error={!!errors.programOfInterest} disabled={submitInquiryMutation.isPending}>
                 <InputLabel>Program of Interest</InputLabel>
                 <Select
                   value={formData.programOfInterest}
@@ -491,7 +533,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
               onChange={handleInputChange('message')}
               error={!!errors.message}
               helperText={errors.message || "Tell us about your goals and any specific questions you have..."}
-              disabled={isSubmitting}
+              disabled={submitInquiryMutation.isPending}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
@@ -559,7 +601,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
           <Button
             onClick={handleClose}
             variant="outlined"
-            disabled={isSubmitting}
+            disabled={submitInquiryMutation.isPending}
             sx={{
               borderColor: '#d1d5db',
               color: '#64748b',
@@ -584,8 +626,8 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={isSubmitting}
-            endIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Send />}
+            disabled={submitInquiryMutation.isPending}
+            endIcon={submitInquiryMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <Send />}
             sx={{
               background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
               '&:hover': {
@@ -607,7 +649,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
               transition: 'all 0.3s ease',
             }}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
+            {submitInquiryMutation.isPending ? 'Submitting...' : 'Submit Inquiry'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -663,7 +705,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
           }}
         >
           <Typography sx={{ fontWeight: 'bold' }}>
-            ❌ Please check the form and try again.
+            ❌ {errorMessage || 'Please check the form and try again.'}
           </Typography>
         </Alert>
       </Snackbar>

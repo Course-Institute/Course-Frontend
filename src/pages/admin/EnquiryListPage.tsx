@@ -15,7 +15,7 @@ import {
 import { useInquiryList } from '../../hooks/useInquiryList';
 
 const EnquiryListPage = () => {
-  const { data, isLoading, error, refetch } = useInquiryList();
+  const { data, isLoading, error } = useInquiryList();
 
   if (isLoading) {
     return (
@@ -65,6 +65,7 @@ const EnquiryListPage = () => {
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Full Name</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Phone</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Inquiry Type</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Program of Interest</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', minWidth: 300 }}>Message</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Date</TableCell>
@@ -79,6 +80,17 @@ const EnquiryListPage = () => {
                   <TableCell sx={{ fontWeight: 600 }}>{inquiry.fullName}</TableCell>
                   <TableCell>{inquiry.email}</TableCell>
                   <TableCell>{inquiry.phone}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={inquiry.inquiryType ? inquiry.inquiryType.charAt(0).toUpperCase() + inquiry.inquiryType.slice(1) : 'N/A'}
+                      size="small"
+                      sx={{
+                        backgroundColor: inquiry.inquiryType === 'student' ? '#e3f2fd' : '#fff3e0',
+                        color: inquiry.inquiryType === 'student' ? '#1976d2' : '#f57c00',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={inquiry.programOfInterest}
