@@ -19,6 +19,7 @@ import {
   Logout as LogoutIcon,
   PersonAdd,
   Payment,
+  Assignment,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -60,8 +61,9 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
     { id: 5, label: 'Manage Bills', icon: <Assessment />, path: '/center/bills' },
     { id: 6, label: 'ID Card Management', icon: <CreditCard />, path: '/center/id-cards' },
     { id: 7, label: 'Upload Results', icon: <Upload />, path: '/center/upload-results' },
-    // { id: 8, label: 'Payment Tracking', icon: <Payment />, path: '/center/payments' },
-    // { id: 9, label: 'Reports', icon: <Assessment />, path: '/center/reports' },
+    { id: 8, label: 'Add Marksheet', icon: <Assignment />, path: '/center/add-marksheet' },
+    // { id: 9, label: 'Payment Tracking', icon: <Payment />, path: '/center/payments' },
+    // { id: 10, label: 'Reports', icon: <Assessment />, path: '/center/reports' },
   ];
 
   const drawer = (

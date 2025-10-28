@@ -205,7 +205,7 @@ export const programsData: Program[] = [
     focusArea: "Emergency response, safety training",
     description: "Specialized training that saves lives. Learn how to handle emergencies, prevent hazards, and manage fire safety equipment. Prepares students for roles in industries, buildings, safety departments, and government sectors.",
     color: "#1d4ed8",
-    image: "https://images.unsplash.com/photo-1581578731548-c6a0c3f15f30?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     levels: [
       {
         id: "fire-safety-cert-12th",
