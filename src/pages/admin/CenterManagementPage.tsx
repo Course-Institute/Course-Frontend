@@ -79,13 +79,21 @@ const CenterManagementPage = () => {
       field: 'centerCode',
       headerName: 'Center Code',
       width: '140px',
-      renderCell: (_, row: any) => row.centerDetails?.centerCode || 'N/A',
+      renderCell: (_, row: any) => (
+        <Typography variant="body2" sx={{ fontWeight: 600, color: '#3b82f6' }}>
+          {row.centerDetails?.centerCode || 'N/A'}
+        </Typography>
+      ),
     },
     {
       field: 'centerName',
       headerName: 'Center Name',
       minWidth: '200px',
-      renderCell: (_, row: any) => row.centerDetails?.centerName || 'N/A',
+      renderCell: (_, row: any) => (
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {row.centerDetails?.centerName || 'N/A'}
+        </Typography>
+      ),
     },
     {
       field: 'centerType',
@@ -120,35 +128,33 @@ const CenterManagementPage = () => {
       renderCell: (_, row: any) => row.authorizedPersonDetails?.contactNo || 'N/A',
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      width: '100px',
+      field: 'username',
+      headerName: 'Username',
+      width: '150px',
+      renderCell: (_, row: any) => (
+        <Typography variant="body2" sx={{ fontWeight: 500, color: '#10b981' }}>
+          {row.loginCredentials?.username || 'N/A'}
+        </Typography>
+      ),
+    },
+    {
+      field: 'password',
+      headerName: 'Password',
+      width: '120px',
       align: 'center',
-      renderCell: (value: string) => {
-        const getStatusColor = (status: string) => {
-          switch (status) {
-            case 'pending': return '#f59e0b';
-            case 'approved': return '#10b981';
-            case 'rejected': return '#ef4444';
-            default: return '#6b7280';
-          }
-        };
-        return (
-          <Box
-            sx={{
-              backgroundColor: getStatusColor(value),
-              color: 'white',
-              padding: '4px 8px',
-              borderRadius: '12px',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              textTransform: 'capitalize',
-            }}
-          >
-            {value}
-          </Box>
-        );
-      },
+      renderCell: (_, row: any) => (
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            fontWeight: 600, 
+            color: '#ef4444',
+            fontFamily: 'monospace',
+            letterSpacing: '1px',
+          }}
+        >
+          {row.loginCredentials?.password || 'N/A'}
+        </Typography>
+      ),
     },
   ];
 
@@ -410,6 +416,8 @@ const CenterManagementPage = () => {
             tableContainerSx={{
               height: '90%',
               maxHeight: '70vh',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              borderRadius: '12px',
             }}
           />
         )}

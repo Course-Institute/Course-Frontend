@@ -44,7 +44,7 @@ const AddMarksheetPageCenter = () => {
 
   // Handle adding subject
   const handleAddSubject = () => {
-    const validationErrors = validateSubject(currentSubject, subjects);
+    const validationErrors = validateSubject(currentSubject, subjects, 'center');
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -105,6 +105,14 @@ const AddMarksheetPageCenter = () => {
     }
 
     setCurrentSubject(updatedSubject);
+
+    // Real-time validation for total marks (center limitation)
+    if (field === 'marks' || field === 'internal') {
+      const newTotal = parseFloat(updatedSubject.total);
+      if (newTotal && newTotal > 80) {
+        setErrors({ total: 'Total marks cannot exceed 80' });
+      }
+    }
   };
 
   // Use the custom hook for saving marksheet
@@ -236,6 +244,8 @@ const AddMarksheetPageCenter = () => {
                 type="number"
                 value={currentSubject.total}
                 disabled
+                error={!!errors.total}
+                helperText={errors.total}
               />
             </Grid>
             <Grid size={1.5}>
