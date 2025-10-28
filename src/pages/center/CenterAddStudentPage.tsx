@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import AddStudentForm from '../../components/AddStudentForm';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -7,6 +8,7 @@ const CenterAddStudentPage: React.FC = () => {
   const [centerInfo, setCenterInfo] = useState<{ centerId: string; centerName: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Get center information from localStorage
@@ -22,8 +24,8 @@ const CenterAddStudentPage: React.FC = () => {
   }, [showToast]);
 
   const handleClose = () => {
-    // Navigate back to center dashboard
-    window.history.back();
+    // Navigate to center student list page after successful student creation
+    navigate('/center/students');
   };
 
   if (isLoading) {

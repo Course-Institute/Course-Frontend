@@ -93,6 +93,24 @@ export const getStudentsData = async (page: number = 1, limit: number = 10): Pro
   }
 };
 
+// Real API function to fetch students data for a specific center
+export const getCenterStudentsData = async (centerId: string, page: number = 1, limit: number = 10): Promise<StudentsResponse> => {
+  try {
+    console.log('Fetching students for centerId:', centerId);
+    const response = await axiosInstance.get(`/api/student/students?page=${page}&limit=${limit}&centerId=${centerId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to fetch center students data. Please try again.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
+};
+
 // Real API function to add a student
 export const addStudent = async (formData: FormData): Promise<AddStudentResponse> => {
   try {

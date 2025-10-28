@@ -28,9 +28,10 @@ import CenterDashboardPage from './pages/center/CenterDashboardPage';
 import CenterAddStudentPage from './pages/center/CenterAddStudentPage';
 import CenterCreateBillPage from './pages/center/CenterCreateBillPage';
 import CenterManageBillsPage from './pages/center/CenterManageBillsPage';
-import CenterUploadResultsPage from './pages/center/CenterUploadResultsPage';
+import CenterManageStudentsPage from './pages/center/CenterManageStudentsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
+import CenterUploadResultsPage from './pages/center/CenterUploadResultsPage';
 
 function App() {
   return (
@@ -133,6 +134,11 @@ function App() {
           <Route path="/center/bills" element={
             <CenterLayout title="MANAGE BILLS">
               <CenterManageBillsPage />
+            </CenterLayout>
+          } />
+          <Route path="/center/students" element={
+            <CenterLayout title="MANAGE STUDENTS">
+              <CenterManageStudentsPage />
             </CenterLayout>
           } />
           
