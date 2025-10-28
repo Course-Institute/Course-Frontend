@@ -48,6 +48,10 @@ export interface Center {
     declaration: boolean;
     signatureUrl?: string;
   };
+  loginCredentials?: {
+    username: string;
+    password: string;
+  };
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
   updatedAt: string;

@@ -23,7 +23,8 @@ export const calculateTotal = (marks: string, internal: string): string => {
 // Validate current subject data
 export const validateSubject = (
   subject: SubjectInput,
-  existingSubjects: SubjectData[]
+  existingSubjects: SubjectData[],
+  role?: string
 ): ValidationErrors => {
   const errors: ValidationErrors = {};
 
@@ -58,6 +59,11 @@ export const validateSubject = (
   const total = parseFloat(subject.total);
   const min = parseFloat(subject.minMarks);
   const max = parseFloat(subject.maxMarks);
+
+  // Center limitation: Total marks cannot exceed 80 (only for center role)
+  if (role === 'center' && total && total > 80) {
+    errors.total = 'Total marks cannot exceed 80';
+  }
 
   if (total && max && total > max) {
     errors.maxMarks = 'Max Marks must be greater than or equal to Total';

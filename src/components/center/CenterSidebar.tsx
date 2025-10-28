@@ -13,8 +13,6 @@ import {
 import {
   Dashboard,
   People,
-  CreditCard,
-  Upload,
   Assessment,
   Logout as LogoutIcon,
   PersonAdd,
@@ -59,9 +57,7 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
     { id: 3, label: 'Manage Students', icon: <People />, path: '/center/students' },
     { id: 4, label: 'Create Bill', icon: <Payment />, path: '/center/create-bill' },
     { id: 5, label: 'Manage Bills', icon: <Assessment />, path: '/center/bills' },
-    { id: 6, label: 'ID Card Management', icon: <CreditCard />, path: '/center/id-cards' },
-    { id: 7, label: 'Upload Results', icon: <Upload />, path: '/center/upload-results' },
-    { id: 8, label: 'Add Marksheet', icon: <Assignment />, path: '/center/add-marksheet' },
+    { id: 6, label: 'Add Marksheet', icon: <Assignment />, path: '/center/add-marksheet' },
     // { id: 9, label: 'Payment Tracking', icon: <Payment />, path: '/center/payments' },
     // { id: 10, label: 'Reports', icon: <Assessment />, path: '/center/reports' },
   ];

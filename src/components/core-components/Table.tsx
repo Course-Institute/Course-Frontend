@@ -62,20 +62,42 @@ const Table: React.FC<ReusableTableProps> = ({
       elevation={0}
       onScroll={onScroll}
       sx={{
-        border: `1px solid #e2e8f0`,
-        borderRadius: '8px',
+        border: 'none',
+        borderRadius: '12px',
         boxSizing: 'border-box',
+        background: 'white',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        overflow: 'auto',
         scrollbarWidth: scrollbarWidth || 'thin',
         '&::-webkit-scrollbar': {
-          width: scrollbarWidth || 'thin',
+          width: '8px',
+          height: '8px',
         },
-        bgcolor: 'white',
+        '&::-webkit-scrollbar-track': {
+          background: '#f1f5f9',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#cbd5e1',
+          borderRadius: '4px',
+          '&:hover': {
+            background: '#94a3b8',
+          },
+        },
         ...tableContainerSx || {},
       }}
     >
       <MuiTable stickyHeader={stickyHeader}>
         <MuiTableHead>
-          <MuiTableRow>
+          <MuiTableRow
+            sx={{
+              backgroundColor: '#f8fafc',
+              borderBottom: '2px solid #e2e8f0',
+              '& .MuiTableCell-head': {
+                backgroundColor: '#f8fafc',
+              },
+            }}
+          >
             {columns?.map(column => (
               <MuiTableCell
                 key={column.field}
@@ -84,17 +106,38 @@ const Table: React.FC<ReusableTableProps> = ({
                   width: column.width || 'auto',
                   minWidth: column.minWidth || 'auto',
                   maxWidth: column.maxWidth || 'auto',
-                  height: headerHeight || 'auto',
+                  height: headerHeight || '56px',
+                  backgroundColor: '#f8fafc',
+                  borderBottom: '2px solid #e2e8f0',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  color: '#475569',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  padding: '16px 12px',
                 }}
               >
-                <Typography noWrap variant="body1">
+                <Typography noWrap variant="body2" sx={{ fontWeight: 600 }}>
                   {column.headerName}
                 </Typography>
               </MuiTableCell>
             ))}
             {renderOptionsCell && (
-              <MuiTableCell key="options" align="right" sx={{ height: headerHeight || 'auto' }}>
-                <Typography variant="body1">
+              <MuiTableCell 
+                key="options" 
+                align="right" 
+                sx={{ 
+                  height: headerHeight || '56px',
+                  backgroundColor: '#f8fafc',
+                  borderBottom: '2px solid #e2e8f0',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  color: '#475569',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   <MoreVertIcon />
                 </Typography>
               </MuiTableCell>
@@ -109,9 +152,20 @@ const Table: React.FC<ReusableTableProps> = ({
               key={rowIndex}
               sx={{
                 cursor: 'pointer',
-                background:  row?.isOutDated ? '#f87171' : selectedRow === rowIndex ? '#3b82f6' : '#FFF',
-                ':hover': { backgroundColor: '#3b82f6' },
-                borderBottom: rowIndex !== rows.length - 1 ? `1px solid #e2e8f0` : 'none',
+                background: row?.isOutDated 
+                  ? '#fef2f2' 
+                  : selectedRow === rowIndex 
+                    ? '#eff6ff' 
+                    : rowIndex % 2 === 0 
+                      ? '#FFFFFF' 
+                      : '#f8fafc',
+                transition: 'all 0.2s ease-in-out',
+                borderBottom: rowIndex !== rows.length - 1 ? `1px solid #f1f5f9` : 'none',
+                '&:hover': { 
+                  backgroundColor: '#f1f5f9',
+                  transform: 'translateX(2px)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                },
               }}
             >
               {columns?.map(column => (
@@ -119,13 +173,16 @@ const Table: React.FC<ReusableTableProps> = ({
                   key={column.field}
                   align={column.align || 'left'}
                   sx={{
-                    paddingY: 1,
+                    padding: '14px 12px',
                     width: column.width || 'auto',
                     minWidth: column.minWidth || 'auto',
                     maxWidth: column.maxWidth || 'auto',
                     borderBottom:
-                      rowIndex !== rows.length - 1 ? `1px solid #e2e8f0` : 'none',
-                      ...(column?.sx || {})
+                      rowIndex !== rows.length - 1 ? `1px solid #f1f5f9` : 'none',
+                    color: '#334155',
+                    fontSize: '0.875rem',
+                    fontWeight: 400,
+                    ...(column?.sx || {})
                   }}
                 >
                   {column?.renderCell
@@ -141,7 +198,8 @@ const Table: React.FC<ReusableTableProps> = ({
                   key="options"
                   sx={{
                     borderBottom:
-                      rowIndex !== rows.length - 1 ? `1px solid #e2e8f0` : 'none',
+                      rowIndex !== rows.length - 1 ? `1px solid #f1f5f9` : 'none',
+                    padding: '14px 12px',
                   }}
                 >
                   {renderOptionsCell(row)}
