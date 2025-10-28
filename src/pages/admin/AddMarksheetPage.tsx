@@ -5,7 +5,6 @@ import {
   Button,
   Grid,
   Typography,
-  Alert,
   CircularProgress,
   IconButton,
   Table,
@@ -15,7 +14,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import ApiBasedAutoComplete from '../../components/core-components/apiBasedAutoComplete';
@@ -25,7 +23,6 @@ import {
   validateSubject,
   validateMaxSubjects,
   validateFormForSave,
-  type SubjectInput,
   type ValidationErrors,
 } from '../../utils/marksheetValidation';
 
@@ -41,7 +38,7 @@ const AddMarksheetPageAdmin = () => {
     maxMarks: '',
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [tableErrors, setTableErrors] = useState<{ [key: number]: string }>({});
+  const [, setTableErrors] = useState<{ [key: number]: string }>({});
 
   // Handle adding subject
   const handleAddSubject = () => {

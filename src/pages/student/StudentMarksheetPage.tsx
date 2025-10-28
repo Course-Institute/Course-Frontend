@@ -12,7 +12,6 @@ import {
   TableRow,
   Paper,
   Chip,
-  Button,
 } from '@mui/material';
 import { useGetMarksheet } from '../../hooks/useGetMarksheet';
 
