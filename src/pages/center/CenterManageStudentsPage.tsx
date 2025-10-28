@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
   IconButton,
+  Button,
   CircularProgress,
   Alert,
 } from '@mui/material';
@@ -16,6 +18,7 @@ import Table, { type Column } from '../../components/core-components/Table';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 const CenterManageStudentsPage = () => {
+  const navigate = useNavigate();
   const [searchTerm] = useState('');
   const [centerInfo, setCenterInfo] = useState<{ centerId: string; centerName: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -150,28 +153,56 @@ const CenterManageStudentsPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: '120px',
+      width: '150px',
       align: 'center',
-      getActions: (_row: any) => (
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-          <IconButton
-            size="small"
-            sx={{
-              color: '#3b82f6',
-              '&:hover': { backgroundColor: '#eff6ff' },
-            }}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            sx={{
-              color: '#ef4444',
-              '&:hover': { backgroundColor: '#fee2e2' },
-            }}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+      getActions: (row: any) => (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
+          {/* Show Marksheet Button - Show only if isMarksheetGenerated is true */}
+          {row.isMarksheetGenerated && (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => navigate(`/center/view-marksheet/${row.registrationNo}`)}
+              sx={{
+                borderColor: '#10b981',
+                color: '#10b981',
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                px: 2,
+                py: 0.5,
+                borderRadius: 2,
+                '&:hover': {
+                  borderColor: '#059669',
+                  backgroundColor: '#ecfdf5',
+                },
+              }}
+            >
+              SHOW MARKSHEET
+            </Button>
+          )}
+          
+          {/* Edit and Delete Buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+            <IconButton
+              size="small"
+              sx={{
+                color: '#3b82f6',
+                '&:hover': { backgroundColor: '#eff6ff' },
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              sx={{
+                color: '#ef4444',
+                '&:hover': { backgroundColor: '#fee2e2' },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Box>
       ),
     },

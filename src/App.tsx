@@ -35,6 +35,9 @@ import CenterUploadResultsPage from './pages/center/CenterUploadResultsPage';
 import AddMarksheetPageAdmin from './pages/admin/AddMarksheetPage';
 import AddMarksheetPageCenter from './pages/center/AddMarksheetPage';
 import EnquiryListPage from './pages/admin/EnquiryListPage';
+import StudentMarksheetPage from './pages/student/StudentMarksheetPage';
+import ViewMarksheetPage from './pages/admin/ViewMarksheetPage';
+import CenterViewMarksheetPage from './pages/center/ViewMarksheetPage';
 
 function App() {
   return (
@@ -119,9 +122,15 @@ function App() {
               <EnquiryListPage />
             </AdminLayout>
           } />
+          <Route path="/admin/view-marksheet/:registrationNo" element={
+            <AdminLayout title="VIEW MARKSHEET">
+              <ViewMarksheetPage />
+            </AdminLayout>
+          } />
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
+          <Route path="/student/marksheet" element={<StudentMarksheetPage />} />
 
           {/* Center Routes with Layout */}
           <Route path="/center-dashboard" element={
@@ -157,6 +166,11 @@ function App() {
           <Route path="/center/add-marksheet" element={
             <CenterLayout title="ADD MARKSHEET">
               <AddMarksheetPageCenter />
+            </CenterLayout>
+          } />
+          <Route path="/center/view-marksheet/:registrationNo" element={
+            <CenterLayout title="VIEW MARKSHEET">
+              <CenterViewMarksheetPage />
             </CenterLayout>
           } />
 

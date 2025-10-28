@@ -20,6 +20,7 @@ import {
   Description,
   School,
   LocalShipping,
+  FilePresent,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 
@@ -32,6 +33,7 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <Dashboard /> },
     { id: 'profile', label: 'Student Profile', icon: <Person /> },
+    { id: 'marksheet', label: 'Marksheet', icon: <FilePresent /> },
     { id: 'support', label: 'Support', icon: <Support /> },
     { id: 'fees', label: 'Fees', icon: <Payment /> },
     { id: 'assignments', label: 'Assignments', icon: <Assignment /> },

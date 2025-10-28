@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -16,6 +17,7 @@ import ConfirmationDialog from '../../components/ConfirmationDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 const ManageStudentsPage = () => {
+  const navigate = useNavigate();
   const [searchTerm] = useState('');
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [approveMarksheetDialogOpen, setApproveMarksheetDialogOpen] = useState(false);
@@ -243,57 +245,82 @@ const ManageStudentsPage = () => {
           
           {/* Approve Marksheet Button - Show only if isMarksheetGenerated is true */}
           {row.isMarksheetGenerated && (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {row.isMarksheetApproved ? (
-                <Button
-                  size="small"
-                  variant="contained"
-                  disabled
-                  sx={{
-                    backgroundColor: '#8b5cf6',
-                    color: 'white',
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    '&:disabled': {
+            <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {row.isMarksheetApproved ? (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    disabled
+                    sx={{
                       backgroundColor: '#8b5cf6',
                       color: 'white',
-                      opacity: 0.8,
-                    },
-                  }}
-                >
-                  MARKSHEET APPROVED
-                </Button>
-              ) : (
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={() => handleApproveMarksheetClick(row)}
-                  disabled={approveMarksheetMutation.isPending}
-                  sx={{
-                    backgroundColor: '#6366f1',
-                    color: 'white',
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    '&:hover': {
-                      backgroundColor: '#4f46e5',
-                    },
-                    '&:disabled': {
-                      backgroundColor: '#9ca3af',
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: 2,
+                      '&:disabled': {
+                        backgroundColor: '#8b5cf6',
+                        color: 'white',
+                        opacity: 0.8,
+                      },
+                    }}
+                  >
+                    MARKSHEET APPROVED
+                  </Button>
+                ) : (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => handleApproveMarksheetClick(row)}
+                    disabled={approveMarksheetMutation.isPending}
+                    sx={{
+                      backgroundColor: '#6366f1',
                       color: 'white',
-                    },
-                  }}
-                >
-                  APPROVE MARKSHEET
-                </Button>
-              )}
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: 2,
+                      '&:hover': {
+                        backgroundColor: '#4f46e5',
+                      },
+                      '&:disabled': {
+                        backgroundColor: '#9ca3af',
+                        color: 'white',
+                      },
+                    }}
+                  >
+                    APPROVE MARKSHEET
+                  </Button>
+                )}
+              </Box>
+              
+              {/* Show Marksheet Button */}
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => navigate(`/admin/view-marksheet/${row.registrationNo}`)}
+                sx={{
+                  borderColor: '#10b981',
+                  color: '#10b981',
+                  textTransform: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 2,
+                  '&:hover': {
+                    borderColor: '#059669',
+                    backgroundColor: '#ecfdf5',
+                  },
+                }}
+              >
+                SHOW MARKSHEET
+              </Button>
             </Box>
           )}
         </Box>
