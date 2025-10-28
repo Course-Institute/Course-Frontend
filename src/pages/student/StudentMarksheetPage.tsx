@@ -16,10 +16,10 @@ import {
 import { useGetMarksheet } from '../../hooks/useGetMarksheet';
 
 const StudentMarksheetPage = () => {
-  // Get registration number from localStorage for student
-  const registrationNo = localStorage.getItem('studentRegistrationNumber') || '';
+  // Get marksheet ID from localStorage for student
+  const marksheetId = localStorage.getItem('studentMarksheetId') || '';
   
-  const { data: marksheet, isLoading, error } = useGetMarksheet(registrationNo, !!registrationNo);
+  const { data: marksheet, isLoading, error } = useGetMarksheet(marksheetId, !!marksheetId);
 
   if (isLoading) {
     return (

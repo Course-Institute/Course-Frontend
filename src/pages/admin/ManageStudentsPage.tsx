@@ -14,6 +14,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { useQueryClient } from '@tanstack/react-query';
 import Table, { type Column } from '../../components/core-components/Table';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
+import EditableMarksheetDialog from '../../components/EditableMarksheetDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 const ManageStudentsPage = () => {
@@ -81,34 +82,13 @@ const ManageStudentsPage = () => {
     setSelectedStudent(null);
   };
 
-  // Handle approve marksheet
+  // Handle approve marksheet - opens editable dialog
   const handleApproveMarksheetClick = (student: any) => {
     setSelectedStudent(student);
     setApproveMarksheetDialogOpen(true);
   };
 
-  const handleApproveMarksheetConfirm = () => {
-    if (selectedStudent) {
-      approveMarksheetMutation.mutate(
-        { registrationNo: selectedStudent.registrationNo },
-        {
-          onSuccess: (data: any) => {
-            showToast(data.message || 'Marksheet approved successfully!', 'success');
-            queryClient.invalidateQueries({ queryKey: ['students'] });
-            setApproveMarksheetDialogOpen(false);
-            setSelectedStudent(null);
-          },
-          onError: (error: any) => {
-            showToast(error?.message || 'Failed to approve marksheet', 'error');
-            setApproveMarksheetDialogOpen(false);
-            setSelectedStudent(null);
-          },
-        }
-      );
-    }
-  };
-
-  const handleApproveMarksheetCancel = () => {
+  const handleApproveMarksheetDialogClose = () => {
     setApproveMarksheetDialogOpen(false);
     setSelectedStudent(null);
   };
@@ -247,7 +227,7 @@ const ManageStudentsPage = () => {
           {row.isMarksheetGenerated && (
             <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                {row.isMarksheetApproved ? (
+                {row.isMarksheetAndCertificateApproved ? (
                   <Button
                     size="small"
                     variant="contained"
@@ -303,7 +283,7 @@ const ManageStudentsPage = () => {
               <Button
                 size="small"
                 variant="outlined"
-                onClick={() => navigate(`/admin/view-marksheet/${row.registrationNo}`)}
+                onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}`)}
                 sx={{
                   borderColor: '#10b981',
                   color: '#10b981',
@@ -676,18 +656,17 @@ const ManageStudentsPage = () => {
         severity="warning"
       />
 
-      {/* Approve Marksheet Confirmation Dialog */}
-      <ConfirmationDialog
-        open={approveMarksheetDialogOpen}
-        onClose={handleApproveMarksheetCancel}
-        onConfirm={handleApproveMarksheetConfirm}
-        title="Approve Marksheet"
-        message={`Are you sure you want to approve marksheet for student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})? This action cannot be undone.`}
-        confirmText="Approve"
-        cancelText="Cancel"
-        isLoading={approveMarksheetMutation.isPending}
-        severity="info"
-      />
+      {/* Editable Marksheet Dialog */}
+      {selectedStudent && (
+        <EditableMarksheetDialog
+          open={approveMarksheetDialogOpen}
+          onClose={handleApproveMarksheetDialogClose}
+          studentId={selectedStudent.studentId || selectedStudent._id || selectedStudent.id}
+          registrationNo={selectedStudent.registrationNo}
+          studentName={selectedStudent.candidateName}
+          marksheetId={selectedStudent.marksheetId}
+        />
+      )}
     </Box>
     </ErrorBoundary>
   );

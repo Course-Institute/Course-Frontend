@@ -3,25 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
-  IconButton,
   Button,
   CircularProgress,
   Alert,
 } from '@mui/material';
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
 import { useCenterStudentsData } from '../../hooks/useCenterStudentsData';
 import { useToast } from '../../contexts/ToastContext';
 import Table, { type Column } from '../../components/core-components/Table';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import MarksheetPreviewDialog from '../../components/MarksheetPreviewDialog';
 
 const CenterManageStudentsPage = () => {
   const navigate = useNavigate();
   const [searchTerm] = useState('');
   const [centerInfo, setCenterInfo] = useState<{ centerId: string; centerName: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   
   const { showToast } = useToast();
 
@@ -151,6 +149,35 @@ const CenterManageStudentsPage = () => {
       ),
     },
     {
+      field: 'marksheetStatus',
+      headerName: 'Marksheet Status',
+      width: '140px',
+      align: 'center',
+      renderCell: (_value: any, row: any) => {
+        // Only show if marksheet is generated
+        if (row.isMarksheetGenerated) {
+          return (
+            <Typography
+              variant="body2"
+              sx={{
+                color: row.isMarksheetAndCertificateApproved ? '#10b981' : '#f59e0b',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+              }}
+            >
+              {row.isMarksheetAndCertificateApproved ? 'Approved' : 'Not Approved'}
+            </Typography>
+          );
+        }
+        return (
+          <Typography variant="body2" sx={{ color: '#9ca3af', fontSize: '0.75rem' }}>
+            Not Generated
+          </Typography>
+        );
+      },
+    },
+    {
       field: 'actions',
       headerName: 'Actions',
       width: '150px',
@@ -159,50 +186,58 @@ const CenterManageStudentsPage = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
           {/* Show Marksheet Button - Show only if isMarksheetGenerated is true */}
           {row.isMarksheetGenerated && (
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => navigate(`/center/view-marksheet/${row.registrationNo}`)}
-              sx={{
-                borderColor: '#10b981',
-                color: '#10b981',
-                textTransform: 'none',
-                fontSize: '0.75rem',
-                fontWeight: 500,
-                px: 2,
-                py: 0.5,
-                borderRadius: 2,
-                '&:hover': {
-                  borderColor: '#059669',
-                  backgroundColor: '#ecfdf5',
-                },
-              }}
-            >
-              SHOW MARKSHEET
-            </Button>
+            <>
+              {row.isMarksheetAndCertificateApproved ? (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}`)}
+                  sx={{
+                    borderColor: '#10b981',
+                    color: '#10b981',
+                    textTransform: 'none',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    px: 2,
+                    py: 0.5,
+                    borderRadius: 2,
+                    '&:hover': {
+                      borderColor: '#059669',
+                      backgroundColor: '#ecfdf5',
+                    },
+                  }}
+                >
+                  VIEW MARKSHEET
+                </Button>
+              ) : (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    const idToUse = row.studentId || row._id || '';
+                    setSelectedStudentId(idToUse);
+                    setPreviewDialogOpen(true);
+                  }}
+                  sx={{
+                    borderColor: '#3b82f6',
+                    color: '#3b82f6',
+                    textTransform: 'none',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    px: 2,
+                    py: 0.5,
+                    borderRadius: 2,
+                    '&:hover': {
+                      borderColor: '#2563eb',
+                      backgroundColor: '#eff6ff',
+                    },
+                  }}
+                >
+                  PREVIEW MARKSHEET
+                </Button>
+              )}
+            </>
           )}
-          
-          {/* Edit and Delete Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-            <IconButton
-              size="small"
-              sx={{
-                color: '#3b82f6',
-                '&:hover': { backgroundColor: '#eff6ff' },
-              }}
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              sx={{
-                color: '#ef4444',
-                '&:hover': { backgroundColor: '#fee2e2' },
-              }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Box>
         </Box>
       ),
     },
@@ -364,6 +399,16 @@ const CenterManageStudentsPage = () => {
             </Box>
           )}
         </Box>
+
+        {/* Marksheet Preview Dialog */}
+        <MarksheetPreviewDialog
+          open={previewDialogOpen}
+          onClose={() => {
+            setPreviewDialogOpen(false);
+            setSelectedStudentId('');
+          }}
+          marksheetId={selectedStudentId}
+        />
       </Box>
     </ErrorBoundary>
   );

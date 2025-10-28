@@ -122,7 +122,7 @@ function App() {
               <EnquiryListPage />
             </AdminLayout>
           } />
-          <Route path="/admin/view-marksheet/:registrationNo" element={
+          <Route path="/admin/view-marksheet/:marksheetId" element={
             <AdminLayout title="VIEW MARKSHEET">
               <ViewMarksheetPage />
             </AdminLayout>
@@ -168,7 +168,7 @@ function App() {
               <AddMarksheetPageCenter />
             </CenterLayout>
           } />
-          <Route path="/center/view-marksheet/:registrationNo" element={
+          <Route path="/center/view-marksheet/:marksheetId" element={
             <CenterLayout title="VIEW MARKSHEET">
               <CenterViewMarksheetPage />
             </CenterLayout>

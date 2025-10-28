@@ -13,6 +13,10 @@ export interface Student {
   year: string;
   session: string;
   createdAt: string;
+  isApprovedByAdmin?: boolean;
+  isMarksheetGenerated?: boolean;
+  isMarksheetAndCertificateApproved?: boolean;
+  studentId?: string;
 }
 
 export interface StudentsResponse {

@@ -1,8 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../api/axiosInstance';
 
+export interface SubjectData {
+  id: string;
+  subjectName: string;
+  marks: number;
+  internal: number;
+  total: number;
+  minMarks: number;
+  maxMarks: number;
+}
+
 interface ApproveMarksheetRequest {
   registrationNo: string;
+  subjects?: SubjectData[];
+  marksheetId?: string;
 }
 
 interface ApproveMarksheetResponse {
@@ -22,8 +34,9 @@ export const useApproveMarksheet = () => {
   return useMutation<ApproveMarksheetResponse, Error, ApproveMarksheetRequest>({
     mutationFn: approveMarksheet,
     onSuccess: () => {
-      // Invalidate and refetch students list
+      // Invalidate and refetch students list and marksheet data
       queryClient.invalidateQueries({ queryKey: ['students'] });
+      queryClient.invalidateQueries({ queryKey: ['marksheet'] });
     },
   });
 };
