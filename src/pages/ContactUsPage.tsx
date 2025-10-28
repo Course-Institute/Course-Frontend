@@ -17,6 +17,8 @@ import {
 import { Email, LocationOn, AccessTime, Send } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
+import LayoutWrapper from '../components/LayoutWrapper';
+import { layoutConfig } from '../theme/layout';
 
 const ContactUsPage = () => {
   const [inquiryForm, setInquiryForm] = useState({
@@ -64,21 +66,22 @@ const ContactUsPage = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Box 
-        sx={{ 
-          flex: 1, 
-          py: 8, 
-          background: `
-            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
-            url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <Container maxWidth="lg">
+      <LayoutWrapper backgroundColor="transparent">
+        <Box 
+          sx={{ 
+            flex: 1, 
+            py: 8, 
+            background: `
+              linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+              url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+            `,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed'
+          }}
+        >
+          <Container sx={layoutConfig.getContainerStyles()}>
           {/* Page Header */}
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <Typography
@@ -411,7 +414,8 @@ const ContactUsPage = () => {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+        </Box>
+      </LayoutWrapper>
 
       <FooterSection />
     </Box>
