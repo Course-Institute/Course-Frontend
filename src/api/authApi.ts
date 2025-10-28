@@ -103,25 +103,25 @@ export const centerLogin = async (credentials: { email: string; password: string
     
     // Transform the backend response to match the expected format
     const backendData = response.data;
-    if (backendData.status && backendData.data) {
+    if (backendData.data && backendData.data.user) {
       return {
-        status: backendData.status,
-        message: backendData.message,
+        status: true,
+        message: backendData.message || 'Center login successful',
         data: {
           user: {
-            id: backendData.data.centerId || '',
-            name: backendData.data.centerName || '',
+            id: backendData.data.user.centerId || '',
+            name: backendData.data.user.centerName || '',
             email: credentials.email,
             role: 'center',
-            centerId: backendData.data.centerId,
-            centerName: backendData.data.centerName,
+            centerId: backendData.data.user.centerId,
+            centerName: backendData.data.user.centerName,
           },
           token: backendData.data.token,
         },
       };
     }
     
-    return response.data;
+    throw new Error('Invalid response format from server');
   } catch (error: any) {
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);

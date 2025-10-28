@@ -4,7 +4,6 @@ import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import InquiryDialog from '../components/InquiryDialog';
 import LayoutWrapper from '../components/LayoutWrapper';
-import { layoutConfig } from '../theme/layout';
 
 const HomePage = () => {
   const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
