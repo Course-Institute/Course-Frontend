@@ -9,8 +9,7 @@ import {
 import {
   People,
   School,
-  CreditCard,
-  Upload,
+  Assignment,
   Payment,
   PendingActions,
   TrendingUp,
@@ -32,18 +31,11 @@ const CenterDashboardPage = () => {
       action: () => navigate('/center/add-student'),
     },
     {
-      title: 'Upload Results',
-      description: 'Upload student results',
-      icon: <Upload sx={{ fontSize: 40, color: '#3b82f6' }} />,
+      title: 'Add Marksheet',
+      description: 'Add student marksheet',
+      icon: <Assignment sx={{ fontSize: 40, color: '#3b82f6' }} />,
       color: '#3b82f6',
-      action: () => navigate('/center/upload-results'),
-    },
-    {
-      title: 'Generate ID Cards',
-      description: 'Generate student ID cards',
-      icon: <CreditCard sx={{ fontSize: 40, color: '#f59e0b' }} />,
-      color: '#f59e0b',
-      action: () => navigate('/admin/id-card-management'),
+      action: () => navigate('/center/add-marksheet'),
     },
   ];
 

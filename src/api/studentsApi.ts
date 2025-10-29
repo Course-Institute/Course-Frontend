@@ -35,6 +35,18 @@ export interface StudentsResponse {
   };
 }
 
+export interface StudentsFilters {
+  search?: string;
+  course?: string;
+  faculty?: string;
+  stream?: string;
+  year?: string;
+  session?: string;
+  isApprovedByAdmin?: boolean;
+  isMarksheetGenerated?: boolean;
+  isMarksheetAndCertificateApproved?: boolean;
+}
+
 export interface AddStudentData {
   candidateName: string;
   motherName: string;
@@ -81,9 +93,27 @@ export interface AddStudentResponse {
 }
 
 // Real API function to fetch students data
-export const getStudentsData = async (page: number = 1, limit: number = 10): Promise<StudentsResponse> => {
+export const getStudentsData = async (page: number = 1, limit: number = 10, filters?: StudentsFilters): Promise<StudentsResponse> => {
   try {
-    const response = await axiosInstance.get(`/api/student/students?page=${page}&limit=${limit}`);
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    // Add filter parameters if provided
+    if (filters) {
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.course) queryParams.append('course', filters.course);
+      if (filters.faculty) queryParams.append('faculty', filters.faculty);
+      if (filters.stream) queryParams.append('stream', filters.stream);
+      if (filters.year) queryParams.append('year', filters.year);
+      if (filters.session) queryParams.append('session', filters.session);
+      if (filters.isApprovedByAdmin !== undefined) queryParams.append('isApprovedByAdmin', filters.isApprovedByAdmin.toString());
+      if (filters.isMarksheetGenerated !== undefined) queryParams.append('isMarksheetGenerated', filters.isMarksheetGenerated.toString());
+      if (filters.isMarksheetAndCertificateApproved !== undefined) queryParams.append('isMarksheetAndCertificateApproved', filters.isMarksheetAndCertificateApproved.toString());
+    }
+
+    const response = await axiosInstance.get(`/api/student/students?${queryParams.toString()}`);
     return response.data;
   } catch (error: any) {
     if (error.response) {

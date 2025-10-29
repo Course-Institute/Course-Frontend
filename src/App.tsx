@@ -9,6 +9,7 @@ import ProgramDetailPage from './pages/ProgramDetailPage';
 import AlumniPage from './pages/AlumniPage';
 import AffiliationPage from './pages/AffiliationPage';
 import ContactUsPage from './pages/ContactUsPage';
+import VerificationPage from './pages/VerificationPage';
 import AdminLayout from './components/admin/AdminLayout';
 import CenterLayout from './components/center/CenterLayout';
 import DashboardPage from './pages/admin/DashboardPage';
@@ -52,6 +53,7 @@ function App() {
           <Route path="/programs/:programId" element={<ProgramDetailPage />} />
           <Route path="/alumni" element={<AlumniPage />} />
           <Route path="/affiliation" element={<AffiliationPage />} />
+          <Route path="/verification" element={<VerificationPage />} />
           <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/login" element={<LoginPage />} />
           

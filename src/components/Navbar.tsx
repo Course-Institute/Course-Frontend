@@ -59,6 +59,7 @@ const Navbar = () => {
     { id: 'programs', label: 'Programs', path: '/programs' },
     { id: 'alumni', label: 'Alumni', path: '/alumni' },
     { id: 'affiliation', label: 'Affiliation', path: '/affiliation' },
+    { id: 'verification', label: 'Verification', path: '/verification' },
     { id: 'contact', label: 'Contact Us', path: '/contact-us' },
   ];
 

@@ -1,11 +1,12 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import React from 'react';
-import { getStudentsData, type Student } from '../api/studentsApi';
+import { getStudentsData, type Student, type StudentsFilters } from '../api/studentsApi';
 import { useIntersectionObserver } from './useIntersectionObserver';
 
 interface UseStudentsDataOptions {
   limit?: number;
+  filters?: StudentsFilters;
 }
 
 interface StudentsPage {
@@ -25,13 +26,14 @@ const fetchStudents = async ({
   queryKey,
 }: {
   pageParam?: number;
-  queryKey: (string | number | undefined)[];
+  queryKey: (string | number | StudentsFilters | undefined)[];
 }): Promise<StudentsPage> => {
-  const [_key, limit] = queryKey;
+  const [_key, limit, filters] = queryKey;
   const pageSize = typeof limit === 'number' ? limit : 10;
+  const filterParams = filters as StudentsFilters | undefined;
 
   try {
-    const response = await getStudentsData(pageParam, pageSize);
+    const response = await getStudentsData(pageParam, pageSize, filterParams);
     return {
       students: response.data.students,
       pagination: {
@@ -50,13 +52,13 @@ const nextPageParam = (lastPage: StudentsPage): number | undefined => {
 };
 
 export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
-  const { limit = 10 } = options;
-  const lastElementRef = useRef<HTMLDivElement>(null);
+  const { limit = 10, filters } = options;
+  const lastElementRef = useRef<HTMLTableRowElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ['students', limit],
+      queryKey: ['students', limit, filters],
       queryFn: fetchStudents,
       getNextPageParam: nextPageParam,
       initialPageParam: 1,
@@ -75,14 +77,32 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
     return data?.pages[data.pages.length - 1]?.pagination ?? null;
   }, [data]);
 
+  // Reset scroll position when filters change (important for infinite scroll)
+  const filtersKey = useMemo(() => JSON.stringify(filters), [filters]);
+  
+  // Reset container scroll when filters change
+  React.useEffect(() => {
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop = 0;
+    }
+  }, [filtersKey]);
+
+  // Only set up intersection observer if we have students and container is ready
   useIntersectionObserver(
     tableContainerRef as React.RefObject<HTMLElement>,
     lastElementRef as React.RefObject<HTMLElement>,
     () => {
-      fetchNextPage();
+      // Only fetch if we have next page and not already fetching
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
     },
     hasNextPage ?? false,
-    isFetchingNextPage
+    isFetchingNextPage,
+    'entering',
+    '50px', // Trigger when 50px away from bottom (closer trigger point)
+    0.1,
+    filtersKey // Pass filtersKey as resetKey to reset observer when filters change
   );
 
   return {
