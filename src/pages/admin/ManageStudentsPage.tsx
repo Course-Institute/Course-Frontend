@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -17,8 +17,13 @@ import {
   InputAdornment,
   Card,
   CardContent,
+  Container,
+  Collapse,
+  Fade,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
-import { Search, Clear, FilterList } from '@mui/icons-material';
+import { Search, Clear, FilterList, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { useStudentsData } from '../../hooks/useStudentsData';
 import { useApproveStudent } from '../../hooks/useApproveStudent';
 import { useApproveMarksheet } from '../../hooks/useApproveMarksheet';
@@ -29,20 +34,24 @@ import ConfirmationDialog from '../../components/ConfirmationDialog';
 import EditableMarksheetDialog from '../../components/EditableMarksheetDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { type StudentsFilters } from '../../api/studentsApi';
+import { programsData } from '../../constants/programsData';
 
 const ManageStudentsPage = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<StudentsFilters>({});
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [approveMarksheetDialogOpen, setApproveMarksheetDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [filtersExpanded, setFiltersExpanded] = useState(!isMobile);
   
   // Debounced search term to avoid too many API calls
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   
   // Update debounced search term after 500ms delay
-  useMemo(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
@@ -75,12 +84,26 @@ const ManageStudentsPage = () => {
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
     const courses = [...new Set(students.map(s => s.course).filter(Boolean))];
-    const faculties = [...new Set(students.map(s => s.faculty).filter(Boolean))];
-    const streams = [...new Set(students.map(s => s.stream).filter(Boolean))];
     const years = [...new Set(students.map(s => s.year).filter(Boolean))];
     const sessions = [...new Set(students.map(s => s.session).filter(Boolean))];
     
-    return { courses, faculties, streams, years, sessions };
+    // Get all program categories from programsData
+    const programCategories = programsData.map(program => program.category);
+    
+    // Get all courses from programsData
+    const allCourses = programsData.flatMap(program => 
+      program.levels.flatMap(level => 
+        level.courses.map(course => course.name)
+      )
+    );
+    
+    return { 
+      courses, 
+      years, 
+      sessions, 
+      programCategories: [...new Set(programCategories)],
+      allCourses: [...new Set(allCourses)]
+    };
   }, [students]);
 
   // Filter handlers
@@ -89,6 +112,25 @@ const ManageStudentsPage = () => {
       ...prev,
       [key]: value || undefined,
     }));
+  };
+
+  // Handle program category change - filter courses based on selected category
+  const handleProgramCategoryChange = (category: string) => {
+    setFilters(prev => ({
+      ...prev,
+      programCategory: category || undefined,
+      course: undefined, // Reset course when category changes
+    }));
+  };
+
+  // Get courses for selected program category
+  const getCoursesForCategory = (category: string) => {
+    if (!category) return [];
+    const program = programsData.find(p => p.category === category);
+    if (!program) return [];
+    return program.levels.flatMap(level => 
+      level.courses.map(course => course.name)
+    );
   };
 
   const handleClearFilters = () => {
@@ -225,8 +267,15 @@ const ManageStudentsPage = () => {
       width: '180px',
       align: 'center',
       getActions: (row: any) => (
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexDirection: 'column', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: { xs: 0.75, sm: 1 }, 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          width: '100%',
+        }}>
+          <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1 }, width: '100%', justifyContent: 'center' }}>
             {row.isApprovedByAdmin ? (
               <Button
                 size="small"
@@ -236,15 +285,17 @@ const ManageStudentsPage = () => {
                   backgroundColor: '#10b981',
                   color: 'white',
                   textTransform: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  px: 2,
-                  py: 0.5,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600,
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.4, sm: 0.5 },
                   borderRadius: 2,
+                  minWidth: { xs: 'auto', sm: '100px' },
+                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
                   '&:disabled': {
                     backgroundColor: '#10b981',
                     color: 'white',
-                    opacity: 0.8,
+                    opacity: 0.9,
                   },
                 }}
               >
@@ -260,13 +311,16 @@ const ManageStudentsPage = () => {
                   backgroundColor: '#f59e0b',
                   color: 'white',
                   textTransform: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  px: 2,
-                  py: 0.5,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600,
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.4, sm: 0.5 },
                   borderRadius: 2,
+                  minWidth: { xs: 'auto', sm: '100px' },
+                  boxShadow: '0 2px 4px rgba(245, 158, 11, 0.2)',
                   '&:hover': {
                     backgroundColor: '#d97706',
+                    boxShadow: '0 4px 8px rgba(245, 158, 11, 0.3)',
                   },
                   '&:disabled': {
                     backgroundColor: '#9ca3af',
@@ -281,8 +335,15 @@ const ManageStudentsPage = () => {
           
           {/* Approve Marksheet Button - Show only if isMarksheetGenerated is true */}
           {row.isMarksheetGenerated && (
-            <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: { xs: 0.75, sm: 1 }, 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              width: '100%',
+              mt: { xs: 0.5, sm: 0 },
+            }}>
+              <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1 }, width: '100%', justifyContent: 'center' }}>
                 {row.isMarksheetAndCertificateApproved ? (
                   <Button
                     size="small"
@@ -292,15 +353,17 @@ const ManageStudentsPage = () => {
                       backgroundColor: '#8b5cf6',
                       color: 'white',
                       textTransform: 'none',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      px: 2,
-                      py: 0.5,
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      fontWeight: 600,
+                      px: { xs: 1.5, sm: 2 },
+                      py: { xs: 0.4, sm: 0.5 },
                       borderRadius: 2,
+                      minWidth: { xs: 'auto', sm: '140px' },
+                      boxShadow: '0 2px 4px rgba(139, 92, 246, 0.2)',
                       '&:disabled': {
                         backgroundColor: '#8b5cf6',
                         color: 'white',
-                        opacity: 0.8,
+                        opacity: 0.9,
                       },
                     }}
                   >
@@ -316,13 +379,16 @@ const ManageStudentsPage = () => {
                       backgroundColor: '#6366f1',
                       color: 'white',
                       textTransform: 'none',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      px: 2,
-                      py: 0.5,
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      fontWeight: 600,
+                      px: { xs: 1.5, sm: 2 },
+                      py: { xs: 0.4, sm: 0.5 },
                       borderRadius: 2,
+                      minWidth: { xs: 'auto', sm: '140px' },
+                      boxShadow: '0 2px 4px rgba(99, 102, 241, 0.2)',
                       '&:hover': {
                         backgroundColor: '#4f46e5',
+                        boxShadow: '0 4px 8px rgba(99, 102, 241, 0.3)',
                       },
                       '&:disabled': {
                         backgroundColor: '#9ca3af',
@@ -344,14 +410,18 @@ const ManageStudentsPage = () => {
                   borderColor: '#10b981',
                   color: '#10b981',
                   textTransform: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  px: 2,
-                  py: 0.5,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600,
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.4, sm: 0.5 },
                   borderRadius: 2,
+                  minWidth: { xs: 'auto', sm: '140px' },
+                  borderWidth: 2,
                   '&:hover': {
                     borderColor: '#059669',
                     backgroundColor: '#ecfdf5',
+                    borderWidth: 2,
+                    boxShadow: '0 2px 4px rgba(16, 185, 129, 0.1)',
                   },
                 }}
               >
@@ -365,636 +435,675 @@ const ManageStudentsPage = () => {
   ];
   return (
     <ErrorBoundary>
-      <Box sx={{ 
-        width: '100%', 
-        // height: '100vh',
+      <Container maxWidth={false} sx={{ 
+        width: '100%',
+        height: '100vh',
+        // py: { xs: 1.5, sm: 2 },
+        // px: { xs: 2, sm: 3, md: 4 },
         display: 'flex',
         flexDirection: 'column',
-        gap: 3,
+        gap: { xs: 2, sm: 3 },
+        backgroundColor: '#f8fafc',
         overflow: 'hidden',
       }}>
 
-
-
-      {/* Error Alert */}
-      {isError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          Failed to load students data: {error?.message || 'Unknown error'}
-          {(error as any)?.response?.status === 401 && (
-            <div style={{ marginTop: 8 }}>
-              <strong>Authentication Error:</strong> Please login again.
-            </div>
-          )}
-          {(error as any)?.response?.status === 403 && (
-            <div style={{ marginTop: 8 }}>
-              <strong>Access Denied:</strong> You don't have permission to access this data.
-            </div>
-          )}
-          {(error as any)?.code === 'NETWORK_ERROR' && (
-            <div style={{ marginTop: 8 }}>
-              <strong>Network Error:</strong> Please check your internet connection.
-            </div>
-          )}
-        </Alert>
-      )}
-
-      {/* Search and Filter Section */}
-      <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #f1f5f9' }}>
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <FilterList sx={{ mr: 1, color: '#6b7280' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-              Search & Filters
-            </Typography>
-            {activeFiltersCount > 0 && (
-              <Chip 
-                label={`${activeFiltersCount} active`} 
-                size="small" 
-                color="primary" 
-                sx={{ ml: 2 }} 
-              />
-            )}
-          </Box>
-
-          {/* Search Bar */}
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              fullWidth
-              placeholder="Search by name, registration number, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: searchTerm && (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="clear search"
-                      onClick={handleClearSearch}
-                      edge="end"
-                      size="small"
-                    >
-                      <Clear />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+        {/* Error Alert */}
+        {isError && (
+          <Fade in={isError}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3,
+                borderRadius: 2,
+                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)',
               }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
+            >
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                Failed to load students data: {error?.message || 'Unknown error'}
+              </Typography>
+              {(error as any)?.response?.status === 401 && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>Authentication Error:</strong> Please login again.
+                </Typography>
+              )}
+              {(error as any)?.response?.status === 403 && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>Access Denied:</strong> You don't have permission to access this data.
+                </Typography>
+              )}
+              {(error as any)?.code === 'NETWORK_ERROR' && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>Network Error:</strong> Please check your internet connection.
+                </Typography>
+              )}
+            </Alert>
+          </Fade>
+        )}
+
+        {/* Search and Filter Section */}
+        <Card sx={{ 
+          // mb: { xs: 1.5, sm: 2 },
+          borderRadius: 3,
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          border: '1px solid #e2e8f0',
+          background: 'linear-gradient(to bottom, #ffffff, #f8fafc)',
+          overflow: 'hidden',
+        }}>
+          <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+            {/* Header Section */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                mb: 2,
+                cursor: isMobile ? 'pointer' : 'default',
+              }}
+              onClick={() => isMobile && setFiltersExpanded(!filtersExpanded)}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box sx={{
+                  p: 0.75,
                   borderRadius: 2,
-                },
-              }}
-            />
-          </Box>
-
-          {/* Filter Row */}
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Course</InputLabel>
-                <Select
-                  value={filters.course || ''}
-                  label="Course"
-                  onChange={(e) => handleFilterChange('course', e.target.value)}
+                  backgroundColor: '#eff6ff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <FilterList sx={{ color: '#3b82f6', fontSize: { xs: '1.1rem', sm: '1.25rem' } }} />
+                </Box>
+                <Box>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700, 
+                      color: '#1e293b',
+                      fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                    }}
+                  >
+                    Search & Filters
+                  </Typography>
+                  {activeFiltersCount > 0 && (
+                    <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+                      {activeFiltersCount} active filter{activeFiltersCount !== 1 ? 's' : ''}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+              {isMobile && (
+                <IconButton 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFiltersExpanded(!filtersExpanded);
+                  }}
+                  sx={{ color: '#64748b' }}
                 >
-                  <MenuItem value="">All Courses</MenuItem>
-                  {uniqueValues.courses.map((course) => (
-                    <MenuItem key={course} value={course}>
-                      {course}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  {filtersExpanded ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              )}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                {activeFiltersCount > 0 && (
+                  <>
+                    <Chip 
+                      label={`${activeFiltersCount} active`} 
+                      size="small" 
+                      color="primary"
+                      sx={{ 
+                        fontWeight: 600,
+                        height: '28px',
+                        display: { xs: 'none', sm: 'flex' },
+                      }} 
+                    />
+                    <Button
+                      variant="outlined"
+                      onClick={handleClearFilters}
+                      startIcon={<Clear />}
+                      size="small"
+                      sx={{
+                        height: '32px',
+                        borderColor: '#ef4444',
+                        color: '#ef4444',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        px: 2,
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        textTransform: 'none',
+                        '&:hover': {
+                          borderColor: '#dc2626',
+                          backgroundColor: '#fef2f2',
+                          color: '#dc2626',
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
+                        },
+                      }}
+                    >
+                      Clear All
+                    </Button>
+                  </>
+                )}
+              </Box>
+            </Box>
 
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Faculty</InputLabel>
-                <Select
-                  value={filters.faculty || ''}
-                  label="Faculty"
-                  onChange={(e) => handleFilterChange('faculty', e.target.value)}
-                >
-                  <MenuItem value="">All Faculties</MenuItem>
-                  {uniqueValues.faculties.map((faculty) => (
-                    <MenuItem key={faculty} value={faculty}>
-                      {faculty}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Stream</InputLabel>
-                <Select
-                  value={filters.stream || ''}
-                  label="Stream"
-                  onChange={(e) => handleFilterChange('stream', e.target.value)}
-                >
-                  <MenuItem value="">All Streams</MenuItem>
-                  {uniqueValues.streams.map((stream) => (
-                    <MenuItem key={stream} value={stream}>
-                      {stream}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 1.5 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Year</InputLabel>
-                <Select
-                  value={filters.year || ''}
-                  label="Year"
-                  onChange={(e) => handleFilterChange('year', e.target.value)}
-                >
-                  <MenuItem value="">All Years</MenuItem>
-                  {uniqueValues.years.map((year) => (
-                    <MenuItem key={year} value={year}>
-                      {year}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 1.5 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Session</InputLabel>
-                <Select
-                  value={filters.session || ''}
-                  label="Session"
-                  onChange={(e) => handleFilterChange('session', e.target.value)}
-                >
-                  <MenuItem value="">All Sessions</MenuItem>
-                  {uniqueValues.sessions.map((session) => (
-                    <MenuItem key={session} value={session}>
-                      {session}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Approval Status</InputLabel>
-                <Select
-                  value={filters.isApprovedByAdmin === undefined ? '' : filters.isApprovedByAdmin.toString()}
-                  label="Approval Status"
-                  onChange={(e) => handleFilterChange('isApprovedByAdmin', e.target.value === '' ? undefined : e.target.value === 'true')}
-                >
-                  <MenuItem value="">All Status</MenuItem>
-                  <MenuItem value="false">Pending</MenuItem>
-                  <MenuItem value="true">Approved</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 1 }}>
-              <Button
+            {/* Search Bar */}
+            <Box sx={{ mb: 1.5 }}>
+              <TextField
                 fullWidth
-                variant="outlined"
-                onClick={handleClearFilters}
-                startIcon={<Clear />}
+                placeholder="Search by name, registration number, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size={isMobile ? "small" : "medium"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search sx={{ color: '#64748b' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchTerm && (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="clear search"
+                        onClick={handleClearSearch}
+                        edge="end"
+                        size="small"
+                        sx={{ color: '#64748b' }}
+                      >
+                        <Clear />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 sx={{
-                  height: '40px',
-                  borderColor: '#d1d5db',
-                  color: '#6b7280',
-                  '&:hover': {
-                    borderColor: '#9ca3af',
-                    backgroundColor: '#f9fafb',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    backgroundColor: '#ffffff',
+                    '&:hover': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '&.Mui-focused': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                      },
+                    },
                   },
                 }}
-              >
-                Clear
-              </Button>
-            </Grid>
-          </Grid>
-
-          {/* Active Filters Display */}
-          {activeFiltersCount > 0 && (
-            <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              <Typography variant="body2" sx={{ color: '#6b7280', mr: 1, alignSelf: 'center' }}>
-                Active filters:
-              </Typography>
-              {searchTerm && (
-                <Chip
-                  label={`Search: "${searchTerm}"`}
-                  onDelete={handleClearSearch}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.course && (
-                <Chip
-                  label={`Course: ${filters.course}`}
-                  onDelete={() => handleFilterChange('course', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.faculty && (
-                <Chip
-                  label={`Faculty: ${filters.faculty}`}
-                  onDelete={() => handleFilterChange('faculty', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.stream && (
-                <Chip
-                  label={`Stream: ${filters.stream}`}
-                  onDelete={() => handleFilterChange('stream', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.year && (
-                <Chip
-                  label={`Year: ${filters.year}`}
-                  onDelete={() => handleFilterChange('year', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.session && (
-                <Chip
-                  label={`Session: ${filters.session}`}
-                  onDelete={() => handleFilterChange('session', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              {filters.isApprovedByAdmin !== undefined && (
-                <Chip
-                  label={`Status: ${filters.isApprovedByAdmin ? 'Approved' : 'Pending'}`}
-                  onDelete={() => handleFilterChange('isApprovedByAdmin', undefined)}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
+              />
             </Box>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* <Grid container spacing={3} sx={{ flexShrink: 0 }}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #f1f5f9',
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  textAlign:"center",
-                  fontWeight: 'bold',
-                  color: '#1e293b',
-                  mb: 3,
-                }}
-              >
-                Student Status Update
-              </Typography>
-              <TextField
-                fullWidth
-                label="Registration Number"
-                variant="outlined"
-                value={registrationNo}
-                onChange={(e) => setRegistrationNo(e.target.value)}
-                sx={{ mb: 3 }}
-                disabled={isUpdating}
-                placeholder="Enter registration number"
-              />
-              <Box sx={{ mb: 3 }}>
-                <FormControlLabel
-                  control={
-                    <Switch 
-                      size="small" 
-                      checked={fullPayment}
-                      onChange={(e) => setFullPayment(e.target.checked)}
-                      disabled={isUpdating}
-                    />
-                  }
-                  label="FULL PAYMENT"
-                  sx={{ width: '100%', justifyContent: 'space-between', }}
-                />
+            {/* Filter Row */}
+            <Collapse in={filtersExpanded}>
+              <Box sx={{ mb: 0 }}>
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 2.5 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Program Category</InputLabel>
+                      <Select
+                        value={filters.programCategory || ''}
+                        label="Program Category"
+                        onChange={(e) => handleProgramCategoryChange(e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Categories</MenuItem>
+                        {uniqueValues.programCategories.map((category) => (
+                          <MenuItem key={category} value={category}>
+                            {category}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 2.5 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Course</InputLabel>
+                      <Select
+                        value={filters.course || ''}
+                        label="Course"
+                        onChange={(e) => handleFilterChange('course', e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Courses</MenuItem>
+                        {getCoursesForCategory(filters.programCategory || '').map((course) => (
+                          <MenuItem key={course} value={course}>
+                            {course}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 1.5 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Year</InputLabel>
+                      <Select
+                        value={filters.year || ''}
+                        label="Year"
+                        onChange={(e) => handleFilterChange('year', e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Years</MenuItem>
+                        {uniqueValues.years.map((year) => (
+                          <MenuItem key={year} value={year}>
+                            {year}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 1.5 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Session</InputLabel>
+                      <Select
+                        value={filters.session || ''}
+                        label="Session"
+                        onChange={(e) => handleFilterChange('session', e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Sessions</MenuItem>
+                        {uniqueValues.sessions.map((session) => (
+                          <MenuItem key={session} value={session}>
+                            {session}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Approval Status</InputLabel>
+                      <Select
+                        value={filters.isApprovedByAdmin === undefined ? '' : filters.isApprovedByAdmin.toString()}
+                        label="Approval Status"
+                        onChange={(e) => handleFilterChange('isApprovedByAdmin', e.target.value === '' ? undefined : e.target.value === 'true')}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Status</MenuItem>
+                        <MenuItem value="false">Pending</MenuItem>
+                        <MenuItem value="true">Approved</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+                    <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                      <InputLabel sx={{ fontWeight: 500 }}>Marksheet Status</InputLabel>
+                      <Select
+                        value={filters.isMarksheetGenerated === undefined ? '' : filters.isMarksheetGenerated.toString()}
+                        label="Marksheet Status"
+                        onChange={(e) => handleFilterChange('isMarksheetGenerated', e.target.value === '' ? undefined : e.target.value === 'true')}
+                        sx={{
+                          borderRadius: 2,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <MenuItem value="">All Status</MenuItem>
+                        <MenuItem value="false">Not Generated</MenuItem>
+                        <MenuItem value="true">Generated</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
               </Box>
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={handleStatusUpdate}
-                disabled={isUpdating || !registrationNo.trim()}
-                sx={{
-                  backgroundColor: '#3b82f6',
-                  '&:hover': { backgroundColor: '#2563eb' },
-                  '&:disabled': { backgroundColor: '#9ca3af' },
-                  textTransform: 'none',
-                  borderRadius: 2,
-                  py: 1.5,
-                }}
-              >
-                {isUpdating ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={16} color="inherit" />
-                    Updating...
-                  </Box>
-                ) : (
-                  'SAVE'
+            </Collapse>
+
+            {/* Active Filters Display */}
+            {activeFiltersCount > 0 && (
+              <Box sx={{ 
+                mt: 1.5, 
+                pt: 1.5,
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: 1,
+                alignItems: 'center',
+              }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: '#64748b', 
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  }}
+                >
+                  Active filters:
+                </Typography>
+                {searchTerm && (
+                  <Chip
+                    label={`Search: "${searchTerm}"`}
+                    onDelete={handleClearSearch}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
                 )}
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #f1f5f9',
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  textAlign:"center",
-                  fontWeight: 'bold',
-                  color: '#1e293b',
-                  mb: 3,
-                }}
-              >
-                Results Management
-              </Typography>
-              <TextField
-                fullWidth
-                label="STUDENTS ID"
-                variant="outlined"
-                sx={{ mb: 3 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: '#10b981',
-                    '&:hover': { backgroundColor: '#059669' },
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    py: 1.5,
-                  }}
-                >
-                  UPLOAD RESULT
-                </Button>
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderColor: '#3b82f6',
-                    color: '#3b82f6',
-                    '&:hover': { 
-                      borderColor: '#2563eb',
-                      backgroundColor: '#eff6ff',
-                    },
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    py: 1.5,
-                  }}
-                >
-                  EDIT RESULT
-                </Button>
+                {filters.programCategory && (
+                  <Chip
+                    label={`Category: ${filters.programCategory}`}
+                    onDelete={() => handleProgramCategoryChange('')}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
+                {filters.course && (
+                  <Chip
+                    label={`Course: ${filters.course}`}
+                    onDelete={() => handleFilterChange('course', undefined)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
+                {filters.year && (
+                  <Chip
+                    label={`Year: ${filters.year}`}
+                    onDelete={() => handleFilterChange('year', undefined)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
+                {filters.session && (
+                  <Chip
+                    label={`Session: ${filters.session}`}
+                    onDelete={() => handleFilterChange('session', undefined)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
+                {filters.isApprovedByAdmin !== undefined && (
+                  <Chip
+                    label={`Status: ${filters.isApprovedByAdmin ? 'Approved' : 'Pending'}`}
+                    onDelete={() => handleFilterChange('isApprovedByAdmin', undefined)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
+                {filters.isMarksheetGenerated !== undefined && (
+                  <Chip
+                    label={`Marksheet: ${filters.isMarksheetGenerated ? 'Generated' : 'Not Generated'}`}
+                    onDelete={() => handleFilterChange('isMarksheetGenerated', undefined)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 500,
+                      borderColor: '#3b82f6',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#3b82f6',
+                        '&:hover': {
+                          color: '#2563eb',
+                        },
+                      },
+                    }}
+                  />
+                )}
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            )}
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #f1f5f9',
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  textAlign:"center",
-                  fontWeight: 'bold',
-                  color: '#1e293b',
-                  mb: 3,
-                }}
-              >
-                Student Details
-              </Typography>
-              <TextField
-                fullWidth
-                label="STUDENTS ID"
-                variant="outlined"
-                sx={{ mb: 3 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: '#8b5cf6',
-                    '&:hover': { backgroundColor: '#7c3aed' },
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    py: 1.5,
-                  }}
-                >
-                  View Forms
-                </Button>
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderColor: '#f59e0b',
-                    color: '#f59e0b',
-                    '&:hover': { 
-                      borderColor: '#d97706',
-                      backgroundColor: '#fffbeb',
-                    },
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    py: 1.5,
-                  }}
-                >
-                  VIEW ID CARD
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid> */}
 
-      {/* Students Data Table - Takes remaining space */}
-      <Box sx={{ }}>
-        {isError ? (
-          <Box sx={{ 
+        {/* Students Data Table */}
+        <Card sx={{ 
+          borderRadius: 3,
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+        }}>
+          <CardContent sx={{ 
+            p: { xs: 2, sm: 3 }, 
+            flex: 1, 
             display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            flexGrow: 1,
-            p: 4 ,
-            height: '90%',
+            flexDirection: 'column', 
+            pb: { xs: 2, sm: 3 },
+            minHeight: 0,
           }}>
-            <CircularProgress size={40} />
-          </Box>
-        ) : (
-          <Box 
-            ref={tableContainerRef}
-            sx={{ height: '95%', display: 'flex', flexDirection: 'column', flex: 1 }}
-          >
             {/* Student Count Display */}
-            <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
+            <Box sx={{ 
+              mb: 1, 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' },
+              justifyContent: 'space-between', 
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              gap: 1,
+              flexShrink: 0,
+              // pb: 2,
+              borderBottom: '2px solid #e2e8f0',
+            }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: '#1e293b',
+                  fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                }}
+              >
                 Students List
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="body1" sx={{ color: '#64748b', fontWeight: 500 }}>
-                  Showing <strong style={{ color: '#3b82f6' }}>{students.length}</strong> student{students.length !== 1 ? 's' : ''}
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: '#64748b', 
+                    fontWeight: 500,
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                  }}
+                >
+                  Showing <Box component="strong" sx={{ color: '#3b82f6', fontWeight: 700 }}>{students.length}</Box> student{students.length !== 1 ? 's' : ''}
                   {pagination?.totalCount && pagination.totalCount > students.length && (
-                    <span> of <strong style={{ color: '#3b82f6' }}>{pagination.totalCount.toLocaleString()}</strong></span>
+                    <span> of <Box component="strong" sx={{ color: '#3b82f6', fontWeight: 700 }}>{pagination.totalCount.toLocaleString()}</Box></span>
                   )}
                 </Typography>
               </Box>
             </Box>
             
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <Table
-                columns={columns}
-                rows={students}
-                stickyHeader={true}
-                lastRowRef={lastElementRef as React.RefObject<HTMLTableRowElement>}
-                tableContainerSx={{
-                  height: '100%',
-                  maxHeight: '100%',
-                borderRadius: 3,
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #f1f5f9',
-                overflow: 'auto',
-                '&::-webkit-scrollbar': {
-                  width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: '#f1f1f1',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: '#c1c1c1',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                  background: '#a8a8a8',
-                },
-                '& .MuiTable-root': {
-                  '& .MuiTableHead-root': {
-                    '& .MuiTableCell-root': {
-                      backgroundColor: '#f5f5f5',
-                      color: '#333',
-                      fontWeight: 'bold',
-                      borderBottom: '2px solid #e0e0e0',
-                      position: 'sticky',
-                      top: 0,
-                      zIndex: 1,
-                    },
-                  },
-                  '& .MuiTableBody-root': {
-                    '& .MuiTableRow-root': {
-                      '&:hover': {
-                        backgroundColor: '#e3f2fd !important',
-                      },
-                      '& .MuiTableCell-root': {
-                        borderBottom: '1px solid #f0f0f0',
-                      },
-                    },
-                  },
-                },
-              }}
-            />
-            
-            {isFetchingNextPage && (
-              <Box sx={{ 
+            <Box 
+              ref={tableContainerRef}
+              sx={{ 
+                flex: 1, 
                 display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center',
-                p: 2,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(4px)',
-                zIndex: 2,
-              }}>
-                <CircularProgress size={24} />
-                <Typography variant="body2" sx={{ ml: 1 }}>
-                  Loading more students...
-                </Typography>
-              </Box>
-            )}
+                flexDirection: 'column', 
+                overflow: 'hidden',
+                minHeight: 0,
+                position: 'relative',
+              }}
+            >
+              {students.length === 0 && !isError ? (
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  flex: 1,
+                  py: 8,
+                  gap: 2,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#64748b', fontWeight: 600 }}>
+                    No students found
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                    Try adjusting your search or filters
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  <Table
+                    columns={columns}
+                    rows={students}
+                    stickyHeader={true}
+                    lastRowRef={lastElementRef as React.RefObject<HTMLTableRowElement>}
+                    tableContainerSx={{
+                      height: '100%',
+                      maxHeight: '100%',
+                      borderRadius: 2,
+                      boxShadow: 'none',
+                      border: '1px solid #e2e8f0',
+                      overflow: 'auto',
+                      backgroundColor: '#ffffff',
+                      '&::-webkit-scrollbar': {
+                        width: '8px',
+                        height: '8px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        background: '#f1f5f9',
+                        borderRadius: '4px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        background: '#cbd5e1',
+                        borderRadius: '4px',
+                        '&:hover': {
+                          background: '#94a3b8',
+                        },
+                      },
+                    }}
+                  />
+                  
+                  {isFetchingNextPage && (
+                    <Box sx={{ 
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      alignItems: 'center',
+                      p: 2,
+                      backgroundColor: 'rgba(248, 250, 252, 0.95)',
+                      backdropFilter: 'blur(4px)',
+                      borderTop: '1px solid #e2e8f0',
+                      zIndex: 10,
+                    }}>
+                      <CircularProgress size={24} sx={{ color: '#3b82f6' }} />
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          ml: 1,
+                          color: '#64748b',
+                          fontWeight: 500,
+                        }}
+                      >
+                        Loading more students...
+                      </Typography>
+                    </Box>
+                  )}
+                </>
+              )}
             </Box>
-          </Box>
-        )}
-      </Box>
+          </CardContent>
+        </Card>
 
 
-      {/* Approve Student Confirmation Dialog */}
-      <ConfirmationDialog
-        open={approveDialogOpen}
-        onClose={handleApproveCancel}
-        onConfirm={handleApproveConfirm}
-        title="Approve Student"
-        message={`Are you sure you want to approve student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})? This action cannot be undone.`}
-        confirmText="Approve"
-        cancelText="Cancel"
-        isLoading={approveStudentMutation.isPending}
-        severity="warning"
-      />
-
-      {/* Editable Marksheet Dialog */}
-      {selectedStudent && (
-        <EditableMarksheetDialog
-          open={approveMarksheetDialogOpen}
-          onClose={handleApproveMarksheetDialogClose}
-          studentId={selectedStudent.studentId || selectedStudent._id || selectedStudent.id}
-          registrationNo={selectedStudent.registrationNo}
-          studentName={selectedStudent.candidateName}
-          marksheetId={selectedStudent.marksheetId}
+        {/* Approve Student Confirmation Dialog */}
+        <ConfirmationDialog
+          open={approveDialogOpen}
+          onClose={handleApproveCancel}
+          onConfirm={handleApproveConfirm}
+          title="Approve Student"
+          message={`Are you sure you want to approve student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})? This action cannot be undone.`}
+          confirmText="Approve"
+          cancelText="Cancel"
+          isLoading={approveStudentMutation.isPending}
+          severity="warning"
         />
-      )}
-    </Box>
+
+        {/* Editable Marksheet Dialog */}
+        {selectedStudent && (
+          <EditableMarksheetDialog
+            open={approveMarksheetDialogOpen}
+            onClose={handleApproveMarksheetDialogClose}
+            studentId={selectedStudent.studentId || selectedStudent._id || selectedStudent.id}
+            registrationNo={selectedStudent.registrationNo}
+            studentName={selectedStudent.candidateName}
+            marksheetId={selectedStudent.marksheetId}
+          />
+        )}
+      </Container>
     </ErrorBoundary>
   );
 };

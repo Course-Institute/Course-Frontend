@@ -1,49 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import axiosInstance from '../api/axiosInstance';
-
-export interface Bill {
-  _id: string;
-  studentName: string;
-  registrationNo: string;
-  course: string;
-  amount: number;
-  paymentMethod: string;
-  billDate: string;
-  dueDate: string;
-  description: string;
-  status: 'pending' | 'paid' | 'overdue';
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BillListResponse {
-  status: boolean;
-  message: string;
-  data: {
-    bills: Bill[];
-    totalCount: number;
-    hasMore: boolean;
-    totalPages: number;
-  };
-}
-
-export interface BillFilters {
-  query?: string;
-  status?: string;
-  paymentMethod?: string;
-  course?: string;
-  centerId?: string;
-}
+import { getBillsListPaginated, type Bill, type BillListResponse, type BillFilters } from '../api/billApi';
 
 const fetchBillList = async ({ pageParam = 1, filters = {} }: { pageParam?: number; filters?: BillFilters }): Promise<BillListResponse> => {
-  const response = await axiosInstance.post('/api/admin/getBillsList', {
-    query: filters.query || '',
-    page: pageParam,
-    limit: 10,
-    ...filters
-  });
-  
-  return response.data;
+  return await getBillsListPaginated(pageParam, filters);
 };
 
 export const useBillList = (filters: BillFilters = {}) => {
@@ -61,3 +20,6 @@ export const useBillList = (filters: BillFilters = {}) => {
     refetchOnWindowFocus: false,
   });
 };
+
+// Re-export types for convenience
+export type { Bill, BillListResponse, BillFilters };
