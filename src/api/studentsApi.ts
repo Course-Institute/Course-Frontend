@@ -45,6 +45,7 @@ export interface StudentsFilters {
   isApprovedByAdmin?: boolean;
   isMarksheetGenerated?: boolean;
   isMarksheetAndCertificateApproved?: boolean;
+  programCategory?: string;
 }
 
 export interface AddStudentData {
@@ -111,6 +112,7 @@ export const getStudentsData = async (page: number = 1, limit: number = 10, filt
       if (filters.isApprovedByAdmin !== undefined) queryParams.append('isApprovedByAdmin', filters.isApprovedByAdmin.toString());
       if (filters.isMarksheetGenerated !== undefined) queryParams.append('isMarksheetGenerated', filters.isMarksheetGenerated.toString());
       if (filters.isMarksheetAndCertificateApproved !== undefined) queryParams.append('isMarksheetAndCertificateApproved', filters.isMarksheetAndCertificateApproved.toString());
+      if (filters.programCategory) queryParams.append('programCategory', filters.programCategory);
     }
 
     const response = await axiosInstance.get(`/api/student/students?${queryParams.toString()}`);
