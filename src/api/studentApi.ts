@@ -85,3 +85,22 @@ export const downloadStudentIdCard = async (registrationNumber?: string): Promis
     }
   }
 };
+
+// API function to verify student by registration number (public endpoint)
+export const verifyStudentByRegistrationNo = async (registrationNo: string): Promise<StudentProfileResponse> => {
+  try {
+    const response = await axiosInstance.get(`api/student/profile?registrationNo=${registrationNo}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to verify student. Please try again.';
+      const err = new Error(errorMessage) as any;
+      err.response = error.response;
+      throw err;
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
+};
