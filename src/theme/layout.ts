@@ -3,13 +3,13 @@ export const layoutConfig = {
   // Main content width for desktop
   contentWidth: {
     xs: '100%',      // Mobile: full width
-    md: '75%',       // Desktop: 75% width
+    md: '100%',      // Desktop: 100% width (full width to reduce white space)
   },
   
   // Margin for centering content
   contentMargin: {
     xs: 0,           // Mobile: no margin
-    md: '0 auto',    // Desktop: center horizontally
+    md: 0,           // Desktop: no margin (full width)
   },
   
   // Container padding

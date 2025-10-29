@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -27,8 +27,26 @@ import {
 } from '../../utils/marksheetValidation';
 
 
-const centerId = localStorage.getItem('centerId');
 const AddMarksheetPageCenter = () => {
+  const [centerId, setCenterId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Read centerId from localStorage when component mounts or when it changes
+    const id = localStorage.getItem('centerId');
+    setCenterId(id);
+    
+    // Listen for storage changes (in case centerId is updated in another tab/window)
+    const handleStorageChange = () => {
+      const updatedId = localStorage.getItem('centerId');
+      setCenterId(updatedId);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [subjects, setSubjects] = useState<SubjectData[]>([]);
   const [currentSubject, setCurrentSubject] = useState({

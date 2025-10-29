@@ -13,9 +13,14 @@ const InstituteLogo: React.FC<InstituteLogoProps> = ({ sx, width = 30, height = 
       component="img"
       src="/institute-logo.svg"
       alt="MIVPS Logo"
+      onError={(e: any) => {
+        // Fallback if logo fails to load
+        e.target.style.display = 'none';
+      }}
       sx={{
         width,
         height,
+        objectFit: 'contain',
         ...sx,
       }}
     />

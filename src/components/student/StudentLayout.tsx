@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Lock as LockIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import StudentSidebar from './StudentSidebar';
@@ -45,11 +44,6 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
     window.location.href = '/login?role=student';
   };
 
-  const handlePasswordChange = () => {
-    // TODO: Implement password change functionality
-    console.log('Password change clicked');
-  };
-
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
@@ -61,17 +55,30 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
       )}
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box 
+        sx={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          marginLeft: sidebarOpen ? '280px' : 0,
+          transition: 'margin-left 0.3s ease',
+        }}
+      >
         {/* Top App Bar */}
         <AppBar 
-          position="static" 
+          position="fixed" 
           elevation={0}
           sx={{ 
             backgroundColor: 'white',
-            borderBottom: '1px solid #e0e0e0',
+            borderBottom: '1px solid #e5e7eb',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+            width: sidebarOpen ? 'calc(100% - 280px)' : '100%',
+            marginLeft: sidebarOpen ? '280px' : 0,
+            transition: 'width 0.3s ease, margin-left 0.3s ease',
+            zIndex: 900,
           }}
         >
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
             {/* Left side - Menu button and breadcrumbs */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <IconButton
@@ -79,15 +86,27 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
                 color="inherit"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 sx={{ 
-                  color: '#666',
+                  color: '#64748b',
                   mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#f1f5f9',
+                    color: '#1976d2',
+                  },
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <MenuIcon />
               </IconButton>
 
               {/* Breadcrumbs */}
-              <Breadcrumbs sx={{ color: '#666' }}>
+              <Breadcrumbs 
+                sx={{ 
+                  color: '#64748b',
+                  '& .MuiBreadcrumbs-separator': {
+                    color: '#94a3b8',
+                  },
+                }}
+              >
                 {breadcrumbs.map((crumb, index) => (
                   <Link
                     key={index}
@@ -96,7 +115,10 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
                     color="inherit"
                     sx={{ 
                       fontSize: '0.875rem',
+                      fontWeight: index === breadcrumbs.length - 1 ? 600 : 400,
+                      color: index === breadcrumbs.length - 1 ? '#1e293b' : '#64748b',
                       '&:hover': { color: '#1976d2' },
+                      transition: 'color 0.2s ease',
                     }}
                   >
                     {crumb.label}
@@ -108,30 +130,21 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
             {/* Right side - Actions */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Button
-                startIcon={<LockIcon />}
-                onClick={handlePasswordChange}
-                sx={{
-                  color: '#666',
-                  textTransform: 'none',
-                  fontSize: '0.875rem',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  },
-                }}
-              >
-                Password change
-              </Button>
-              
-              <Button
                 startIcon={<LogoutIcon />}
                 onClick={handleLogout}
                 sx={{
-                  color: '#666',
+                  color: '#64748b',
                   textTransform: 'none',
                   fontSize: '0.875rem',
+                  fontWeight: 500,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    backgroundColor: '#f1f5f9',
+                    color: '#dc2626',
                   },
+                  transition: 'all 0.2s ease',
                 }}
               >
                 Logout
@@ -141,7 +154,14 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({
         </AppBar>
 
         {/* Page Content */}
-        <Box sx={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+        <Box 
+          sx={{ 
+            flex: 1, 
+            background: 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)',
+            marginTop: '64px', // AppBar height
+            minHeight: 'calc(100vh - 64px)',
+          }}
+        >
           {children}
         </Box>
       </Box>

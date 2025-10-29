@@ -9,20 +9,9 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  Dashboard,
   Person,
-  Support,
-  Payment,
-  Assignment,
-  Science,
-  Build,
-  Quiz,
-  Description,
-  School,
-  LocalShipping,
   FilePresent,
 } from '@mui/icons-material';
-import InstituteLogo from '../InstituteLogo';
 
 interface StudentSidebarProps {
   activeItem: string;
@@ -31,18 +20,8 @@ interface StudentSidebarProps {
 
 const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Dashboard /> },
     { id: 'profile', label: 'Student Profile', icon: <Person /> },
     { id: 'marksheet', label: 'Marksheet', icon: <FilePresent /> },
-    { id: 'support', label: 'Support', icon: <Support /> },
-    { id: 'fees', label: 'Fees', icon: <Payment /> },
-    { id: 'assignments', label: 'Assignments', icon: <Assignment /> },
-    { id: 'lab', label: 'Lab', icon: <Science /> },
-    { id: 'project', label: 'Project', icon: <Build /> },
-    { id: 'exam-form', label: 'Examination Form', icon: <Quiz /> },
-    { id: 'question-paper', label: 'Question Paper', icon: <Description /> },
-    { id: 'result', label: 'Result', icon: <School /> },
-    { id: 'courier', label: 'Courier', icon: <LocalShipping /> },
   ];
 
   return (
@@ -54,6 +33,10 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
         color: 'white',
         display: 'flex',
         flexDirection: 'column',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 1000,
       }}
     >
       {/* Logo Section */}
@@ -66,7 +49,44 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
-        <InstituteLogo width={40} height={40} sx={{ filter: 'brightness(0) invert(1)' }} />
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            borderRadius: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          <Box
+            component="img"
+            src="/institute-logo.svg"
+            alt="MIVPS Logo"
+            sx={{
+              width: '100%',
+              height: '100%',
+              padding: 0.5,
+              objectFit: 'contain',
+              filter: 'brightness(0) invert(1)',
+            }}
+            onError={(e: any) => {
+              // Hide image if it fails to load
+              e.target.style.display = 'none';
+              // Show a simple "M" as fallback
+              const parent = e.target.parentElement;
+              if (parent && !parent.querySelector('.logo-fallback')) {
+                const fallback = document.createElement('div');
+                fallback.className = 'logo-fallback';
+                fallback.textContent = 'M';
+                fallback.style.cssText = 'color: white; font-weight: bold; font-size: 24px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;';
+                parent.appendChild(fallback);
+              }
+            }}
+          />
+        </Box>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
             MIVPS
@@ -85,13 +105,16 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
               <ListItemButton
                 onClick={() => onItemClick(item.id)}
                 sx={{
-                  borderRadius: 1,
+                  borderRadius: 2,
                   mx: 1,
+                  my: 0.5,
                   backgroundColor: activeItem === item.id ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
                     backgroundColor: activeItem === item.id 
                       ? 'rgba(255, 255, 255, 0.25)' 
                       : 'rgba(255, 255, 255, 0.1)',
+                    transform: 'translateX(4px)',
                   },
                 }}
               >
@@ -102,8 +125,9 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
                   primary={item.label}
                   sx={{
                     '& .MuiListItemText-primary': {
-                      fontSize: '0.9rem',
-                      fontWeight: activeItem === item.id ? 'bold' : 'normal',
+                      fontSize: '0.95rem',
+                      fontWeight: activeItem === item.id ? 700 : 500,
+                      letterSpacing: '0.3px',
                     },
                   }}
                 />

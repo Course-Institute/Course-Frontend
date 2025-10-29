@@ -36,6 +36,8 @@ export interface StudentProfile {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  isMarksheetAndCertificateApproved?: boolean;
+  isApprovedByAdmin?: boolean;
 }
 
 export interface StudentProfileResponse {
