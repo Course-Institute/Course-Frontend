@@ -196,7 +196,7 @@ const Navbar = () => {
       <Box
         sx={{
           width: '100%',
-          height: '40vh',
+          height: { xs: '90px', sm: '22vh', md: '35vh' },
           backgroundImage: 'url(/images/header/header-banner.png)',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
