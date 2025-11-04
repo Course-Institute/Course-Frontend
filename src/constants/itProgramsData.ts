@@ -5,7 +5,7 @@ export const itProgramsData: Program = {
   category: "IT",
   focusArea: "Information Technology, Computer Applications",
   description: "Master the digital world with our comprehensive IT programs. From basic computer applications to advanced programming, web design, and digital marketing. Our courses prepare students for thriving careers in the technology sector.",
-  color: "#7c3aed",
+  color: "#00184dff",
   image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
   levels: [
     {

@@ -92,13 +92,13 @@ const Sidebar = ({ open, onClose, drawerWidth }: SidebarProps) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              backgroundColor: '#1e293b',
+              backgroundColor: '#ffffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <InstituteLogo width={24} height={24} />
+            <InstituteLogo width={65} height={65} />
           </Box>
           <Typography
             variant="h6"

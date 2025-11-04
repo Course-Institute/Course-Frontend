@@ -5,7 +5,7 @@ export const vocationalProgramsData: Program = {
   category: "Vocational",
   focusArea: "Technical skills, trades, practical training",
   description: "Build practical skills for immediate employment. Our vocational programs cover technical trades, crafts, and specialized skills that prepare students for hands-on careers in various industries.",
-  color: "#f59e0b",
+  color: "#00184dff",
   image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
   levels: [
     {

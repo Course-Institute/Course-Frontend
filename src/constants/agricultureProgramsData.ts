@@ -5,7 +5,7 @@ export const agricultureProgramsData: Program = {
   category: "Agriculture",
   focusArea: "Farming, horticulture, food production, agribusiness",
   description: "Cultivate success in agriculture and food production. Our programs cover modern farming techniques, horticulture, dairy farming, food technology, and agribusiness management. Students learn sustainable practices and innovative methods to excel in the agricultural sector.",
-  color: "#16a34a",
+  color: "#00184dff",
   image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
   levels: [
     {

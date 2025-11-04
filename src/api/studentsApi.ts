@@ -168,3 +168,53 @@ export const addStudent = async (formData: FormData): Promise<AddStudentResponse
     }
   }
 };
+
+// Delete a student by ID
+export const deleteStudent = async (studentId: string) => {
+  try {
+    const response = await axiosInstance.post('/api/student/delete-student', { studentId });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to delete student. Please try again.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
+};
+
+// Update a student by ID
+export const updateStudent = async (studentId: string, data: Partial<Student>) => {
+  try {
+    const response = await axiosInstance.post('/api/student/update-student', { studentId, ...data });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to update student. Please try again.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
+};
+
+export const getStudentDetails = async (studentId: string) => {
+  try {
+    const response = await axiosInstance.post('/api/student/get-student', { studentId });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data?.message || 'Failed to fetch student details. Please try again.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+  }
+};

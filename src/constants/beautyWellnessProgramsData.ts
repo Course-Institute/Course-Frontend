@@ -5,7 +5,7 @@ export const beautyWellnessProgramsData: Program = {
   category: "Beauty & Wellness",
   focusArea: "Beauty therapy, spa treatments, wellness",
   description: "Transform lives through beauty and wellness. Our programs train students in professional beauty therapy, spa treatments, hair styling, and wellness management. Graduates are prepared for careers in salons, spas, wellness centers, and beauty industry.",
-  color: "#ec4899",
+  color: "#00184dff",
   image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
   levels: [
     {

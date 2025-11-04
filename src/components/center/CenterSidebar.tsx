@@ -92,13 +92,13 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              backgroundColor: '#1e293b',
+              backgroundColor: '#f7f7f7ff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <InstituteLogo width={24} height={24} />
+            <InstituteLogo width={60} height={60} />
           </Box>
           <Typography
             variant="h6"

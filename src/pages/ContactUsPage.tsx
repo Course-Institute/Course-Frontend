@@ -53,13 +53,12 @@ const ContactUsPage = () => {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <LayoutWrapper backgroundColor="transparent">
+      <LayoutWrapper>
         <div style={{ 
           flex: 1, 
           padding: '64px 0', 
           background: `
-            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
-            url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+          linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%)
           `,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -140,7 +139,8 @@ const ContactUsPage = () => {
                             borderRadius: '8px',
                             fontSize: '1rem',
                             transition: 'border-color 0.3s ease',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            backgroundColor: 'white'
                           }}
                           onFocus={(e) => e.target.style.borderColor = '#2563eb'}
                           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -167,7 +167,8 @@ const ContactUsPage = () => {
                             borderRadius: '8px',
                             fontSize: '1rem',
                             transition: 'border-color 0.3s ease',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            backgroundColor: 'white'
                           }}
                           onFocus={(e) => e.target.style.borderColor = '#2563eb'}
                           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -228,7 +229,8 @@ const ContactUsPage = () => {
                             borderRadius: '8px',
                             fontSize: '1rem',
                             transition: 'border-color 0.3s ease',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            backgroundColor: 'white'
                           }}
                           onFocus={(e) => e.target.style.borderColor = '#2563eb'}
                           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -292,7 +294,8 @@ const ContactUsPage = () => {
                           transition: 'border-color 0.3s ease',
                           boxSizing: 'border-box',
                           resize: 'vertical',
-                          fontFamily: 'inherit'
+                          fontFamily: 'inherit',
+                          backgroundColor: 'white'
                         }}
                         onFocus={(e) => e.target.style.borderColor = '#2563eb'}
                         onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -394,9 +397,7 @@ const ContactUsPage = () => {
                         overflowWrap: 'break-word',
                         hyphens: 'auto'
                       }}>
-                       Mahavir Institute of Vocational & Paramedical Science
-Near Railway Station, Main Road
-Delhi, India - 110001
+                        Gaur City 1, Sector-04, Greater Noida, Uttar Pradesh
                       </p>
                     </div>
                   </div>
@@ -432,7 +433,16 @@ Delhi, India - 110001
                         wordWrap: 'break-word',
                         overflowWrap: 'break-word'
                       }}>
-                        info@mahavirinstitute.com
+                        info@mivpsa.in
+                      </p>
+                      <p style={{
+                        color: '#64748b',
+                        margin: 0,
+                        fontSize: '1rem',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word'
+                      }}>
+                        admission@mivpsa.in
                       </p>
                     </div>
                   </div>

@@ -5,7 +5,7 @@ export const apparelProgramsData: Program = {
   category: "Apparel",
   focusArea: "Fashion design, tailoring, garment production",
   description: "Master the art of fashion and garment creation. Our apparel programs cover fashion design, tailoring, garment production, and merchandising. Students learn cutting-edge techniques and traditional craftsmanship to excel in the fashion industry.",
-  color: "#8b5cf6",
+  color: "#00184dff",
   image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
   levels: [
     {

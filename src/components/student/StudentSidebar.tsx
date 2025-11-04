@@ -29,7 +29,7 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
       sx={{
         width: 280,
         height: '100vh',
-        backgroundColor: '#1976d2',
+        backgroundColor: '#004e8dff',
         color: 'white',
         display: 'flex',
         flexDirection: 'column',
@@ -51,10 +51,10 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
       >
         <Box
           sx={{
-            width: 40,
-            height: 40,
-            borderRadius: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            width: 65,
+            height: 65,
+            borderRadius: 10,
+            backgroundColor: '#006bb3ff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -68,9 +68,8 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
             sx={{
               width: '100%',
               height: '100%',
-              padding: 0.5,
+              padding: 0,
               objectFit: 'contain',
-              filter: 'brightness(0) invert(1)',
             }}
             onError={(e: any) => {
               // Hide image if it fails to load
@@ -88,7 +87,7 @@ const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick
           />
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'white' }}>
             MIVPS
           </Typography>
           <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.75rem' }}>

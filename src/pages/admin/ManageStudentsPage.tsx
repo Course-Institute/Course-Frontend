@@ -23,7 +23,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import { Search, Clear, FilterList, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Search, Clear, FilterList, ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
 import { useStudentsData } from '../../hooks/useStudentsData';
 import { useApproveStudent } from '../../hooks/useApproveStudent';
 import { useApproveMarksheet } from '../../hooks/useApproveMarksheet';
@@ -35,6 +35,7 @@ import EditableMarksheetDialog from '../../components/EditableMarksheetDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { type StudentsFilters } from '../../api/studentsApi';
 import { programsData } from '../../constants/programsData';
+import { useDeleteStudent } from '../../hooks/useStudentsData';
 
 const ManageStudentsPage = () => {
   const navigate = useNavigate();
@@ -78,6 +79,7 @@ const ManageStudentsPage = () => {
   const approveStudentMutation = useApproveStudent();
   const approveMarksheetMutation = useApproveMarksheet();
   const queryClient = useQueryClient();
+  const deleteStudentMutation = useDeleteStudent();
 
   const { showToast } = useToast();
 
@@ -191,6 +193,36 @@ const ManageStudentsPage = () => {
     setSelectedStudent(null);
   };
 
+  const handleEditStudent = (student: any) => {
+    const id = student.studentId || student._id || student.id;
+    navigate(`/admin/edit-student/${id}`);
+  };
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingStudent, setDeletingStudent] = useState<any>(null);
+
+  const handleDeleteClick = (student: any) => {
+    setDeletingStudent(student);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deletingStudent) {
+      try {
+        await deleteStudentMutation.mutateAsync(deletingStudent.studentId || deletingStudent._id || deletingStudent.id);
+        showToast(`Student ${deletingStudent.candidateName} deleted successfully!`, 'success');
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to delete student', 'error');
+      }
+      setDeleteDialogOpen(false);
+      setDeletingStudent(null);
+    }
+  };
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeletingStudent(null);
+  };
+
 
   // Define table columns matching backend data structure
   const columns: Column[] = [
@@ -241,6 +273,27 @@ const ManageStudentsPage = () => {
       align: 'center',
     },
     {
+      field: 'centerName',
+      headerName: 'Center Name',
+      minWidth: '220px',
+      renderCell: (value: string) => (
+        <Box sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {value || '—'}
+        </Box>
+      ),
+    },
+    {
+      field: 'centerCode',
+      headerName: 'Center Code',
+      width: '160px',
+      align: 'center',
+      renderCell: (value: string) => (
+        <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {value || '—'}
+        </Box>
+      ),
+    },
+    {
       field: 'contactNumber',
       headerName: 'Contact',
       width: '120px',
@@ -262,174 +315,100 @@ const ManageStudentsPage = () => {
       },
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      width: '180px',
+      field: 'editDelete',
+      headerName: 'Edit/Delete',
+      width: '130px',
       align: 'center',
       getActions: (row: any) => (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          gap: { xs: 0.75, sm: 1 }, 
-          flexDirection: 'column', 
-          alignItems: 'center',
-          width: '100%',
-        }}>
-          <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1 }, width: '100%', justifyContent: 'center' }}>
-            {row.isApprovedByAdmin ? (
-              <Button
-                size="small"
-                variant="contained"
-                disabled
-                sx={{
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  textTransform: 'none',
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600,
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 0.4, sm: 0.5 },
-                  borderRadius: 2,
-                  minWidth: { xs: 'auto', sm: '100px' },
-                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
-                  '&:disabled': {
-                    backgroundColor: '#10b981',
-                    color: 'white',
-                    opacity: 0.9,
-                  },
-                }}
-              >
-                APPROVED
-              </Button>
-            ) : (
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => handleApproveClick(row)}
-                disabled={approveStudentMutation.isPending}
-                sx={{
-                  backgroundColor: '#f59e0b',
-                  color: 'white',
-                  textTransform: 'none',
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600,
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 0.4, sm: 0.5 },
-                  borderRadius: 2,
-                  minWidth: { xs: 'auto', sm: '100px' },
-                  boxShadow: '0 2px 4px rgba(245, 158, 11, 0.2)',
-                  '&:hover': {
-                    backgroundColor: '#d97706',
-                    boxShadow: '0 4px 8px rgba(245, 158, 11, 0.3)',
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#9ca3af',
-                    color: 'white',
-                  },
-                }}
-              >
-                APPROVE
-              </Button>
-            )}
-          </Box>
-          
-          {/* Approve Marksheet Button - Show only if isMarksheetGenerated is true */}
-          {row.isMarksheetGenerated && (
-            <Box sx={{ 
-              display: 'flex', 
-              gap: { xs: 0.75, sm: 1 }, 
-              flexDirection: 'column', 
-              alignItems: 'center',
-              width: '100%',
-              mt: { xs: 0.5, sm: 0 },
-            }}>
-              <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1 }, width: '100%', justifyContent: 'center' }}>
-                {row.isMarksheetAndCertificateApproved ? (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    disabled
-                    sx={{
-                      backgroundColor: '#8b5cf6',
-                      color: 'white',
-                      textTransform: 'none',
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                      fontWeight: 600,
-                      px: { xs: 1.5, sm: 2 },
-                      py: { xs: 0.4, sm: 0.5 },
-                      borderRadius: 2,
-                      minWidth: { xs: 'auto', sm: '140px' },
-                      boxShadow: '0 2px 4px rgba(139, 92, 246, 0.2)',
-                      '&:disabled': {
-                        backgroundColor: '#8b5cf6',
-                        color: 'white',
-                        opacity: 0.9,
-                      },
-                    }}
-                  >
-                    MARKSHEET APPROVED
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={() => handleApproveMarksheetClick(row)}
-                    disabled={approveMarksheetMutation.isPending}
-                    sx={{
-                      backgroundColor: '#6366f1',
-                      color: 'white',
-                      textTransform: 'none',
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                      fontWeight: 600,
-                      px: { xs: 1.5, sm: 2 },
-                      py: { xs: 0.4, sm: 0.5 },
-                      borderRadius: 2,
-                      minWidth: { xs: 'auto', sm: '140px' },
-                      boxShadow: '0 2px 4px rgba(99, 102, 241, 0.2)',
-                      '&:hover': {
-                        backgroundColor: '#4f46e5',
-                        boxShadow: '0 4px 8px rgba(99, 102, 241, 0.3)',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#9ca3af',
-                        color: 'white',
-                      },
-                    }}
-                  >
-                    APPROVE MARKSHEET
-                  </Button>
-                )}
-              </Box>
-              
-              {/* Show Marksheet Button */}
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}`)}
-                sx={{
-                  borderColor: '#10b981',
-                  color: '#10b981',
-                  textTransform: 'none',
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600,
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 0.4, sm: 0.5 },
-                  borderRadius: 2,
-                  minWidth: { xs: 'auto', sm: '140px' },
-                  borderWidth: 2,
-                  '&:hover': {
-                    borderColor: '#059669',
-                    backgroundColor: '#ecfdf5',
-                    borderWidth: 2,
-                    boxShadow: '0 2px 4px rgba(16, 185, 129, 0.1)',
-                  },
-                }}
-              >
-                SHOW MARKSHEET
-              </Button>
-            </Box>
-          )}
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={() => handleEditStudent(row)}
+            sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', borderRadius: 2, '&:hover': { bgcolor: '#e0edff' } }}
+          >
+            <Edit sx={{ fontSize: 18 }} />
+          </IconButton>
+          <IconButton
+            color="error"
+            size="small"
+            onClick={() => handleDeleteClick(row)}
+            sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', borderRadius: 2, '&:hover': { bgcolor: '#feecec' } }}
+            disabled={deleteStudentMutation.isPending}
+          >
+            <Delete sx={{ fontSize: 18 }} />
+          </IconButton>
         </Box>
+      ),
+    },
+    {
+      field: 'approval',
+      headerName: 'Approval',
+      width: '120px',
+      align: 'center',
+      getActions: (row: any) => (
+        row.isApprovedByAdmin ? (
+          <Button size="small" variant="outlined" disabled sx={{ color: '#22c55e', borderColor: '#22c55e', borderRadius: 10, height: 26, px: 1.5, minWidth: 96, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap' }}>
+            Approved
+          </Button>
+        ) : (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => handleApproveClick(row)}
+            disabled={approveStudentMutation.isPending}
+            sx={{ background: '#eab308', color: '#fff', borderRadius: 10, height: 26, px: 1.5, minWidth: 92, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', boxShadow: 'none', '&:hover': { background: '#ca8a04' } }}
+          >
+            Approve
+          </Button>
+        )
+      ),
+    },
+    {
+      field: 'marksheet',
+      headerName: 'Marksheet',
+      width: '200px',
+      align: 'center',
+      getActions: (row: any) => (
+        row.isMarksheetGenerated ? (
+          row.isMarksheetAndCertificateApproved ? (
+            <Button size="small" variant="outlined" disabled sx={{ color: '#8b5cf6', borderColor: '#8b5cf6', background: 'rgba(139,92,246,0.08)', borderRadius: 10, height: 26, px: 1.5, minWidth: 160, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap' }}>
+              Marksheet Approved
+            </Button>
+          ) : (
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => handleApproveMarksheetClick(row)}
+              disabled={approveMarksheetMutation.isPending}
+              sx={{ background: '#6366f1', color: '#fff', borderRadius: 10, height: 26, px: 1.5, minWidth: 150, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', boxShadow: 'none', '&:hover': { background: '#4f46e5' } }}
+            >
+              Approve Marksheet
+            </Button>
+          )
+        ) : (
+          <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>Not generated</Typography>
+        )
+      ),
+    },
+    {
+      field: 'view',
+      headerName: 'View',
+      width: '170px',
+      align: 'center',
+      getActions: (row: any) => (
+        row.isMarksheetGenerated ? (
+          <Button
+            size="small"
+            variant="outlined"
+            sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
+            onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}`)}
+          >
+            Show Marksheet
+          </Button>
+        ) : (
+          <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>N/A</Typography>
+        )
       ),
     },
   ];
@@ -1090,6 +1069,19 @@ const ManageStudentsPage = () => {
           cancelText="Cancel"
           isLoading={approveStudentMutation.isPending}
           severity="warning"
+        />
+
+        {/* Delete Student Confirmation Dialog */}
+        <ConfirmationDialog
+          open={deleteDialogOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Student"
+          message={`Are you sure you want to delete student ${deletingStudent?.candidateName} (${deletingStudent?.registrationNo})? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isLoading={deleteStudentMutation.isPending}
+          severity="error"
         />
 
         {/* Editable Marksheet Dialog */}

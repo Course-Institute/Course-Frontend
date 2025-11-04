@@ -29,6 +29,8 @@ interface AddStudentFormProps {
     centerName: string;
     name: string;
   };
+  initialData?: Partial<FormData>;
+  onSubmitOverride?: (payload: Record<string, any>) => Promise<void> | void;
 }
 
 interface FormData {
@@ -113,22 +115,32 @@ const initialFormData: FormData = {
   centerId: '',
 };
 
-const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }: AddStudentFormProps) => {
+const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, initialData, onSubmitOverride }: AddStudentFormProps) => {
   const { addStudent, isSubmitting, error: submitError } = useAddStudent();
   const { showSuccess, showError } = useToast();
   
   const [formData, setFormData] = useState<FormData>(() => {
+    let base = initialFormData;
     if (preFilledCenter) {
-      return {
-        ...initialFormData,
+      base = {
+        ...base,
         centerId: preFilledCenter.centerId,
         center: {
           centerId: preFilledCenter.centerId,
           name: preFilledCenter.centerName
         }
-      };
+      } as FormData;
     }
-    return initialFormData;
+    if (initialData) {
+      const merged: any = { ...base, ...initialData };
+      // If initialData provides centerName/centerId, shape the center object
+      if ((initialData as any)?.centerId && (initialData as any)?.centerName) {
+        merged.centerId = (initialData as any).centerId;
+        merged.center = { centerId: (initialData as any).centerId, name: (initialData as any).centerName };
+      }
+      return merged as FormData;
+    }
+    return base as FormData;
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPreview, setShowPreview] = useState(false);
@@ -321,8 +333,30 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
 
   const handlePreviewSave = async () => {
     try {
+      if (onSubmitOverride) {
+        // Build a plain JSON payload (exclude files and empty strings)
+        const jsonPayload: Record<string, any> = {};
+        Object.keys(formData).forEach(key => {
+          const value = formData[key as keyof FormData] as any;
+          if (['photo','adharCardFront','adharCardBack','signature'].includes(key)) return;
+          if (key === 'center' && value && typeof value === 'object') {
+            jsonPayload.center = value;
+            return;
+          }
+          if (typeof value === 'string') {
+            if (value.trim() !== '') jsonPayload[key] = value;
+          } else if (value !== undefined && value !== null) {
+            jsonPayload[key] = value;
+          }
+        });
+        await onSubmitOverride(jsonPayload);
+        showSuccess('Student updated successfully!');
+        setShowPreview(false);
+        setTimeout(() => onClose(), 300);
+        return;
+      }
+
       const formDataToSend = new FormData();
-      
       // Add all text fields (excluding empty values and center object)
       Object.keys(formData).forEach(key => {
         const value = formData[key as keyof FormData];
@@ -335,7 +369,6 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
           formDataToSend.append(key, value);
         }
       });
-      
       // Add file fields
       if (formData.photo) {
         formDataToSend.append('photo', formData.photo);
@@ -349,21 +382,17 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter }
       if (formData.signature) {
         formDataToSend.append('signature', formData.signature);
       }
-      
       await addStudent(formDataToSend as any);
-      
       // Show success toast and reset form
       showSuccess('Student added successfully!');
       resetForm();
       setShowPreview(false);
-      
-      // Close dialog after a short delay to show success state
       setTimeout(() => {
         onClose();
       }, 1000);
     } catch (error) {
       console.error('Error submitting form:', error);
-      showError('Failed to add student. Please try again.');
+      showError(onSubmitOverride ? 'Failed to update student. Please try again.' : 'Failed to add student. Please try again.');
     }
   };
 
