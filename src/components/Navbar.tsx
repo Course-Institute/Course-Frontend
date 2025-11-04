@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -22,6 +22,7 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
   const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
@@ -63,6 +64,15 @@ const Navbar = () => {
     { id: 'contact', label: 'Contact Us', path: '/contact-us' },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY >= 310);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const drawer = (
     <Box sx={{ width: 280, height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
       {/* Simple Mobile Header */}
@@ -79,11 +89,11 @@ const Navbar = () => {
         }}
         onClick={handleLogoClick}
       >
-        <InstituteLogo width={32} height={32} sx={{ color: '#2563eb' }} />
+        <InstituteLogo width={32} height={32} sx={{ color: '#2563eb' }} />  
       </Box>
       
       {/* Navigation Items */}
-      <List sx={{ px: 2, py: 1 }}>
+      <List sx={{ px: 2, py: 2 }}>
         {navItems.map((item) => (
           <ListItem
             key={item.id}
@@ -92,7 +102,7 @@ const Navbar = () => {
               borderRadius: 2,
               mb: 1,
               cursor: 'pointer',
-              backgroundColor: window.location.pathname === item.path ? 'rgba(37, 99, 235, 0.1)' : 'transparent',
+              backgroundColor: window.location.pathname === item.path ? 'rgba(0, 81, 255, 0.1)' : 'transparent',
               border: window.location.pathname === item.path ? '2px solid #2563eb' : '2px solid transparent',
               '&:hover': {
                 backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -222,9 +232,52 @@ const Navbar = () => {
         </Box>
       </Box>
 
-      <AppBar
-        position="static"
+      {/* Announcement Strip */}
+      <Box
         sx={{
+          width: '100%',
+          backgroundColor: '#0f2747',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { xs: 2, md: 4 },
+          py: 1,
+          position: isSticky ? 'fixed' : 'static',
+          top: isSticky ? 0 : 'auto',
+          left: isSticky ? 0 : 'auto',
+          right: isSticky ? 0 : 'auto',
+          zIndex: isSticky ? 1301 : 'auto',
+          height: isSticky ? 25 : 'auto',
+        }}
+      >
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '1440px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            whiteSpace: { xs: 'normal', sm: 'nowrap' },
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          <Typography sx={{ color: '#fbbf24', fontWeight: 700 }}>
+            Announcement:
+          </Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
+            Admission Open: 2025–2026 | Diploma in Nursery Teacher Training (Teaching) | PGDCA | BLIS
+            | IT Programs | Beauty & Wellness Programs | @ +91 93106 55232
+          </Typography>
+        </Box>
+      </Box>
+
+      <AppBar
+        position={isSticky ? 'fixed' : 'static'}
+        sx={{
+          top: isSticky ? 40 : 'auto',
+          zIndex: isSticky ? 1300 : 'auto',
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -256,7 +309,7 @@ const Navbar = () => {
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'nowrap',
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}>
             {navItems.map((item) => (
               <Button
@@ -273,11 +326,18 @@ const Navbar = () => {
                   fontSize: '0.9rem',
                   minWidth: 'auto',
                   whiteSpace: 'nowrap',
+                  border: 'none',
+                  outline: 'none',
                   '&:hover': {
                     backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     color: '#2563eb',
                     transform: 'translateY(-1px)',
                     boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                    border: 'none',
+                  },
+                  '&:focus': {
+                    outline: 'none',
+                    border: 'none',
                   },
                   '&::before': window.location.pathname === item.path ? {
                     content: '""',
@@ -396,6 +456,14 @@ const Navbar = () => {
           )}
         </Toolbar>
       </AppBar>
+
+      {/* Spacer to prevent layout shift when announcement + navbar become fixed */}
+      {isSticky && (
+        <>
+          <Box sx={{ height: 40 }} />
+          <Toolbar />
+        </>
+      )}
 
       {/* Mobile Drawer */}
       <Drawer

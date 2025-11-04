@@ -136,7 +136,7 @@ const LoginPage = () => {
         return {
           background: `
             linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(34, 197, 94, 0.6) 100%),
-            url('https://images.unsplash.com/photo-1523240798034-6c2165d3b3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+            url('student-panel.jpg')
           `,
           cardBackground: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           iconBackground: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
@@ -150,7 +150,7 @@ const LoginPage = () => {
         return {
           background: `
             linear-gradient(135deg, rgba(34, 197, 94, 0.6) 0%, rgba(251, 191, 36, 0.6) 100%),
-            url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+            url('center-panel.jpg')
           `,
           cardBackground: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
           iconBackground: 'linear-gradient(135deg, #22c55e 0%, #fbbf24 100%)',
@@ -165,7 +165,7 @@ const LoginPage = () => {
         return {
           background: `
             linear-gradient(135deg, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.6) 100%),
-            url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')
+            url('admin-panel.jpg')
           `,
           cardBackground: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
           iconBackground: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',

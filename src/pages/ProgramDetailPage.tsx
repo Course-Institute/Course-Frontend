@@ -62,7 +62,7 @@ const ProgramDetailPage = () => {
           flex: 1, 
           py: 8, 
           background: `
-            linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%),
+            linear-gradient(135deg, rgba(252, 252, 252, 0.78) 0%, rgba(161, 161, 161, 0.86) 100%),
             url('${program.image}')
           `,
           backgroundSize: 'cover',
@@ -96,7 +96,7 @@ const ProgramDetailPage = () => {
             <Box
               sx={{
                 display: 'inline-block',
-                background: `linear-gradient(135deg, ${program.color} 0%, ${program.color}CC 100%)`,
+                background: `linear-gradient(135deg, #ffffffec, rgba(255, 255, 255, 0.66))`,
                 borderRadius: '50px',
                 px: 4,
                 py: 1,
@@ -107,9 +107,9 @@ const ProgramDetailPage = () => {
               <Typography
                 variant="h6"
                 sx={{
-                  color: 'white',
+                  color: '#00184dff',
                   fontWeight: 'bold',
-                  fontSize: '1rem',
+                  fontSize: '1.3rem',
                   textTransform: 'uppercase',
                   letterSpacing: '1px'
                 }}

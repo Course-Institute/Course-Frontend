@@ -146,6 +146,16 @@ Generated on: ${new Date().toLocaleString()}
     </Box>
   );
 
+  // Robust avatar/photo preview
+  let photoUrl: string | undefined = undefined;
+  if (formData.photo) {
+    if (formData.photo instanceof File) {
+      photoUrl = URL.createObjectURL(formData.photo);
+    } else if (typeof formData.photo === 'string') {
+      photoUrl = formData.photo;
+    }
+  }
+
   return (
     <DialogBox
       open={open}
@@ -204,7 +214,7 @@ Generated on: ${new Date().toLocaleString()}
         {/* Header with Photo */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 1.5, backgroundColor: '#f8fafc', borderRadius: 2, flexShrink: 0 }}>
           <Avatar
-            src={formData.photo ? URL.createObjectURL(formData.photo) : undefined}
+            src={photoUrl}
             sx={{ width: 60, height: 60, mr: 2, border: '2px solid #e2e8f0' }}
           >
             {formData.candidateName?.charAt(0)?.toUpperCase()}

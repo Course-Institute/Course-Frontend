@@ -86,7 +86,7 @@ const FooterSection = () => {
     <LayoutWrapper>
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          background: 'linear-gradient(135deg, #243647ff 0%)',
           position: 'relative',
           overflow: 'hidden',
           '&::before': {
@@ -96,55 +96,10 @@ const FooterSection = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: `
-              radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%)
-            `,
             zIndex: 1,
           },
         }}
       >
-        {/* Animated Background Elements */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '10%',
-            left: '10%',
-            width: '100px',
-            height: '100px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '50%',
-            animation: 'float 6s ease-in-out infinite',
-            zIndex: 1,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '20%',
-            right: '15%',
-            width: '60px',
-            height: '60px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            borderRadius: '50%',
-            animation: 'float 8s ease-in-out infinite reverse',
-            zIndex: 1,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: '20%',
-            left: '20%',
-            width: '80px',
-            height: '80px',
-            background: 'rgba(255, 255, 255, 0.06)',
-            borderRadius: '50%',
-            animation: 'float 10s ease-in-out infinite',
-            zIndex: 1,
-          }}
-        />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
           {/* Hero Footer Section */}
@@ -155,14 +110,12 @@ const FooterSection = () => {
                   <Box
                     sx={{
                       p: 2,
-                      borderRadius: 3,
-                      background: 'rgba(255, 255, 255, 0.15)',
+                      borderRadius: 10,
                       backdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
                       mr: 2,
                     }}
                   >
-                    <InstituteLogo width={40} height={40} />
+                  <InstituteLogo width={75} height={75} sx={{borderRadius:10}} />
                   </Box>
                   <Box>
                     <Typography
@@ -406,9 +359,9 @@ const FooterSection = () => {
                   {/* Contact Info */}
                   <Box sx={{ mb: 2 }}>
                     {[
-                      { icon: <LocationOn />, text: 'Near Railway Station, Main Road, Delhi, India - 110001' },
-                      { icon: <Phone />, text: '+91 98765 43210' },
-                      { icon: <Email />, text: 'info@mahavirinstitute.com' },
+                      { icon: <LocationOn />, text: 'Gaur City 1, Sector-04, Greater Noida, Uttar Pradesh' },
+                      { icon: <Phone />, text: '+91 93106 55232' },
+                      { icon: <Email />, text: `info@mivpsa.in`, anotherText: 'admission@mivpsa.in' },
                     ].map((contact, index) => (
                       <Fade in timeout={1800 + index * 200} key={index}>
                         <Box
@@ -439,6 +392,7 @@ const FooterSection = () => {
                           >
                             {contact.icon}
                           </Box>
+                          <Box sx={{display:"flex", flexDirection:"column"}}>
                           <Typography
                             variant="body2"
                             sx={{
@@ -449,6 +403,18 @@ const FooterSection = () => {
                           >
                             {contact.text}
                           </Typography>
+                          {contact?.anotherText && 
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'rgba(255, 255, 255, 0.9)',
+                              lineHeight: 1.4,
+                              fontSize: '0.85rem',
+                            }}
+                          >
+                            {contact.anotherText}
+                          </Typography>}
+                          </Box>
                         </Box>
                       </Fade>
                     ))}

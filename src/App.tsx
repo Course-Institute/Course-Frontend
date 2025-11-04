@@ -39,6 +39,7 @@ import EnquiryListPage from './pages/admin/EnquiryListPage';
 import StudentMarksheetPage from './pages/student/StudentMarksheetPage';
 import ViewMarksheetPage from './pages/admin/ViewMarksheetPage';
 import CenterViewMarksheetPage from './pages/center/ViewMarksheetPage';
+import EditStudentPage from './pages/admin/EditStudentPage';
 
 function App() {
   return (
@@ -127,6 +128,11 @@ function App() {
           <Route path="/admin/view-marksheet/:marksheetId" element={
             <AdminLayout title="VIEW MARKSHEET">
               <ViewMarksheetPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/edit-student/:id" element={
+            <AdminLayout title="EDIT STUDENT">
+              <EditStudentPage />
             </AdminLayout>
           } />
 

@@ -12,8 +12,7 @@ const AboutUsPage = () => {
           flex: 1, 
           padding: '64px 0', 
           background: `
-            linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%),
-            url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2022&q=80')
+            linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%)
           `,
           backgroundSize: 'cover',
           backgroundPosition: 'center',

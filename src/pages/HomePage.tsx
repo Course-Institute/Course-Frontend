@@ -151,14 +151,14 @@ const HomePage = () => {
       title: "Career Support",
       description: "Comprehensive placement assistance, resume building, and interview preparation to help students land their dream jobs.",
       icon: <TrendingUp sx={{ color: "#f59e0b" }} />,
-    },
+        },
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden', maxWidth: '100%' }}>  
       <Navbar />
       <LayoutWrapper>
-        {/* Hero Section with Carousel */}
+                {/* Hero Section with Carousel */}
         <Box
           sx={{
             height: { xs: '70vh', sm: '80vh' },
@@ -166,10 +166,11 @@ const HomePage = () => {
         position: 'relative',
         overflow: 'hidden',
         width: '100%',
+        maxWidth: '98.5%',
             borderRadius: { xs: 0, sm: 3 },
             mx: { xs: 0, sm: 2 },
             mt: { xs: 0, sm: 2 },
-            boxShadow: { xs: 'none', sm: '0 20px 40px rgba(0,0,0,0.1)' },
+            boxShadow: { xs: 'none', sm: '0 20px 40px rgba(0,0,0,0.1)' },       
           }}
         >
         {/* Carousel Images */}
@@ -188,12 +189,12 @@ const HomePage = () => {
               backgroundRepeat: 'no-repeat',
               opacity: currentImageIndex === index ? 1 : 0,
               transition: 'opacity 1s ease-in-out',
-                zIndex: 1,
+              zIndex: 1,
             }}
           />
         ))}
 
-          {/* Gradient Overlay */}
+          {/* Overlay */}
           <Box
             sx={{
               position: 'absolute',
@@ -201,7 +202,7 @@ const HomePage = () => {
               left: 0,
               width: '100%',
               height: '100%',
-              background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.7) 0%, rgba(16, 185, 129, 0.7) 100%)',
+              background: 'rgba(14, 14, 14, 0.75)',
               zIndex: 2,
             }}
           />
@@ -228,6 +229,7 @@ const HomePage = () => {
                   sx={{
                     fontWeight: 800,
                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+                    color: 'white',
                     mb: 2,
                     textShadow: '0 2px 4px rgba(0,0,0,0.3)',
                     lineHeight: 1.2,
@@ -239,6 +241,7 @@ const HomePage = () => {
                   variant="h5"
                   sx={{
                     fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+                    color: 'white',
                     mb: 4,
                     opacity: 0.95,
                     maxWidth: '600px',
@@ -383,13 +386,6 @@ const HomePage = () => {
           <Slide direction="up" in timeout={800}>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: 3 }}>
               {stats.map((stat, index) => {
-                const colors = [
-                  { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '#ffffff' },
-                  { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '#ffffff' },
-                  { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '#ffffff' },
-                  { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', icon: '#ffffff' },
-                ];
-                const colorScheme = colors[index % colors.length];
                 return (
                 <Box key={index}>
                   <Card
@@ -397,40 +393,28 @@ const HomePage = () => {
                       textAlign: 'center',
                       p: 3,
                       borderRadius: 3,
-                      background: colorScheme.bg,
-                      color: 'white',
-                      border: 'none',
+                      background: '#e9e9e9ff',
+                      color: '#0f172a',
+                      border: '1px solid #e2e8f0',
                       transition: 'all 0.3s ease',
                       position: 'relative',
                       overflow: 'hidden',
                       '&:hover': {
-                        transform: 'translateY(-8px) scale(1.02)',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                      },
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(255,255,255,0.1)',
-                        backdropFilter: 'blur(10px)',
-                        zIndex: 1,
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 10px 20px rgba(0,0,0,0.06)',
                       },
                     }}
                   >
                     <CardContent sx={{ p: 0, position: 'relative', zIndex: 2 }}>
                       <Avatar
                         sx={{
-                          backgroundColor: 'rgba(255,255,255,0.2)',
-                          color: colorScheme.icon,
+                          backgroundColor: 'rgba(37,99,235,0.1)',
+                          color: '#2563eb',
                           width: 56,
                           height: 56,
                           mx: 'auto',
                           mb: 2,
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255,255,255,0.3)',
+                          border: '1px solid rgba(37,99,235,0.15)',
                         }}
                       >
                         {stat.icon}
@@ -439,10 +423,9 @@ const HomePage = () => {
                         variant="h4"
                         sx={{
                           fontWeight: 800,
-                          color: 'white',
+                          color: '#0f172a',
                           mb: 1,
                           fontSize: { xs: '1.5rem', sm: '2rem' },
-                          textShadow: '0 2px 4px rgba(0,0,0,0.3)',
                         }}
                       >
                         {stat.number}
@@ -450,7 +433,7 @@ const HomePage = () => {
                       <Typography
                         variant="body1"
                         sx={{
-                          color: 'rgba(255,255,255,0.9)',
+                          color: '#475569',
                           fontWeight: 500,
                           fontSize: { xs: '0.875rem', sm: '1rem' },
                         }}
@@ -466,12 +449,14 @@ const HomePage = () => {
           </Slide>
         </Container>
       
-      {/* Introduction Section */}
-        <Box sx={{ 
-          background: 'linear-gradient(135deg,rgb(57, 98, 233) 0%,rgb(149, 103, 233) 100%)',
+            {/* Introduction Section */}
+        <Box sx={{
+        background: '#e9e9e9ff',
           py: { xs: 6, sm: 8 },
           position: 'relative',
           overflow: 'hidden',
+          width: '100%',
+          maxWidth: '100%',
         }}>
           {/* Background Pattern */}
           <Box
@@ -484,6 +469,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '50%',
               transform: 'translate(30%, -30%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           <Box
@@ -496,6 +483,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.05)',
               borderRadius: '50%',
               transform: 'translate(-30%, 30%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           
@@ -506,7 +495,7 @@ const HomePage = () => {
                   variant="h3"
                   sx={{
                     fontWeight: 800,
-                    color: 'rgb(201, 231, 29)',
+                    color: 'rgba(0, 0, 0, 1)',
                     mb: 3,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
                     textShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -517,7 +506,7 @@ const HomePage = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: '#764ba2',
+                    color: '#000000ff',
                     maxWidth: '800px',
                     mx: 'auto',
                     fontSize: { xs: '1rem', sm: '1.1rem' },
@@ -657,12 +646,14 @@ const HomePage = () => {
           </Container>
         </Box>
 
-        {/* Program Highlights */}
-        <Box sx={{ 
-          background: 'linear-gradient(135deg,rgb(200, 84, 218) 0%, #ffe8f0 100%)',
+                {/* Program Highlights */}
+        <Box sx={{
+        background: '#ffffff',
           py: { xs: 6, sm: 8 },
           position: 'relative',
           overflow: 'hidden',
+          width: '100%',
+          maxWidth: '100%',
         }}>
           {/* Background Pattern */}
           <Box
@@ -675,6 +666,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '50%',
               transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           <Box
@@ -687,6 +680,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.05)',
               borderRadius: '50%',
               transform: 'translate(50%, 50%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           
@@ -697,10 +692,10 @@ const HomePage = () => {
                   variant="h3"
                   sx={{
                     fontWeight: 800,
-                    color: 'white',
+                    color: '#0f172a',
                     mb: 3,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
                   Career Pathways for Every Ambition
@@ -708,11 +703,11 @@ const HomePage = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: 'rgba(255,255,255,0.9)',
+                    color: '#475569',
                     maxWidth: '600px',
                     mx: 'auto',
                     fontSize: { xs: '1rem', sm: '1.1rem' },
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
                   Discover your passion and build a successful career with our comprehensive range of programs
@@ -750,8 +745,8 @@ const HomePage = () => {
                       >
                         <Box
                           sx={{
-                            backgroundColor: program.bgColor,
-                            color: program.color,
+                            backgroundColor: 'rgba(37,99,235,0.08)',
+                            color: '#2563eb',
                             borderRadius: 2,
                             p: 1.5,
                       display: 'flex',
@@ -778,8 +773,8 @@ const HomePage = () => {
                             label={program.stats}
                             size="small"
                             sx={{
-                              backgroundColor: program.color,
-                              color: 'white',
+                              backgroundColor: 'rgba(37,99,235,0.1)',
+                              color: '#2563eb',
                               fontWeight: 600,
                             }}
                           />
@@ -805,12 +800,14 @@ const HomePage = () => {
         </Container>
         </Box>
 
-        {/* Features Section */}
-        <Box sx={{ 
-          background: 'linear-gradient(135deg,rgb(107, 172, 230) 0%,rgb(130, 247, 178) 100%)',
+                {/* Features Section */}
+        <Box sx={{
+        background: '#e9e9e9ff',
           py: { xs: 6, sm: 8 },
           position: 'relative',
           overflow: 'hidden',
+          width: '100%',
+          maxWidth: '100%',
         }}>
           {/* Background Pattern */}
           <Box
@@ -823,6 +820,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '50%',
               transform: 'translate(40%, -40%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           <Box
@@ -835,6 +834,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.05)',
               borderRadius: '50%',
               transform: 'translate(-40%, 40%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           
@@ -845,10 +846,10 @@ const HomePage = () => {
                   variant="h3"
                   sx={{
                     fontWeight: 800,
-                    color: 'white',
+                    color: '#0f172a',
                     mb: 3,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
                   Why Choose Us?
@@ -856,11 +857,11 @@ const HomePage = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: 'rgba(255,255,255,0.9)',
+                    color: '#475569',
                     maxWidth: '600px',
                     mx: 'auto',
                     fontSize: { xs: '1rem', sm: '1.1rem' },
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
                   We provide the perfect environment for your educational and career growth
@@ -896,7 +897,7 @@ const HomePage = () => {
                         >
                           {feature.icon}
                         </Box>
-                        <Typography
+                      <Typography
                           variant="h6"
                           sx={{
                             fontWeight: 700,
@@ -929,11 +930,13 @@ const HomePage = () => {
         {/* CTA Section */}
         <Box
           sx={{
-            background: 'linear-gradient(135deg,rgb(182, 229, 198) 0%,rgb(169, 253, 150) 100%)',
-            color: 'white',
+            background: '#ffffff',
+            color: '#0f172a',
             py: { xs: 6, sm: 8 },
             position: 'relative',
             overflow: 'hidden',
+            width: '100%',
+            maxWidth: '100%',
           }}
         >
           {/* Background Pattern */}
@@ -947,6 +950,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '50%',
               transform: 'translate(50%, -50%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           <Box
@@ -959,6 +964,8 @@ const HomePage = () => {
               background: 'rgba(255, 255, 255, 0.05)',
               borderRadius: '50%',
               transform: 'translate(-50%, 50%)',
+              pointerEvents: 'none',
+              zIndex: 0,
             }}
           />
           
@@ -971,7 +978,7 @@ const HomePage = () => {
                     fontWeight: 800,
                     mb: 3,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
                   Ready to Start Your Journey?
@@ -985,7 +992,7 @@ const HomePage = () => {
                     fontSize: { xs: '1.1rem', sm: '1.3rem' },
                     maxWidth: '600px',
                     mx: 'auto',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                    textShadow: 'none',
                   }}
                 >
             Take the first step toward a brighter future. Connect with our admissions team to explore your best-fit program and career opportunities.
@@ -997,19 +1004,19 @@ const HomePage = () => {
                     size="large"
             onClick={() => setInquiryDialogOpen(true)}
                     sx={{
-              backgroundColor: 'white',
-              color: '#2563eb',
+              backgroundColor: '#2563eb',
+              color: 'white',
                       px: 4,
                       py: 1.5,
               fontSize: '1.1rem',
                       fontWeight: 700,
                       borderRadius: 3,
                       textTransform: 'none',
-                      boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+                      boxShadow: '0 6px 16px rgba(37,99,235,0.25)',
                       '&:hover': {
-                        backgroundColor: '#f8fafc',
+                        backgroundColor: '#1e40af',
                         transform: 'translateY(-2px)',
-                        boxShadow: '0 12px 25px rgba(0,0,0,0.25)',
+                        boxShadow: '0 10px 20px rgba(37,99,235,0.3)',
                       },
             }}
           >
@@ -1020,8 +1027,8 @@ const HomePage = () => {
                     size="large"
                     onClick={handleProgramClick}
                     sx={{
-                      borderColor: 'white',
-                      color: 'white',
+                      borderColor: '#2563eb',
+                      color: '#2563eb',
                       px: 4,
                       py: 1.5,
                       fontSize: '1.1rem',
@@ -1030,8 +1037,8 @@ const HomePage = () => {
                       textTransform: 'none',
                       borderWidth: 2,
                       '&:hover': {
-                        borderColor: 'white',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        borderColor: '#1e40af',
+                        backgroundColor: 'rgba(37,99,235,0.06)',
                         borderWidth: 2,
                       },
                     }}

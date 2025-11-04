@@ -4,6 +4,7 @@ import App from './App';
 import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import theme from './theme';
+import './index.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -54,7 +54,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
   const submitInquiryMutation = useSubmitInquiry();
 
   const programs = [
-    'Paramedical Programs',
+    ' ograms',
     'Vocational Programs',
     'Yoga & Naturopathy',
     'IT Programmes',

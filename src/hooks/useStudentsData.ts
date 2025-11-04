@@ -1,8 +1,9 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import React from 'react';
-import { getStudentsData, type Student, type StudentsFilters } from '../api/studentsApi';
+import { getStudentsData, type Student, type StudentsFilters, deleteStudent, updateStudent } from '../api/studentsApi';
 import { useIntersectionObserver } from './useIntersectionObserver';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UseStudentsDataOptions {
   limit?: number;
@@ -116,4 +117,24 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
     hasNextPage,
     fetchNextPage,
   };
+};
+
+export const useDeleteStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (studentId: string) => deleteStudent(studentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+    },
+  });
+};
+
+export const useUpdateStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({studentId, data}: {studentId: string, data: any}) => updateStudent(studentId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+    },
+  });
 };

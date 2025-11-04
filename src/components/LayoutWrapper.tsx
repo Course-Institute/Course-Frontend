@@ -14,7 +14,9 @@ const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
   return (
     <Box sx={{
       ...layoutConfig.getContentStyles(),
-      backgroundColor
+      backgroundColor,
+      overflowX: 'hidden',
+      maxWidth: '100%',
     }}>
       {children}
     </Box>
