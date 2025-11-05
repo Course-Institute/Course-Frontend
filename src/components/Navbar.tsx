@@ -66,7 +66,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsSticky(window.scrollY >= 310);
+      setIsSticky(window.scrollY >= 360);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -240,33 +240,62 @@ const Navbar = () => {
           color: '#ffffff',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          px: { xs: 2, md: 4 },
+          justifyContent: { xs: 'flex-start', md: 'center' },
+          px: { xs: 1.5, sm: 2, md: 4 },
           py: 1,
-          position: isSticky ? 'fixed' : 'static',
+          position: 'static',
           top: isSticky ? 0 : 'auto',
           left: isSticky ? 0 : 'auto',
           right: isSticky ? 0 : 'auto',
           zIndex: isSticky ? 1301 : 'auto',
           height: isSticky ? 25 : 'auto',
+          overflowX: { xs: 'auto', md: 'hidden' },
+          overflowY: 'hidden',
+          '&::-webkit-scrollbar': {
+            height: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(255, 255, 255, 0.1)',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(251, 191, 36, 0.5)',
+            borderRadius: '2px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: 'rgba(251, 191, 36, 0.7)',
+          },
         }}
       >
         <Box
           sx={{
-            width: '100%',
-            maxWidth: '1440px',
+            width: { xs: 'max-content', md: '100%' },
+            maxWidth: { xs: 'none', md: '1440px' },
             display: 'flex',
+            flexDirection: 'row',
             alignItems: 'center',
-            gap: 1.5,
-            whiteSpace: { xs: 'normal', sm: 'nowrap' },
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            gap: { xs: 1, md: 1.5 },
+            whiteSpace: 'nowrap',
           }}
         >
-          <Typography sx={{ color: '#fbbf24', fontWeight: 700 }}>
+          <Typography 
+            sx={{ 
+              color: '#fbbf24', 
+              fontWeight: 700,
+              fontSize: { xs: '0.875rem', md: '1rem' },
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
             Announcement:
           </Typography>
-          <Typography sx={{ fontWeight: 600, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
+          <Typography 
+            sx={{ 
+              fontWeight: 600, 
+              fontSize: { xs: '0.875rem', md: '0.95rem' },
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
             Admission Open: 2025–2026 | Diploma in Nursery Teacher Training (Teaching) | PGDCA | BLIS
             | IT Programs | Beauty & Wellness Programs | @ +91 93106 55232
           </Typography>
@@ -276,8 +305,8 @@ const Navbar = () => {
       <AppBar
         position={isSticky ? 'fixed' : 'static'}
         sx={{
-          top: isSticky ? 40 : 'auto',
-          zIndex: isSticky ? 1300 : 'auto',
+          top: isSticky ? 0 : 'auto',
+          zIndex: isSticky ? 1500 : 'auto',
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
