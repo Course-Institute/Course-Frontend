@@ -137,8 +137,8 @@ export const generateCenterFormPDF = async (formData: CenterFormData): Promise<v
   const addRow = (label: string, value: string, isHeader: boolean = false) => {
     if (isHeader) {
       // Header row with background
-      doc.setFillColor(240, 240, 240);
-      doc.rect(leftColumn - 2, yPosition - 5, pageWidth - 40, lineHeight + 2, 'F');
+      // doc.setFillColor(240, 240, 240);
+      // doc.rect(leftColumn - 2, yPosition - 5, pageWidth - 40, lineHeight + 2, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.text(label, leftColumn, yPosition);
@@ -320,6 +320,40 @@ export const generateStudentFormPDF = async (formData: StudentFormData): Promise
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
+
+  async function urlToBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+if(formData.photo){
+const base64Photo = await urlToBase64(formData.photo);
+
+  const imgWidth = 28;
+  const imgHeight = 28;
+
+  const imgX = pageWidth - imgWidth - 28;  // your positioning
+  const imgY = 63;
+
+  // ✅ Draw image
+  doc.addImage(base64Photo, "JPEG", imgX, imgY, imgWidth, imgHeight);
+
+  // ✅ Add border box
+  const borderPadding = 2;
+   doc.setDrawColor(14, 68, 85); // change here
+
+doc.setLineWidth(0.3);
+doc.roundedRect(
+  imgX - borderPadding,
+  imgY - borderPadding,
+  imgWidth + borderPadding * 2,
+  imgHeight + borderPadding * 2,
+  3, 3, "S" // corner radius + style (stroke)
+);
+}
   
   // Set font
   doc.setFont('helvetica');
@@ -330,44 +364,60 @@ export const generateStudentFormPDF = async (formData: StudentFormData): Promise
   // doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
   const logo = await loadLogoBase64();
   doc.addImage(logo, "PNG", pageWidth / 2 - 75, 0, 150, 60);
-  
-  // doc.setFontSize(14);
-  // doc.setFont('helvetica', 'bold');
-  // doc.text('Student Registration Form', pageWidth / 2, 40, { align: 'center' });
-  
-  // Logo placeholder
-  // doc.setFontSize(10);
-  // doc.setFont('helvetica', 'normal');
-  // // doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
-  // doc.addImage(logo, "PNG", pageWidth / 2 , 0, 10, 10);
-  
+
   // Section 1 heading
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bolditalic');
   doc.text('STUDENT REGISTRATION FORM', pageWidth / 2, 70, { align: 'center' });
-  
-  let yPosition = 80;
-  const lineHeight = 7;
+
+let yPosition = 80;
+  // const lineHeight = 7;
   const leftColumn = 20;
-  const rightColumn = 110;
-  
-  // Helper function to add a row
-  const addRow = (label: string, value: string, isHeader: boolean = false) => {
-    if (isHeader) {
-      // Header row with background
-      doc.setFillColor(240, 240, 240);
-      doc.rect(leftColumn - 2, yPosition - 5, pageWidth - 40, lineHeight + 2, 'F');
-    doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text(label, leftColumn, yPosition);
-    } else {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text(label, leftColumn, yPosition);
-      doc.text(value || '', rightColumn, yPosition);
-    }
-    yPosition += lineHeight;
-  };
+  // const rightColumn = 110;
+
+const fieldWidth = 80;
+const fieldHeight = 8;
+const gap = 10;
+
+const drawField = (x: number, y: number, label: string, value: string) => {
+ const safeLabel = label ? label.toUpperCase() : "";
+  const safeValue = value ? value : "";
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text(safeLabel, x, y);
+
+  // box
+  doc.setDrawColor(14, 68, 85);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(x, y + 2, fieldWidth, fieldHeight, 2, 3, "S");
+
+  // text inside
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(safeValue, x + 2, y + 2 + 6);
+};
+
+const addRow = (label1: any, value1: any, label2?: any, value2?: any) => {
+  const x1 = 15;
+  const x2 = x1 + fieldWidth + gap;
+
+  const rowY = yPosition; // lock starting Y for row
+
+  drawField(x1, rowY, label1, value1);
+  drawField(x2, rowY, label2, value2);
+
+  // move down for next row AFTER both fields
+  yPosition += fieldHeight + 14
+};
+
+const addSection = (title: string) => {
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(title.toUpperCase(), 15, yPosition + 6);
+
+  yPosition += 14;
+};
 
 const waterMark = await loadWaterMarkBase64();
 const fadedWatermark = await createFadedDataUrl(waterMark, 0.1);
@@ -382,14 +432,19 @@ doc.addImage(
 );
   
   // Personal Information Section
-  addRow('Personal Information', '', true);
-  addRow('Full Name:', formData.candidateName);
-  addRow('Father\'s Name:', formData.fatherName);
-  addRow('Mother\'s Name:', formData.motherName);
-  addRow('Date of Birth:', formData.dateOfBirth);
-  addRow('Gender:', formData.gender);
-  addRow('Category:', formData.category);
-  addRow('Aadhar Card No:', formData.adharCardNo);
+addSection("PERSONAL DETAILS");
+
+yPosition = 80; // after logo + heading
+
+addSection("Personal Details");
+
+addRow("Name", formData.candidateName, "Father's Name", formData.fatherName);
+addRow("Mother's Name", formData.motherName, "Date Of Birth", formData.dateOfBirth);
+addRow("Gender", formData.gender, "Category", formData.category);
+addRow("Aadhar Card No", formData.adharCardNo, "Contact Number", formData.contactNumber);
+addRow("Alternate Number", formData.alternateNumber, "Email", formData.emailAddress);
+
+
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -398,9 +453,9 @@ doc.addImage(
   }
   
   // Contact Information Section
-  addRow('Contact Information', '', true);
-  addRow('Contact Number:', formData.contactNumber);
-  addRow('Alternate Number:', formData.alternateNumber || '');
+addSection("Contact Information");
+
+  addRow('Contact Number:', formData.contactNumber, 'Alternate Number:', formData.alternateNumber || '');
   addRow('Email Address:', formData.emailAddress);
   
   // Check if we need a new page
@@ -410,14 +465,12 @@ doc.addImage(
   }
   
   // Address Information Section
-  addRow('Address Information', '', true);
-  addRow('Permanent Address:', formData.permanentAddress);
-  addRow('Current Address:', formData.currentAddress);
-  addRow('City:', formData.city);
-  addRow('State:', formData.state);
-  addRow('Country:', formData.country);
+  addSection("Address Information");
+
+  addRow('Permanent Address:', formData.permanentAddress, 'City:', formData.city);
+  addRow('Current Address:', formData.currentAddress, 'State:', formData.state);
+  addRow('Country:', formData.country, 'Pincode:', formData.pincode);
   addRow('Nationality:', formData.nationality);
-  addRow('Pincode:', formData.pincode);
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -425,10 +478,17 @@ doc.addImage(
     yPosition = 20;
   }
   
+  doc.addImage(
+  fadedWatermark,
+  "PNG",
+  (pageWidth / 2) - 60,
+  (pageHeight / 2) - 60,
+  120,
+  120
+);
   // Employment Information Section
-  addRow('Employment Information', '', true);
-  addRow('Employed:', formData.isEmployed);
-  addRow('Employer Name:', formData.employerName || '');
+addSection("Employment Information");
+  addRow('Employed:', formData.isEmployed, 'Employer Name:', formData.employerName || '');
   addRow('Designation:', formData.designation || '');
   
   // Check if we need a new page
@@ -438,17 +498,12 @@ doc.addImage(
   }
   
   // Academic Information Section
-  addRow('Academic Information', '', true);
-  addRow('Course Type:', formData.courseType);
-  addRow('Grade:', formData.grade);
-  addRow('Course:', formData.course);
-  addRow('Stream:', formData.stream);
-  addRow('Year:', formData.year);
-  addRow('Session:', formData.session);
-  addRow('Month Session:', formData.monthSession || '');
-  addRow('Duration:', formData.duration || '');
-  addRow('Course Fee:', formData.courseFee ? `₹${formData.courseFee}` : 'N/A');
-  addRow('Hostel Facility:', formData.hostelFacility || 'No');
+addSection("Academic Information");
+  addRow('Course Type:', formData.courseType, 'Grade:', formData.grade);
+  addRow('Course:', formData.course, 'Stream:', formData.stream);
+  addRow('Year:', formData.year, 'Session:', formData.session);
+  addRow('Month Session:', formData.monthSession || '', 'Duration:', formData.duration || '');
+  addRow('Course Fee:', formData.courseFee ? `${formData.courseFee}` : 'N/A', 'Hostel Facility:', formData.hostelFacility || '');
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -456,14 +511,14 @@ doc.addImage(
     yPosition = 20;
   }
   
-  // Documents Section
-  addRow('Documents Upload', '', true);
-  addRow('Photo:', formData.photo ? '[File Uploaded]' : '[Not Uploaded]');
-  addRow('Aadhar Front:', formData.adharCardFront ? '[File Uploaded]' : '[Not Uploaded]');
-  addRow('Aadhar Back:', formData.adharCardBack ? '[File Uploaded]' : '[Not Uploaded]');
-  addRow('Signature:', formData.signature ? '[File Uploaded]' : '[Not Uploaded]');
-  
-  // Declaration
+  doc.addImage(
+  fadedWatermark,
+  "PNG",
+  (pageWidth / 2) - 60,
+  (pageHeight / 2) - 60,
+  120,
+  120
+);
   yPosition += 10;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);

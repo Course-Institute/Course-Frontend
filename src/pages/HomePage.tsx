@@ -54,8 +54,10 @@ const handleClose = () => {
 
   // Hero images array
   const heroImages = [
-    '/images/hero/hero-image-1.png',
-    '/images/hero/hero-image-2.png'
+    '/images/hero/hero-image-1.jpg',
+    '/images/hero/hero-image-2.jpg',
+    '/images/hero/hero-image-3.jpg',
+    '/images/hero/hero-image-4.jpg',
   ];
 
   // Auto-rotate carousel every 15 seconds
@@ -207,20 +209,6 @@ const handleClose = () => {
             }}
           />
         ))}
-
-          {/* Overlay */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'rgba(14, 14, 14, 0.75)',
-              zIndex: 2,
-            }}
-          />
-
           {/* Hero Content */}
           <Box
             sx={{
@@ -236,85 +224,6 @@ const handleClose = () => {
               px: { xs: 2, sm: 4 },
             }}
           >
-            <Fade in timeout={1000}>
-              <Box>
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
-                    color: 'white',
-                    mb: 2,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  Shape Your Future
-                </Typography>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                    color: 'white',
-                    mb: 4,
-                    opacity: 0.95,
-                    maxWidth: '600px',
-                    mx: 'auto',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                  }}
-                >
-                  Transform your career with industry-relevant skills and hands-on training
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={() => setInquiryDialogOpen(true)}
-                    sx={{
-                      backgroundColor: 'white',
-                      color: '#2563eb',
-                      px: 4,
-                      py: 1.5,
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      borderRadius: 3,
-                      textTransform: 'none',
-                      boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
-                      '&:hover': {
-                        backgroundColor: '#f8fafc',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 12px 25px rgba(0,0,0,0.25)',
-                      },
-                    }}
-                  >
-                    Start Your Journey
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={handleProgramClick}
-                    sx={{
-                      borderColor: 'white',
-                      color: 'white',
-                      px: 4,
-                      py: 1.5,
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      borderRadius: 3,
-                      textTransform: 'none',
-                      borderWidth: 2,
-                      '&:hover': {
-                        borderColor: 'white',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 2,
-                      },
-                    }}
-                  >
-                    Explore Programs
-                  </Button>
-                </Box>
-              </Box>
-            </Fade>
           </Box>
 
         {/* Navigation Buttons */}
