@@ -245,7 +245,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
             overflow: 'hidden',
             '&::before': {
               content: '""',
-              position: 'absolute',
+            position: 'absolute',
               top: 0,
               left: 0,
               right: 0,

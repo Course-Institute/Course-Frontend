@@ -17,7 +17,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { ArrowBack, School, AccessTime, People, AttachMoney } from '@mui/icons-material';
+import { ArrowBack, School, AccessTime, People } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
 import { programsData } from '../constants/programsData';
@@ -313,18 +313,6 @@ const ProgramDetailPage = () => {
                       <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', color: '#1e293b' }}>
                         Eligibility
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', color: '#1e293b' }}>
-                        Course Fee
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', color: '#1e293b' }}>
-                        Exam Fee
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', color: '#1e293b' }}>
-                        Reg. Fee
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', color: '#1e293b' }}>
-                        Total Fee
-                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -353,18 +341,6 @@ const ProgramDetailPage = () => {
                         <TableCell sx={{ color: '#64748b' }}>
                           {course.eligibility}
                         </TableCell>
-                        <TableCell sx={{ color: '#64748b', fontWeight: '600' }}>
-                          ₹{course.courseFee.toLocaleString()}
-                        </TableCell>
-                        <TableCell sx={{ color: '#64748b', fontWeight: '600' }}>
-                          ₹{course.examFee.toLocaleString()}
-                        </TableCell>
-                        <TableCell sx={{ color: '#64748b', fontWeight: '600' }}>
-                          ₹{course.regFee.toLocaleString()}
-                        </TableCell>
-                        <TableCell sx={{ color: program.color, fontWeight: 'bold', fontSize: '1.1rem' }}>
-                          ₹{course.totalFee.toLocaleString()}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -374,8 +350,8 @@ const ProgramDetailPage = () => {
           </Card>
 
           {/* Summary Stats */}
-          <Grid container spacing={4} sx={{ mt: 4 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid container spacing={3} sx={{ mt: 4 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Card
                 sx={{
                   textAlign: 'center',
@@ -394,7 +370,7 @@ const ProgramDetailPage = () => {
                 </Typography>
               </Card>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Card
                 sx={{
                   textAlign: 'center',
@@ -413,7 +389,7 @@ const ProgramDetailPage = () => {
                 </Typography>
               </Card>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Card
                 sx={{
                   textAlign: 'center',
@@ -429,25 +405,6 @@ const ProgramDetailPage = () => {
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#64748b' }}>
                   Eligibility
-                </Typography>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card
-                sx={{
-                  textAlign: 'center',
-                  p: 3,
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${program.color}10 0%, ${program.color}05 100%)`,
-                  border: `1px solid ${program.color}20`,
-                }}
-              >
-                <AttachMoney sx={{ fontSize: 40, color: program.color, mb: 2 }} />
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: program.color, mb: 1 }}>
-                  ₹{program.levels[selectedLevelIndex].courses[0]?.totalFee.toLocaleString().slice(0, -3)}K
-                </Typography>
-                <Typography variant="body1" sx={{ color: '#64748b' }}>
-                  Total Fee
                 </Typography>
               </Card>
             </Grid>

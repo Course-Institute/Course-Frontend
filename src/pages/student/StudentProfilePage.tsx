@@ -86,7 +86,7 @@ const StudentProfilePage: React.FC = () => {
             course: profile.course,
             session: profile.session,
             year: profile.year,
-            faculty: profile.faculty,
+            grade: profile.grade,
             stream: profile.stream,
             contactNumber: profile.contactNumber,
             emailAddress: profile.emailAddress,
@@ -582,10 +582,10 @@ const StudentProfilePage: React.FC = () => {
                           letterSpacing: '0.5px',
                         }}
                       >
-                        Faculty
+                        Grade
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                        {profile?.faculty || 'N/A'}
+                        {profile?.grade || 'N/A'}
                       </Typography>
                     </Box>
                   </Grid>

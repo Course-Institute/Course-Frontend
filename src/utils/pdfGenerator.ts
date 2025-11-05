@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+// Provide a minimal declaration so TypeScript won't error for the plugin types
 
 interface CenterFormData {
   // Center Details
@@ -43,34 +44,89 @@ interface CenterFormData {
   username: string;
   password: string;
   confirmPassword: string;
+
+  photo?: File | null;
 }
 
-export const generateCenterFormPDF = (formData: CenterFormData): void => {
+const loadLogoBase64 = async () => {
+  const res = await fetch("/preview-header.png"); // path from public folder
+  const blob = await res.blob();
+
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+};
+
+const loadWaterMarkBase64 = async () => {
+  const res = await fetch("/institute-watermark.png"); // path from public folder
+  const blob = await res.blob();
+
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+};
+
+// Render the watermark into a temporary canvas with reduced opacity and add that image to the PDF.
+const createFadedDataUrl = (dataUrl: string, alpha = 0.1) =>
+  new Promise<string>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;   // ✅ full resolution
+      canvas.height = img.height; // ✅ full resolution
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject("Canvas context failed");
+
+      ctx.clearRect(0, 0, img.width, img.height);
+      ctx.globalAlpha = alpha; // watermark fade
+      ctx.drawImage(img, 0, 0);
+
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+
+
+
+export const generateCenterFormPDF = async (formData: CenterFormData): Promise<void> => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
+
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  // doc.text("Mahavir Institute", pageWidth / 2, 60, { align: "center" });
+  const logo = await loadLogoBase64();
+  doc.addImage(logo, "PNG", pageWidth / 2 - 75, 0, 150, 60);
   
   // Set font
   doc.setFont('helvetica');
   
-  // Header
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
+  // // Header
+  // doc.setFontSize(20);
+  // doc.setFont('helvetica', 'bold');
+  // doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
   
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Center Registration & Login Panel', pageWidth / 2, 40, { align: 'center' });
+  // doc.setFontSize(14);
+  // doc.setFont('helvetica', 'bold');
+  // doc.text('Center Registration & Login Panel', pageWidth / 2, 40, { align: 'center' });
   
-  // Logo placeholder
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
+  // // Logo placeholder
+  // doc.setFontSize(10);
+  // doc.setFont('helvetica', 'normal');
+  // doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
   
   // Section 1 heading
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bolditalic');
-  doc.text('SECTION 1: CENTER REGISTRATION FORM', 20, 65);
+  doc.text('CENTER REGISTRATION FORM', pageWidth / 2, 70, { align: 'center' });
   
   let yPosition = 80;
   const lineHeight = 7;
@@ -112,6 +168,17 @@ export const generateCenterFormPDF = (formData: CenterFormData): void => {
     doc.addPage();
     yPosition = 20;
   }
+  const waterMark = await loadWaterMarkBase64();
+  const fadedWatermark = await createFadedDataUrl(waterMark, 0.1);
+
+  doc.addImage(
+    fadedWatermark,
+    "PNG",
+    pageWidth / 2 - 60,
+    pageHeight / 2 - 60,
+    120,
+    120
+  );
   
   // Authorized Person Details Section
   addRow('Authorized Person Details', '', true);
@@ -234,7 +301,7 @@ interface StudentFormData {
   employerName?: string;
   designation?: string;
   courseType: string;
-  faculty: string;
+  grade: string;
   course: string;
   stream: string;
   year: string;
@@ -249,7 +316,7 @@ interface StudentFormData {
   signature?: File;
 }
 
-export const generateStudentFormPDF = (formData: StudentFormData): void => {
+export const generateStudentFormPDF = async (formData: StudentFormData): Promise<void>   => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -260,21 +327,24 @@ export const generateStudentFormPDF = (formData: StudentFormData): void => {
   // Header
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
+  // doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
+  const logo = await loadLogoBase64();
+  doc.addImage(logo, "PNG", pageWidth / 2 - 75, 0, 150, 60);
   
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Student Registration Form', pageWidth / 2, 40, { align: 'center' });
+  // doc.setFontSize(14);
+  // doc.setFont('helvetica', 'bold');
+  // doc.text('Student Registration Form', pageWidth / 2, 40, { align: 'center' });
   
   // Logo placeholder
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
+  // doc.setFontSize(10);
+  // doc.setFont('helvetica', 'normal');
+  // // doc.text('Place Institute Logo Here', pageWidth / 2, 50, { align: 'center' });
+  // doc.addImage(logo, "PNG", pageWidth / 2 , 0, 10, 10);
   
   // Section 1 heading
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bolditalic');
-  doc.text('SECTION 1: STUDENT REGISTRATION FORM', 20, 65);
+  doc.text('STUDENT REGISTRATION FORM', pageWidth / 2, 70, { align: 'center' });
   
   let yPosition = 80;
   const lineHeight = 7;
@@ -298,6 +368,18 @@ export const generateStudentFormPDF = (formData: StudentFormData): void => {
     }
     yPosition += lineHeight;
   };
+
+const waterMark = await loadWaterMarkBase64();
+const fadedWatermark = await createFadedDataUrl(waterMark, 0.1);
+
+doc.addImage(
+  fadedWatermark,
+  "PNG",
+  (pageWidth / 2) - 60,
+  (pageHeight / 2) - 60,
+  120,
+  120
+);
   
   // Personal Information Section
   addRow('Personal Information', '', true);
@@ -358,7 +440,7 @@ export const generateStudentFormPDF = (formData: StudentFormData): void => {
   // Academic Information Section
   addRow('Academic Information', '', true);
   addRow('Course Type:', formData.courseType);
-  addRow('Faculty:', formData.faculty);
+  addRow('Grade:', formData.grade);
   addRow('Course:', formData.course);
   addRow('Stream:', formData.stream);
   addRow('Year:', formData.year);
@@ -440,7 +522,6 @@ export const generateCenterFormPreview = (formData: CenterFormData): string => {
           margin-bottom: 20px;
         }
         .form-table th {
-          background-color: #f0f0f0;
           padding: 8px;
           text-align: left;
           font-weight: bold;

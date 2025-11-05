@@ -251,8 +251,8 @@ const ManageStudentsPage = () => {
       minWidth: '120px',
     },
     {
-      field: 'faculty',
-      headerName: 'Faculty',
+      field: 'grade',
+      headerName: 'Grade',
       minWidth: '120px',
     },
     {

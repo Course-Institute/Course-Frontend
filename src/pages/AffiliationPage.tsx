@@ -61,7 +61,7 @@ const AffiliationPage = () => {
       <LayoutWrapper backgroundColor="transparent">
         <div style={{ 
           flex: 1, 
-          padding: '64px 0', 
+          padding: '64px 0px', 
           background: `
           linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%)
 
@@ -148,7 +148,7 @@ const AffiliationPage = () => {
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-              gap: '32px',
+              gap: '72px',
               marginBottom: '48px',
               justifyContent: 'center',
               alignItems: 'center'
