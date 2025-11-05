@@ -60,7 +60,7 @@ interface FormData {
   pincode: string;
   courseType: string;
   course: string;
-  faculty: string;
+  grade: string;
   stream: string;
   year: string;
   session: string;
@@ -103,7 +103,7 @@ const initialFormData: FormData = {
   pincode: '',
   courseType: '',
   course: '',
-  faculty: '',
+  grade: '',
   stream: '',
   year: '2025',
   session: '2025',
@@ -277,7 +277,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
     }
     
     // Other required fields
-    const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'nationality', 'courseType', 'course', 'faculty', 'stream', 'year', 'session'];
+    const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'nationality', 'courseType', 'course', 'grade', 'year', 'session'];
     otherRequiredFields.forEach(field => {
       if (!formData[field as keyof FormData]) {
         newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
@@ -420,23 +420,31 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
         {/* Center Selection - Full Width */}
         <Grid size={12}>
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1e293b' }}>
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, fontWeight: "bold", color: "#1e293b" }}
+            >
               Center Information
             </Typography>
             {preFilledCenter ? (
-              <Box sx={{ 
-                p: 2, 
-                border: '1px solid #e5e7eb', 
-                borderRadius: 2, 
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2
-              }}>
-                <Typography variant="body1" sx={{ fontWeight: 'medium', color: '#374151' }}>
+              <Box
+                sx={{
+                  p: 2,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 2,
+                  backgroundColor: "#f9fafb",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: "medium", color: "#374151" }}
+                >
                   Selected Center: <strong>{preFilledCenter.centerName}</strong>
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                <Typography variant="body2" sx={{ color: "#6b7280" }}>
                   (Pre-filled from your center login)
                 </Typography>
               </Box>
@@ -449,8 +457,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 idKey="centerId"
                 customActionMethod="GET"
                 onSelect={(opt) => {
-                  handleInputChange('centerId', opt?.centerId ? opt.centerId : '');
-                  handleInputChange('center', opt);
+                  handleInputChange(
+                    "centerId",
+                    opt?.centerId ? opt.centerId : ""
+                  );
+                  handleInputChange("center", opt);
                 }}
                 selectedOptions={formData?.center ?? null}
                 error={!!errors.centerId}
@@ -471,7 +482,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Candidate Name *"
                   value={formData.candidateName}
-                  onChange={(e) => handleInputChange('candidateName', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("candidateName", e.target.value)
+                  }
                   error={!!errors.candidateName}
                   helperText={errors.candidateName}
                   placeholder="Candidate Name"
@@ -484,7 +497,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Mother's Name *"
                   value={formData.motherName}
-                  onChange={(e) => handleInputChange('motherName', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("motherName", e.target.value)
+                  }
                   error={!!errors.motherName}
                   helperText={errors.motherName}
                   placeholder="Mother's Name"
@@ -494,22 +509,31 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
               {/* Photo */}
               <Grid size={12}>
                 <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
                     Photo *
                   </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
-                    onChange={(e) => handleFileChange('photo', e.target.files?.[0] || null)}
-                    style={{ display: 'none' }}
+                    onChange={(e) =>
+                      handleFileChange("photo", e.target.files?.[0] || null)
+                    }
+                    style={{ display: "none" }}
                     id="photo-upload"
                   />
                   <label htmlFor="photo-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.photo ? formData.photo.name : 'Choose Photo'}
+                      {formData.photo ? formData.photo.name : "Choose Photo"}
                     </Button>
                   </label>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1, display: "block" }}
+                  >
                     Image only in jpg
                   </Typography>
                   {errors.photo && (
@@ -526,14 +550,18 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Gender *</InputLabel>
                   <Select
                     value={formData.gender}
-                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("gender", e.target.value)
+                    }
                     label="Gender *"
                   >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
                     <MenuItem value="Other">Other</MenuItem>
                   </Select>
-                  {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
+                  {errors.gender && (
+                    <FormHelperText>{errors.gender}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
@@ -543,8 +571,10 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Adharcard No. *"
                   value={formData.adharCardNo}
-                  type='number'
-                  onChange={(e) => handleInputChange('adharCardNo', e.target.value)}
+                  type="number"
+                  onChange={(e) =>
+                    handleInputChange("adharCardNo", e.target.value)
+                  }
                   error={!!errors.adharCardNo}
                   helperText={errors.adharCardNo}
                   placeholder="12-digit Aadhar Number"
@@ -555,19 +585,29 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
               {/* Adhar Card Back */}
               <Grid size={12}>
                 <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
                     Aadhar Card Back *
                   </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
-                    onChange={(e) => handleFileChange('adharCardBack', e.target.files?.[0] || null)}
-                    style={{ display: 'none' }}
+                    onChange={(e) =>
+                      handleFileChange(
+                        "adharCardBack",
+                        e.target.files?.[0] || null
+                      )
+                    }
+                    style={{ display: "none" }}
                     id="adhar-back-upload"
                   />
                   <label htmlFor="adhar-back-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.adharCardBack ? formData.adharCardBack.name : 'Choose Aadhar Back'}
+                      {formData.adharCardBack
+                        ? formData.adharCardBack.name
+                        : "Choose Aadhar Back"}
                     </Button>
                   </label>
                 </Box>
@@ -579,7 +619,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Employer Name"
                   value={formData.employerName}
-                  onChange={(e) => handleInputChange('employerName', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("employerName", e.target.value)
+                  }
                   placeholder="Employer Name"
                 />
               </Grid>
@@ -591,7 +633,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   label="Contact Number *"
                   type="number"
                   value={formData.contactNumber}
-                  onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("contactNumber", e.target.value)
+                  }
                   error={!!errors.contactNumber}
                   helperText={errors.contactNumber}
                   placeholder="10-digit Contact Number"
@@ -606,7 +650,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   label="Email Address *"
                   type="email"
                   value={formData.emailAddress}
-                  onChange={(e) => handleInputChange('emailAddress', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("emailAddress", e.target.value)
+                  }
                   error={!!errors.emailAddress}
                   helperText={errors.emailAddress}
                   placeholder="Email Address"
@@ -623,7 +669,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   value={formData.permanentAddress}
                   onChange={(e) => {
                     if (e.target.value.length <= 300) {
-                      handleInputChange('permanentAddress', e.target.value);
+                      handleInputChange("permanentAddress", e.target.value);
                     }
                   }}
                   error={!!errors.permanentAddress}
@@ -638,7 +684,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="State *"
                   value={formData.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  onChange={(e) => handleInputChange("state", e.target.value)}
                   error={!!errors.state}
                   helperText={errors.state}
                   placeholder="State"
@@ -651,7 +697,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Country *</InputLabel>
                   <Select
                     value={formData.country}
-                    onChange={(e) => handleInputChange('country', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("country", e.target.value)
+                    }
                     label="Country *"
                   >
                     <MenuItem value="">Select Country</MenuItem>
@@ -661,7 +709,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                     <MenuItem value="Canada">Canada</MenuItem>
                     <MenuItem value="Australia">Australia</MenuItem>
                   </Select>
-                  {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+                  {errors.country && (
+                    <FormHelperText>{errors.country}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
@@ -672,9 +722,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <Select
                     value={formData.courseType}
                     onChange={(e) => {
-                      handleInputChange('courseType', e.target.value);
+                      handleInputChange("courseType", e.target.value);
                       // Clear course field when course type changes
-                      handleInputChange('course', '');
+                      handleInputChange("course", "");
                     }}
                     label="Course Type *"
                   >
@@ -685,21 +735,31 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                       </MenuItem>
                     ))}
                   </Select>
-                  {errors.courseType && <FormHelperText>{errors.courseType}</FormHelperText>}
+                  {errors.courseType && (
+                    <FormHelperText>{errors.courseType}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
               {/* Course */}
               <Grid size={12}>
-                <FormControl fullWidth error={!!errors.course} disabled={!formData.courseType}>
+                <FormControl
+                  fullWidth
+                  error={!!errors.course}
+                  disabled={!formData.courseType}
+                >
                   <InputLabel>Course *</InputLabel>
                   <Select
                     value={formData.course}
-                    onChange={(e) => handleInputChange('course', e.target.value)}
-                    label="Course *"
+                    onChange={(e) =>
+                      handleInputChange("course", e.target.value)
+                    }
+                    label="Cours *"
                   >
                     <MenuItem value="">
-                      {formData.courseType ? 'Select Course' : 'Select Course Type First'}
+                      {formData.courseType
+                        ? "Select Course"
+                        : "Select Course Type First"}
                     </MenuItem>
                     {availableCourses.map((course) => (
                       <MenuItem key={course} value={course}>
@@ -707,7 +767,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                       </MenuItem>
                     ))}
                   </Select>
-                  {errors.course && <FormHelperText>{errors.course}</FormHelperText>}
+                  {errors.course && (
+                    <FormHelperText>{errors.course}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
@@ -717,7 +779,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Year *"
                   value={formData.year}
-                  onChange={(e) => handleInputChange('year', e.target.value)}
+                  onChange={(e) => handleInputChange("year", e.target.value)}
                   error={!!errors.year}
                   helperText={errors.year}
                 />
@@ -729,7 +791,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Session *"
                   value={formData.session}
-                  onChange={(e) => handleInputChange('session', e.target.value)}
+                  onChange={(e) => handleInputChange("session", e.target.value)}
                   error={!!errors.session}
                   helperText={errors.session}
                 />
@@ -742,7 +804,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   label="Course Fee (in Rs.)"
                   type="number"
                   value={formData.courseFee}
-                  onChange={(e) => handleInputChange('courseFee', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("courseFee", e.target.value)
+                  }
                   placeholder="Course Fee in Rs."
                   error={!!errors.courseFee}
                   helperText={errors.courseFee}
@@ -760,7 +824,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Father's Name *"
                   value={formData.fatherName}
-                  onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("fatherName", e.target.value)
+                  }
                   error={!!errors.fatherName}
                   helperText={errors.fatherName}
                   placeholder="Father's Name"
@@ -772,7 +838,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 <DateInput
                   label="Date of Birth *"
                   value={formData.dateOfBirth}
-                  onChange={(value) => handleInputChange('dateOfBirth', value)}
+                  onChange={(value) => handleInputChange("dateOfBirth", value)}
                   error={!!errors.dateOfBirth}
                   helperText={errors.dateOfBirth}
                   required
@@ -782,22 +848,33 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
               {/* Signature */}
               <Grid size={12}>
                 <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
                     Signature *
                   </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
-                    onChange={(e) => handleFileChange('signature', e.target.files?.[0] || null)}
-                    style={{ display: 'none' }}
+                    onChange={(e) =>
+                      handleFileChange("signature", e.target.files?.[0] || null)
+                    }
+                    style={{ display: "none" }}
                     id="signature-upload"
                   />
                   <label htmlFor="signature-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.signature ? formData.signature.name : 'Choose Signature'}
+                      {formData.signature
+                        ? formData.signature.name
+                        : "Choose Signature"}
                     </Button>
                   </label>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1, display: "block" }}
+                  >
                     Image only in jpg
                   </Typography>
                   {errors.signature && (
@@ -814,7 +891,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Category *</InputLabel>
                   <Select
                     value={formData.category}
-                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("category", e.target.value)
+                    }
                     label="Category *"
                   >
                     <MenuItem value="">Select Category</MenuItem>
@@ -824,26 +903,38 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                     <MenuItem value="ST">ST</MenuItem>
                     <MenuItem value="EWS">EWS</MenuItem>
                   </Select>
-                  {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
+                  {errors.category && (
+                    <FormHelperText>{errors.category}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
               {/* Adhar Card Front */}
               <Grid size={12}>
                 <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
                     Aadhar Card Front *
                   </Typography>
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg"
-                    onChange={(e) => handleFileChange('adharCardFront', e.target.files?.[0] || null)}
-                    style={{ display: 'none' }}
+                    onChange={(e) =>
+                      handleFileChange(
+                        "adharCardFront",
+                        e.target.files?.[0] || null
+                      )
+                    }
+                    style={{ display: "none" }}
                     id="adhar-front-upload"
                   />
                   <label htmlFor="adhar-front-upload">
                     <Button variant="outlined" component="span" fullWidth>
-                      {formData.adharCardFront ? formData.adharCardFront.name : 'Choose Aadhar Front'}
+                      {formData.adharCardFront
+                        ? formData.adharCardFront.name
+                        : "Choose Aadhar Front"}
                     </Button>
                   </label>
                 </Box>
@@ -855,13 +946,17 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Are you employed? *</InputLabel>
                   <Select
                     value={formData.isEmployed}
-                    onChange={(e) => handleInputChange('isEmployed', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("isEmployed", e.target.value)
+                    }
                     label="Are you employed? *"
                   >
                     <MenuItem value="No">No</MenuItem>
                     <MenuItem value="Yes">Yes</MenuItem>
                   </Select>
-                  {errors.isEmployed && <FormHelperText>{errors.isEmployed}</FormHelperText>}
+                  {errors.isEmployed && (
+                    <FormHelperText>{errors.isEmployed}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
@@ -871,7 +966,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Designation"
                   value={formData.designation}
-                  onChange={(e) => handleInputChange('designation', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("designation", e.target.value)
+                  }
                   placeholder="Designation"
                 />
               </Grid>
@@ -883,7 +980,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   label="Alternate No."
                   type="number"
                   value={formData.alternateNumber}
-                  onChange={(e) => handleInputChange('alternateNumber', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("alternateNumber", e.target.value)
+                  }
                   error={!!errors.alternateNumber}
                   helperText={errors.alternateNumber}
                   placeholder="10-digit Alternate Number"
@@ -901,7 +1000,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   value={formData.currentAddress}
                   onChange={(e) => {
                     if (e.target.value.length <= 300) {
-                      handleInputChange('currentAddress', e.target.value);
+                      handleInputChange("currentAddress", e.target.value);
                     }
                   }}
                   error={!!errors.currentAddress}
@@ -916,7 +1015,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="City *"
                   value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  onChange={(e) => handleInputChange("city", e.target.value)}
                   error={!!errors.city}
                   helperText={errors.city}
                   placeholder="City"
@@ -929,7 +1028,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Nationality *"
                   value={formData.nationality}
-                  onChange={(e) => handleInputChange('nationality', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("nationality", e.target.value)
+                  }
                   error={!!errors.nationality}
                   helperText={errors.nationality}
                   placeholder="Nationality"
@@ -943,7 +1044,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   label="Pincode *"
                   type="number"
                   value={formData.pincode}
-                  onChange={(e) => handleInputChange('pincode', e.target.value)}
+                  onChange={(e) => handleInputChange("pincode", e.target.value)}
                   error={!!errors.pincode}
                   helperText={errors.pincode}
                   placeholder="6-digit Pincode"
@@ -951,43 +1052,55 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 />
               </Grid>
 
-              {/* Faculty */}
+              {/* Grade */}
               <Grid size={12}>
-                <FormControl fullWidth error={!!errors.faculty}>
-                  <InputLabel>Faculty *</InputLabel>
+                <FormControl fullWidth error={!!errors.grade}>
+                  <InputLabel>Grade *</InputLabel>
                   <Select
-                    value={formData.faculty}
-                    onChange={(e) => handleInputChange('faculty', e.target.value)}
-                    label="Faculty *"
+                    value={formData.grade}
+                    onChange={(e) =>
+                      handleInputChange("grade", e.target.value)
+                    }
+                    label="Grade *"
                   >
-                    <MenuItem value="">Select Faculty</MenuItem>
-                    <MenuItem value="Engineering">Engineering</MenuItem>
-                    <MenuItem value="Management">Management</MenuItem>
-                    <MenuItem value="Science">Science</MenuItem>
-                    <MenuItem value="Arts">Arts</MenuItem>
-                    <MenuItem value="Commerce">Commerce</MenuItem>
+                    <MenuItem value="">Select Grade</MenuItem>
+                    <MenuItem value="10th">10th</MenuItem>
+                    <MenuItem value="12th">12th</MenuItem>
                   </Select>
-                  {errors.faculty && <FormHelperText>{errors.faculty}</FormHelperText>}
+                  {errors.grade && (
+                    <FormHelperText>{errors.grade}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
               {/* Stream */}
               <Grid size={12}>
-                <FormControl fullWidth error={!!errors.stream}>
-                  <InputLabel>Stream *</InputLabel>
+                <FormControl
+                  fullWidth
+                  error={!!errors.stream}
+                  disabled={formData.grade === "10th"} // ✅ Disable when 10th
+                >
+                  <InputLabel>Stream </InputLabel>
                   <Select
                     value={formData.stream}
-                    onChange={(e) => handleInputChange('stream', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("stream", e.target.value)
+                    }
                     label="Stream *"
                   >
                     <MenuItem value="">Select Stream</MenuItem>
+                    <MenuItem value="Arts">Arts</MenuItem>
+                    <MenuItem value="Biology">Biology</MenuItem>
+                    <MenuItem value="Commerce">Commerce</MenuItem>
                     <MenuItem value="Computer Science">Computer Science</MenuItem>
-                    <MenuItem value="Electronics">Electronics</MenuItem>
-                    <MenuItem value="Mechanical">Mechanical</MenuItem>
-                    <MenuItem value="Civil">Civil</MenuItem>
-                    <MenuItem value="Electrical">Electrical</MenuItem>
+                    <MenuItem value="Mathematics">
+                      Mathematics
+                    </MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
                   </Select>
-                  {errors.stream && <FormHelperText>{errors.stream}</FormHelperText>}
+                  {errors.stream && (
+                    <FormHelperText>{errors.stream}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
@@ -997,7 +1110,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Month Session</InputLabel>
                   <Select
                     value={formData.monthSession}
-                    onChange={(e) => handleInputChange('monthSession', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("monthSession", e.target.value)
+                    }
                     label="Month Session"
                   >
                     <MenuItem value="January">January</MenuItem>
@@ -1022,7 +1137,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Hostel Facility</InputLabel>
                   <Select
                     value={formData.hostelFacility}
-                    onChange={(e) => handleInputChange('hostelFacility', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("hostelFacility", e.target.value)
+                    }
                     label="Hostel Facility"
                   >
                     <MenuItem value="No">No</MenuItem>
@@ -1037,7 +1154,9 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   fullWidth
                   label="Duration"
                   value={formData.duration}
-                  onChange={(e) => handleInputChange('duration', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("duration", e.target.value)
+                  }
                   placeholder="Duration"
                 />
               </Grid>
@@ -1046,16 +1165,16 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
         </Grid>
 
         {/* Submit Button */}
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
           <Button
             type="submit"
             variant="contained"
             size="large"
             disabled={isSubmitting}
             sx={{
-              backgroundColor: '#3b82f6',
-              '&:hover': { backgroundColor: '#2563eb' },
-              textTransform: 'none',
+              backgroundColor: "#3b82f6",
+              "&:hover": { backgroundColor: "#2563eb" },
+              textTransform: "none",
               borderRadius: 2,
               px: 6,
               py: 1.5,
@@ -1066,8 +1185,10 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 <CircularProgress size={20} sx={{ mr: 1 }} />
                 Submitting...
               </>
+            ) : isStepMode ? (
+              "Next"
             ) : (
-              isStepMode ? 'Next' : 'Preview & Submit'
+              "Preview & Submit"
             )}
           </Button>
         </Box>

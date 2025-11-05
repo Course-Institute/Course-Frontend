@@ -88,7 +88,7 @@ Designation: ${formData.designation || 'N/A'}
 ACADEMIC INFORMATION
 -------------------
 Course Type: ${formData.courseType}
-Faculty: ${formData.faculty}
+Grade: ${formData.grade}
 Course: ${formData.course}
 Stream: ${formData.stream}
 Year: ${formData.year}
@@ -304,7 +304,7 @@ Generated on: ${new Date().toLocaleString()}
             {/* Academic Information */}
             <InfoCard title="Academic Information" icon={<School color="primary" />}>
               <InfoRow label="Course Type" value={formData.courseType} />
-              <InfoRow label="Faculty" value={formData.faculty} />
+              <InfoRow label="Grade" value={formData.grade} />
               <InfoRow label="Course" value={formData.course} />
               <InfoRow label="Stream" value={formData.stream} />
               <InfoRow label="Year" value={formData.year} />

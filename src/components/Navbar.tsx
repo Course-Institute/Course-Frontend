@@ -205,29 +205,29 @@ const Navbar = () => {
       {/* Header Image */}
       <Box
         sx={{
-          width: '100%',
-          height: { xs: '90px', sm: '22vh', md: '35vh' },
-          backgroundImage: 'url(/images/header/header-banner.png)',
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          '&::before': {
+          width: "100%",
+          height: { xs: "90px", sm: "22vh", md: "35vh" },
+          backgroundImage: "url(/images/header/header-banner.png)",
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          "&::before": {
             content: '""',
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.1)',
-          }
+            background: "rgba(0, 0, 0, 0.1)",
+          },
         }}
       >
         {/* Optional: Add text content here if needed */}
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{ position: "relative" }}>
           {/* You can add header text or logo here if needed */}
         </Box>
       </Box>
@@ -235,151 +235,189 @@ const Navbar = () => {
       {/* Announcement Strip */}
       <Box
         sx={{
-          width: '100%',
-          backgroundColor: '#0f2747',
-          color: '#ffffff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: { xs: 'flex-start', md: 'center' },
+          width: "100%",
+          backgroundColor: "#0f2747",
+          color: "#ffffff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: { xs: "flex-start", md: "center" },
           px: { xs: 1.5, sm: 2, md: 4 },
           py: 1,
-          position: 'static',
-          top: isSticky ? 0 : 'auto',
-          left: isSticky ? 0 : 'auto',
-          right: isSticky ? 0 : 'auto',
-          zIndex: isSticky ? 1301 : 'auto',
-          height: isSticky ? 25 : 'auto',
-          overflowX: { xs: 'auto', md: 'hidden' },
-          overflowY: 'hidden',
-          '&::-webkit-scrollbar': {
-            height: '4px',
+          position: "static",
+          top: isSticky ? 0 : "auto",
+          left: isSticky ? 0 : "auto",
+          right: isSticky ? 0 : "auto",
+          zIndex: isSticky ? 1301 : "auto",
+          height: isSticky ? 25 : "auto",
+          overflowX: { xs: "auto", md: "hidden" },
+          overflowY: "hidden",
+          "&::-webkit-scrollbar": {
+            height: "4px",
           },
-          '&::-webkit-scrollbar-track': {
-            background: 'rgba(255, 255, 255, 0.1)',
+          "&::-webkit-scrollbar-track": {
+            background: "rgba(255, 255, 255, 0.1)",
           },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(251, 191, 36, 0.5)',
-            borderRadius: '2px',
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(251, 191, 36, 0.5)",
+            borderRadius: "2px",
           },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: 'rgba(251, 191, 36, 0.7)',
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "rgba(251, 191, 36, 0.7)",
           },
         }}
       >
         <Box
           sx={{
-            width: { xs: 'max-content', md: '100%' },
-            maxWidth: { xs: 'none', md: '1440px' },
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            width: { xs: "max-content", md: "100%" },
+            maxWidth: { xs: "none", md: "1440px" },
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
             gap: { xs: 1, md: 1.5 },
-            whiteSpace: 'nowrap',
+            whiteSpace: "nowrap",
           }}
         >
-          <Typography 
-            sx={{ 
-              color: '#fbbf24', 
+          <Typography
+            sx={{
+              color: "#fbbf24",
               fontWeight: 700,
-              fontSize: { xs: '0.875rem', md: '1rem' },
-              whiteSpace: 'nowrap',
+              fontSize: { xs: "0.875rem", md: "1rem" },
+              whiteSpace: "nowrap",
               flexShrink: 0,
             }}
           >
             Announcement:
           </Typography>
-          <Typography 
-            sx={{ 
-              fontWeight: 600, 
-              fontSize: { xs: '0.875rem', md: '0.95rem' },
-              whiteSpace: 'nowrap',
+          <Typography
+            sx={{
+              fontWeight: 600,
+              fontSize: { xs: "0.875rem", md: "0.95rem" },
+              whiteSpace: "nowrap",
               flexShrink: 0,
             }}
           >
-            Admission Open: 2025–2026 | Diploma in Nursery Teacher Training (Teaching) | PGDCA | BLIS
-            | IT Programs | Beauty & Wellness Programs | @ +91 93106 55232
+            <Box
+              sx={{
+                width: '100%',
+                overflow: 'hidden',
+                position: 'relative',
+                // marquee container styling
+                '& .marquee': {
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap',
+                  px: 1,
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: { xs: '0.875rem', md: '0.95rem' },
+                  animation: 'marquee 34s linear infinite',
+                },
+                // keyframes for the marquee animation
+                '@keyframes marquee': {
+                  '0%': { transform: 'translateX(100%)' },
+                  '100%': { transform: 'translateX(-100%)' },
+                },
+              }}
+              aria-hidden={false}
+            >
+              <Box component="div" className="marquee">
+                Admission Open: 2025–2026 | Diploma in Nursery Teacher Training
+                (Teaching) | PGDCA | BLIS | IT Programs | Beauty & Wellness
+                Programs | @ +91 93106 55232
+              </Box>
+            </Box>
           </Typography>
         </Box>
       </Box>
 
       <AppBar
-        position={isSticky ? 'fixed' : 'static'}
+        position={isSticky ? "fixed" : "static"}
         sx={{
-          top: isSticky ? 0 : 'auto',
-          zIndex: isSticky ? 1500 : 'auto',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+          top: isSticky ? 0 : "auto",
+          zIndex: isSticky ? 1500 : "auto",
+          background:
+            "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)",
+          backdropFilter: "blur(20px)",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
         }}
       >
         <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
           {/* Logo Only */}
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              cursor: 'pointer',
-              '&:hover': {
-                transform: 'scale(1.02)',
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              "&:hover": {
+                transform: "scale(1.02)",
               },
-              transition: 'all 0.3s ease',
+              transition: "all 0.3s ease",
             }}
             onClick={handleLogoClick}
           >
-            <InstituteLogo width={60} height={60} sx={{ color: '#2563eb' }} />
+            <InstituteLogo width={60} height={60} sx={{ color: "#2563eb" }} />
           </Box>
 
           {/* All Navigation Items in One Line */}
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 1, 
-            flexGrow: 1, 
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexWrap: 'nowrap',
-            overflow: 'hidden',
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "nowrap",
+              overflow: "hidden",
+            }}
+          >
             {navItems.map((item) => (
               <Button
                 key={item.id}
                 onClick={() => handleNavigation(item.path)}
                 sx={{
-                  color: window.location.pathname === item.path ? '#2563eb' : '#475569',
-                  fontWeight: window.location.pathname === item.path ? 'bold' : '600',
-                  textTransform: 'none',
-                  position: 'relative',
+                  color:
+                    window.location.pathname === item.path
+                      ? "#2563eb"
+                      : "#475569",
+                  fontWeight:
+                    window.location.pathname === item.path ? "bold" : "600",
+                  textTransform: "none",
+                  position: "relative",
                   px: 2,
                   py: 1,
                   borderRadius: 2,
-                  fontSize: '0.9rem',
-                  minWidth: 'auto',
-                  whiteSpace: 'nowrap',
-                  border: 'none',
-                  outline: 'none',
-                  '&:hover': {
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    color: '#2563eb',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                    border: 'none',
+                  fontSize: "0.9rem",
+                  minWidth: "auto",
+                  whiteSpace: "nowrap",
+                  border: "none",
+                  outline: "none",
+                  "&:hover": {
+                    backgroundColor: "rgba(37, 99, 235, 0.1)",
+                    color: "#2563eb",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
+                    border: "none",
                   },
-                  '&:focus': {
-                    outline: 'none',
-                    border: 'none',
+                  "&:focus": {
+                    outline: "none",
+                    border: "none",
                   },
-                  '&::before': window.location.pathname === item.path ? {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '80%',
-                    height: 3,
-                    background: 'linear-gradient(90deg, #2563eb, #10b981)',
-                    borderRadius: '2px 2px 0 0',
-                  } : {},
-                  transition: 'all 0.3s ease',
+                  "&::before":
+                    window.location.pathname === item.path
+                      ? {
+                          content: '""',
+                          position: "absolute",
+                          bottom: 0,
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: "80%",
+                          height: 3,
+                          background:
+                            "linear-gradient(90deg, #2563eb, #10b981)",
+                          borderRadius: "2px 2px 0 0",
+                        }
+                      : {},
+                  transition: "all 0.3s ease",
                 }}
               >
                 {item.label}
@@ -388,27 +426,28 @@ const Navbar = () => {
           </Box>
 
           {/* Login Buttons */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               variant="contained"
               size="small"
-              onClick={() => handleLoginClick('Student')}
+              onClick={() => handleLoginClick("Student")}
               sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                color: 'white',
-                textTransform: 'none',
+                background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                color: "white",
+                textTransform: "none",
                 px: 2,
                 py: 1,
                 borderRadius: 2,
-                fontWeight: 'bold',
-                fontSize: '0.8rem',
-                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.4)',
+                fontWeight: "bold",
+                fontSize: "0.8rem",
+                boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(37, 99, 235, 0.4)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               Student
@@ -416,23 +455,24 @@ const Navbar = () => {
             <Button
               variant="contained"
               size="small"
-              onClick={() => handleLoginClick('Center')}
+              onClick={() => handleLoginClick("Center")}
               sx={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: 'white',
-                textTransform: 'none',
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                color: "white",
+                textTransform: "none",
                 px: 2,
                 py: 1,
                 borderRadius: 2,
-                fontWeight: 'bold',
-                fontSize: '0.8rem',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                fontWeight: "bold",
+                fontSize: "0.8rem",
+                boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               Center
@@ -440,23 +480,24 @@ const Navbar = () => {
             <Button
               variant="contained"
               size="small"
-              onClick={() => handleLoginClick('App')}
+              onClick={() => handleLoginClick("App")}
               sx={{
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                color: 'white',
-                textTransform: 'none',
+                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                color: "white",
+                textTransform: "none",
                 px: 2,
                 py: 1,
                 borderRadius: 2,
-                fontWeight: 'bold',
-                fontSize: '0.8rem',
-                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)',
+                fontWeight: "bold",
+                fontSize: "0.8rem",
+                boxShadow: "0 2px 8px rgba(245, 158, 11, 0.3)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #d97706 0%, #b45309 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               App
@@ -470,17 +511,17 @@ const Navbar = () => {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ 
-                ml: 'auto',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                '&:hover': {
-                  backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                  transform: 'scale(1.05)',
+              sx={{
+                ml: "auto",
+                backgroundColor: "rgba(37, 99, 235, 0.1)",
+                "&:hover": {
+                  backgroundColor: "rgba(37, 99, 235, 0.2)",
+                  transform: "scale(1.05)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
-              <MenuIcon sx={{ color: '#2563eb' }} />
+              <MenuIcon sx={{ color: "#2563eb" }} />
             </IconButton>
           )}
         </Toolbar>
@@ -504,11 +545,11 @@ const Navbar = () => {
           keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 250 },
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 250 },
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
           <IconButton onClick={handleDrawerToggle}>
             <CloseIcon />
           </IconButton>

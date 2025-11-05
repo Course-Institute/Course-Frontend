@@ -75,7 +75,7 @@ export interface AddStudentData {
   pincode: string;
   courseType: string;
   course: string;
-  faculty: string;
+  grade: string;
   stream: string;
   year: string;
   session: string;
