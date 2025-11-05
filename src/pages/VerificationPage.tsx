@@ -12,7 +12,7 @@ interface VerificationResult {
     registrationNo: string;
     candidateName: string;
     course: string;
-    faculty: string;
+    grade: string;
     stream: string;
     year: string;
     session: string;
@@ -47,7 +47,7 @@ const VerificationPage = () => {
           registrationNo: response.data.registrationNo,
           candidateName: response.data.candidateName,
           course: response.data.course,
-          faculty: response.data.faculty,
+          grade: response.data.grade,
           stream: response.data.stream,
           year: response.data.year,
           session: response.data.session,
@@ -293,10 +293,10 @@ const VerificationPage = () => {
                           </Box>
                           <Box>
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 0.5 }}>
-                              Faculty
+                              Grade
                             </Typography>
                             <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-                              {result.student.faculty}
+                              {result.student.grade}
                             </Typography>
                           </Box>
                           <Box>
