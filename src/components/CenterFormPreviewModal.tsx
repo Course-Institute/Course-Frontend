@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon, Download as DownloadIcon } from '@mui/icons-material';
 import { generateCenterFormPDF } from '../utils/pdfGenerator';
+import InstituteLogo from './InstituteLogo';
 
 interface CenterFormData {
   // Center Details
@@ -115,17 +116,28 @@ const CenterFormPreviewModal: React.FC<CenterFormPreviewModalProps> = ({
               margin: '0 auto',
             }}
           >
-            {/* Header */}
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-                Mahavir Institute
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                Center Registration & Login Panel
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Place Institute Logo Here
-              </Typography>
+            {/* Branding Header */}
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              p: 1.5,
+              borderRadius: 2,
+              mb: 3,
+              background: 'linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)',
+              border: '1px solid #e2e8f0',
+            }}>
+              <Box sx={{ p: 1, borderRadius: 2, backgroundColor: 'white', border: '1px solid #e5e7eb' }}>
+                <InstituteLogo width={48} height={48} sx={{ borderRadius: 1 }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
+                  Mahavir Institute of Vocational & Paramedical Science
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#475569' }}>
+                  Center Registration Preview
+                </Typography>
+              </Box>
             </Box>
 
             {/* Section Title */}

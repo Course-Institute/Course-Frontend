@@ -24,6 +24,7 @@ import {
 import DialogBox from './core-components/DialogBox/DialogBox';
 import { type AddStudentData } from '../hooks/useAddStudent';
 import { generateStudentFormPDF } from '../utils/pdfGenerator';
+import InstituteLogo from './InstituteLogo';
 
 interface StudentFormPreviewDialogProps {
   open: boolean;
@@ -191,6 +192,30 @@ Generated on: ${new Date().toLocaleString()}
         display: 'flex',
         flexDirection: 'column'
       }}>
+        {/* Branding Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          p: 1.5,
+          borderRadius: 2,
+          mb: 1.5,
+          background: 'linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)',
+          border: '1px solid #e2e8f0',
+          flexShrink: 0,
+        }}>
+          <Box sx={{ p: 1, borderRadius: 2, backgroundColor: 'white', border: '1px solid #e5e7eb' }}>
+            <InstituteLogo width={44} height={44} sx={{ borderRadius: 1 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
+              Mahavir Institute of Vocational & Paramedical Science
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#475569' }}>
+              Student Registration Preview
+            </Typography>
+          </Box>
+        </Box>
         {/* Download Button */}
         <Tooltip title="Download PDF">
           <IconButton

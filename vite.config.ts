@@ -9,7 +9,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    port: 4000,
+    port: 4001,
     proxy: {
       '/api': {
         target : process.env.NODE_ENV === 'production'
