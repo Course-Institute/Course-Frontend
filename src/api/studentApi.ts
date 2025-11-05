@@ -20,7 +20,7 @@ export interface StudentProfile {
   country: string;
   pincode: string;
   courseType: string;
-  faculty: string;
+  grade: string;
   course: string;
   stream: string;
   year: string;
