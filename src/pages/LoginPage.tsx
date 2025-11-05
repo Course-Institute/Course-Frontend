@@ -356,14 +356,7 @@ const LoginPage = () => {
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 3,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        border: `2px solid ${getThemeConfig().primaryColor}20`,
-                        '&:hover': {
-                          border: `2px solid ${getThemeConfig().primaryColor}40`,
-                        },
-                        '&.Mui-focused': {
-                          border: `2px solid ${getThemeConfig().primaryColor}`,
-                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
-                        },
+                        
                       },
                       '& .MuiInputLabel-root': {
                         color: getThemeConfig().primaryColor,
@@ -389,14 +382,7 @@ const LoginPage = () => {
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 3,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        border: `2px solid ${getThemeConfig().primaryColor}20`,
-                        '&:hover': {
-                          border: `2px solid ${getThemeConfig().primaryColor}40`,
-                        },
-                        '&.Mui-focused': {
-                          border: `2px solid ${getThemeConfig().primaryColor}`,
-                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
-                        },
+                       
                       },
                       '& .MuiInputLabel-root': {
                         color: getThemeConfig().primaryColor,
@@ -418,14 +404,7 @@ const LoginPage = () => {
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 3,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        border: `2px solid ${getThemeConfig().primaryColor}20`,
-                        '&:hover': {
-                          border: `2px solid ${getThemeConfig().primaryColor}40`,
-                        },
-                        '&.Mui-focused': {
-                          border: `2px solid ${getThemeConfig().primaryColor}`,
-                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
-                        },
+                        
                       },
                       '& .MuiInputLabel-root': {
                         color: getThemeConfig().primaryColor,
@@ -447,14 +426,7 @@ const LoginPage = () => {
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 3,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        border: `2px solid ${getThemeConfig().primaryColor}20`,
-                        '&:hover': {
-                          border: `2px solid ${getThemeConfig().primaryColor}40`,
-                        },
-                        '&.Mui-focused': {
-                          border: `2px solid ${getThemeConfig().primaryColor}`,
-                          boxShadow: `0 0 0 3px ${getThemeConfig().primaryColor}20`,
-                        },
+                        
                       },
                       '& .MuiInputLabel-root': {
                         color: getThemeConfig().primaryColor,
@@ -481,7 +453,7 @@ const LoginPage = () => {
               )}
 
               {/* Options */}
-              <Grid container justifyContent="end" sx={{ mb: 4 }}>
+              {/* <Grid container justifyContent="end" sx={{ mb: 4 }}>
                 <Grid size="auto">
                   <Button
                     variant="text"
@@ -498,7 +470,7 @@ const LoginPage = () => {
                     Reset password
                   </Button>
                 </Grid>
-              </Grid>
+              </Grid> */}
 
               {/* Submit Button */}
               <Button
