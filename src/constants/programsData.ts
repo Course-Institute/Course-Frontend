@@ -25,7 +25,6 @@ export interface Program {
   color: string;
   image: string;
   levels: ProgramLevel[];
-  background?: string;
 }
 
 // Import IT, Vocational, Beauty & Wellness, Apparel, and Agriculture programs
@@ -41,8 +40,8 @@ export const programsData: Program[] = [
     category: "Paramedical",
     focusArea: "Healthcare support, diagnostics",
     description: "Step into the vital world of healthcare. Our paramedical courses train students in diagnostic, technical, and patient care skills. Graduates are prepared to work in hospitals, labs, and clinics.",
-    color: "#00184dff",
-    image: "https://images.unsplash.com/photo-1572996489045-96ed977a73b4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
+    color: "#2563eb",
+    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     levels: [
       {
         id: "paramedical-cert-12th",
@@ -205,8 +204,8 @@ export const programsData: Program[] = [
     category: "Fire Safety",
     focusArea: "Emergency response, safety training",
     description: "Specialized training that saves lives. Learn how to handle emergencies, prevent hazards, and manage fire safety equipment. Prepares students for roles in industries, buildings, safety departments, and government sectors.",
-    color: "#00184dff",
-    image: "https://images.unsplash.com/photo-1575867094974-9e16b6f55360?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
+    color: "#1d4ed8",
+    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     levels: [
       {
         id: "fire-safety-cert-12th",
@@ -287,8 +286,8 @@ export const programsData: Program[] = [
     category: "NTT",
     focusArea: "Early childhood education",
     description: "Shape young minds and build a career in education. Provides insights into child development, classroom management, and early learning strategies.",
-    color: "#00184dff",
-    image: "https://images.unsplash.com/photo-1600173845923-ad1412bfab75?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
+    color: "#34d399",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     levels: [
       {
         id: "ntt-cert-10th",
@@ -333,8 +332,8 @@ export const programsData: Program[] = [
     category: "Yoga & Naturopathy",
     focusArea: "Holistic health, therapy",
     description: "A perfect combination of traditional wisdom and modern wellness. Yoga programs focus on body, mind, and spirit. Preparing students to become certified Yoga Trainers, Naturopaths, and Wellness Therapists.",
-    color: "#00184dff",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1220",
+    color: "#059669",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     levels: [
       {
         id: "yoga-cert-12th",
