@@ -27,6 +27,7 @@ import {
   Star,
   CheckCircle,
   People,
+  Verified,
 } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import FooterSection from '../components/FooterSection';
@@ -919,6 +920,161 @@ const HomePage = () => {
                           {feature.description}
                         </Typography>
                       </CardContent>
+                    </Card>
+                  </Slide>
+                </Box>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* Our Certifications Section */}
+        <Box sx={{
+          background: '#ffffff',
+          py: { xs: 6, sm: 8 },
+          position: 'relative',
+          overflow: 'hidden',
+          width: '100%',
+          maxWidth: '100%',
+        }}>
+          {/* Background Pattern */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: '300px',
+              height: '300px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '50%',
+              transform: 'translate(30%, -30%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '250px',
+              height: '250px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '50%',
+              transform: 'translate(-30%, 30%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+          
+          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+            <Fade in timeout={1000}>
+              <Box sx={{ textAlign: 'center', mb: 6 }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    mb: 3,
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                    textShadow: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                  }}
+                >
+                  <Verified sx={{ color: '#2563eb', fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }} />
+                  Our Certifications
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#475569',
+                    maxWidth: '600px',
+                    mx: 'auto',
+                    fontSize: { xs: '1rem', sm: '1.1rem' },
+                    textShadow: 'none',
+                  }}
+                >
+                  Recognized and accredited by leading educational bodies and industry organizations
+                </Typography>
+              </Box>
+            </Fade>
+
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, 
+              gap: 3 
+            }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((index) => (
+                <Box key={index}>
+                  <Slide direction="up" in timeout={1200 + index * 100}>
+                    <Card
+                      sx={{
+                        borderRadius: 3,
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                        border: '1px solid #e2e8f0',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        aspectRatio: '1 / 1',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                          '& .cert-image': {
+                            transform: 'scale(1.1)',
+                          },
+                          '& .cert-overlay': {
+                            opacity: 1,
+                          },
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: '100%',
+                          height: '100%',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={`/uploads/certification-${index}.jpg`}
+                          alt={`Certification ${index}`}
+                          className="cert-image"
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.5s ease',
+                          }}
+                          onError={(e: any) => {
+                            // Fallback to a placeholder if image doesn't exist
+                            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e2e8f0" width="400" height="400"/%3E%3Ctext fill="%2394a3b8" font-family="sans-serif" font-size="18" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ECertification ' + index + '%3C/text%3E%3C/svg%3E';
+                          }}
+                        />
+                        <Box
+                          className="cert-overlay"
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(16, 185, 129, 0.8) 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0,
+                            transition: 'opacity 0.3s ease',
+                          }}
+                        >
+                          <Verified sx={{ color: 'white', fontSize: '3rem' }} />
+                        </Box>
+                      </Box>
                     </Card>
                   </Slide>
                 </Box>
