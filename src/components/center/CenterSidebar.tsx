@@ -13,10 +13,8 @@ import {
 import {
   Dashboard,
   People,
-  Assessment,
   Logout as LogoutIcon,
   PersonAdd,
-  Payment,
   Assignment,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
@@ -55,8 +53,6 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
     { id: 1, label: 'Dashboard', icon: <Dashboard />, path: '/center-dashboard' },
     { id: 2, label: 'Add Student', icon: <PersonAdd />, path: '/center/add-student' },
     { id: 3, label: 'Manage Students', icon: <People />, path: '/center/students' },
-    { id: 4, label: 'Create Bill', icon: <Payment />, path: '/center/create-bill' },
-    { id: 5, label: 'Manage Bills', icon: <Assessment />, path: '/center/bills' },
     { id: 6, label: 'Add Marksheet', icon: <Assignment />, path: '/center/add-marksheet' },
     // { id: 9, label: 'Payment Tracking', icon: <Payment />, path: '/center/payments' },
     // { id: 10, label: 'Reports', icon: <Assessment />, path: '/center/reports' },

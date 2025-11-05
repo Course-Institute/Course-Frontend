@@ -240,6 +240,7 @@ const InquiryDialog = ({ open, onClose, title = "Ready to Start Your Journey?", 
             background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
             boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
             border: '1px solid rgba(59, 130, 246, 0.2)',
+            mt:10,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
