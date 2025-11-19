@@ -7,7 +7,6 @@ import {
   validateAddress,
   validatePassword,
   validateConfirmPassword,
-  validateFileSize,
   validateRequired,
   validateNumber,
   validatePinCode,
@@ -152,16 +151,21 @@ export function useCenterForm(): {
       return { isValid: false, error: 'File is required' };
     }
     
+    const maxSizeBytes = 200 * 1024; // 200KB
+    
     if (Array.isArray(files)) {
       // Multiple files validation
-      const hasInvalidFile = files.some(file => !validateFileSize(file).isValid);
+      const hasInvalidFile = files.some(file => file.size > maxSizeBytes);
       if (hasInvalidFile) {
-        return { isValid: false, error: 'One or more files exceed the 2MB limit' };
+        return { isValid: false, error: 'One or more files exceed the 200KB limit' };
       }
       return { isValid: true };
     } else {
       // Single file validation
-      return validateFileSize(files);
+      if (files.size > maxSizeBytes) {
+        return { isValid: false, error: 'File size must be less than 200KB' };
+      }
+      return { isValid: true };
     }
   }, []);
 

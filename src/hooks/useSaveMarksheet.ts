@@ -14,14 +14,34 @@ export interface SubjectData {
 export interface MarksheetFormData {
   studentId: string;
   subjects: SubjectData[];
+  semester?: string;
+  courseId?: string; // Course ID for the marksheet
   role?: string;
+  marksheetId?: string; // For updates
 }
 
 export const useSaveMarksheet = () => {
   return useMutation({
     mutationFn: async (data: MarksheetFormData) => {
-      const response = await axiosInstance.post('/api/marksheet/upload-marksheet', data);
-      return response.data;
+      // If marksheetId is provided, update existing marksheet using POST
+      if (data.marksheetId) {
+        const response = await axiosInstance.post(
+          '/api/marksheet/update-marksheet',
+          {
+            marksheetId: data.marksheetId,
+            studentId: data.studentId,
+            subjects: data.subjects,
+            semester: data.semester,
+            courseId: data.courseId,
+            role: data.role,
+          }
+        );
+        return response.data;
+      } else {
+        // Otherwise, create new marksheet
+        const response = await axiosInstance.post('/api/marksheet/upload-marksheet', data);
+        return response.data;
+      }
     },
     onError: (error: any) => {
       console.error('Error saving marksheet:', error);

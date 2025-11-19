@@ -21,7 +21,10 @@ import {
   Chip,
   Fade,
   Slide,
-  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import { 
   Add as AddIcon, 
@@ -34,6 +37,9 @@ import {
 } from '@mui/icons-material';
 import ApiBasedAutoComplete from '../../components/core-components/apiBasedAutoComplete';
 import { useSaveMarksheet, type SubjectData, type MarksheetFormData } from '../../hooks/useSaveMarksheet';
+import { useCourses } from '../../hooks/useCourses';
+import { useCourseSubjects } from '../../hooks/useCourseSubjects';
+import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
 import {
   calculateTotal,
   validateSubject,
@@ -48,6 +54,9 @@ const AddMarksheetPageCenter = () => {
   const [centerId, setCenterId] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [subjects, setSubjects] = useState<SubjectData[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [semester, setSemester] = useState("");
+  const [existingMarksheetId, setExistingMarksheetId] = useState<string | null>(null);
   const [currentSubject, setCurrentSubject] = useState({
     subjectName: '',
     marks: '',
@@ -59,6 +68,30 @@ const AddMarksheetPageCenter = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [, setTableErrors] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch courses from API
+  const { courses, isLoading: isLoadingCourses } = useCourses();
+
+  // Normalize selectedCourse to always be a string (extract _id if it's an object)
+  const normalizedCourseId = selectedCourse 
+    ? (typeof selectedCourse === 'string' 
+        ? selectedCourse 
+        : (selectedCourse as any)?._id || String(selectedCourse))
+    : "";
+
+  // Fetch subjects based on selected course and semester
+  const { subjects: courseSubjects, isLoading: isLoadingSubjects } = useCourseSubjects(
+    normalizedCourseId,
+    semester
+  );
+
+  // Fetch existing marksheet for selected student and semester
+  const studentId = selectedStudent?.studentId || selectedStudent?.id || "";
+  const { data: existingMarksheet, isLoading: isLoadingMarksheet } = useGetMarksheetBySemester(
+    studentId,
+    semester,
+    !!studentId && !!semester
+  );
 
   useEffect(() => {
     // Read centerId from localStorage when component mounts or when it changes
@@ -129,9 +162,94 @@ const AddMarksheetPageCenter = () => {
     showToast('Subject removed successfully!', 'info');
   };
 
+  /* ---------------------------------------------------------------
+                     COURSE CHANGE → LOAD SUBJECTS
+  --------------------------------------------------------------- */
+  const handleCourseChange = (courseId: string) => {
+    setSelectedCourse(courseId);
+    // Reset subject when course changes
+    setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
+  };
+
+  /* ---------------------------------------------------------------
+                     SEMESTER CHANGE → RELOAD SUBJECTS
+  --------------------------------------------------------------- */
+  const handleSemesterChange = (newSemester: string) => {
+    // Clear course and subjects when semester changes
+    if (subjects.length === 0) {
+      setSelectedCourse("");
+      setCurrentSubject({
+        subjectName: "",
+        marks: "",
+        internal: "",
+        total: "",
+        minMarks: "",
+        maxMarks: "",
+      });
+    }
+    setSemester(newSemester);
+    setExistingMarksheetId(null);
+    setSubjects([]);
+    
+    // Reset subject selection when semester changes
+    setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
+    
+    if (errors.semester) {
+      const newErrors = { ...errors };
+      delete newErrors.semester;
+      setErrors(newErrors);
+    }
+  };
+
+  // Load existing marksheet data when it's fetched
+  useEffect(() => {
+    // Only process if we have a valid marksheet response and not loading
+    if (!isLoadingMarksheet && existingMarksheet && existingMarksheet._id) {
+      setExistingMarksheetId(existingMarksheet._id);
+      
+      // Pre-select course if it exists in marksheet
+      if (existingMarksheet.courseId) {
+        // Extract courseId if it's an object (handle populated courseId)
+        const courseIdValue = typeof existingMarksheet.courseId === 'string' 
+          ? existingMarksheet.courseId 
+          : (existingMarksheet.courseId as any)?._id || existingMarksheet.courseId;
+        setSelectedCourse(courseIdValue);
+      }
+      
+      // Convert existing subjects to the format expected by the form
+      if (existingMarksheet.subjects && existingMarksheet.subjects.length > 0) {
+        const formattedSubjects: SubjectData[] = existingMarksheet.subjects.map((sub: any, index: number) => ({
+          id: sub.id || `existing-${Date.now()}-${index}`,
+          subjectName: sub.subjectName,
+          marks: sub.marks,
+          internal: sub.internal,
+          total: sub.total,
+          minMarks: sub.minMarks,
+          maxMarks: sub.maxMarks,
+        }));
+        setSubjects(formattedSubjects);
+      } else {
+        // Marksheet exists but has no subjects yet
+        setSubjects([]);
+      }
+    } else if (!isLoadingMarksheet && (!existingMarksheet || existingMarksheet === null) && studentId && semester) {
+      // No existing marksheet found, ensure we're in create mode
+      // Only reset if we don't have any subjects added yet (to avoid clearing user input)
+      if (subjects.length === 0) {
+        setExistingMarksheetId(null);
+        setSelectedCourse(""); // Reset course when no marksheet found
+      }
+    }
+  }, [existingMarksheet, isLoadingMarksheet, studentId, semester]);
+
   // Handle input change
   const handleInputChange = (field: string, value: string) => {
-    setErrors({});
+    // Clear field-specific errors
+    if (errors[field]) {
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+    }
 
     let updatedSubject = { ...currentSubject, [field]: value };
 
@@ -145,11 +263,15 @@ const AddMarksheetPageCenter = () => {
 
     setCurrentSubject(updatedSubject);
 
-    // Real-time validation for total marks (center limitation)
+    // Real-time validation for center role - total marks cannot exceed 80
     if (field === 'marks' || field === 'internal') {
       const newTotal = parseFloat(updatedSubject.total);
       if (newTotal && newTotal > 80) {
-        setErrors({ total: 'Total marks cannot exceed 80' });
+        setErrors({ ...errors, total: 'Total marks cannot exceed 80 for center role' });
+      } else if (errors.total && newTotal <= 80) {
+        const newErrors = { ...errors };
+        delete newErrors.total;
+        setErrors(newErrors);
       }
     }
   };
@@ -159,9 +281,28 @@ const AddMarksheetPageCenter = () => {
 
   // Handle save
   const handleSave = () => {
+    // Validate semester is selected
+    if (!semester) {
+      setErrors({ ...errors, semester: "Please select a semester" });
+      return;
+    }
+
     const validationErrors = validateFormForSave(selectedStudent, subjects);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      return;
+    }
+
+    // Normalize selectedCourse to always be a string (extract _id if it's an object)
+    const normalizedCourseIdForSave = selectedCourse 
+      ? (typeof selectedCourse === 'string' 
+          ? selectedCourse 
+          : (selectedCourse as any)?._id || String(selectedCourse))
+      : "";
+
+    // Validate course is selected
+    if (!normalizedCourseIdForSave) {
+      setErrors({ ...errors, course: "Please select a course" });
       return;
     }
 
@@ -169,23 +310,35 @@ const AddMarksheetPageCenter = () => {
     const data: MarksheetFormData = {
       studentId: selectedStudent.studentId || selectedStudent.id,
       subjects,
+      semester: semester.toString(),
+      courseId: normalizedCourseIdForSave, // Include courseId in marksheet (always a string)
       role: 'center',
     } as any;
 
     saveMarksheetMutation.mutate(data, {
       onSuccess: () => {
-        showToast('Marksheet saved successfully!', 'success');
-        // Reset form
-        setSelectedStudent(null);
-        setSubjects([]);
-        setCurrentSubject({
-          subjectName: '',
-          marks: '',
-          internal: '',
-          total: '',
-          minMarks: '',
-          maxMarks: '',
-        });
+        const message = existingMarksheetId 
+          ? 'Marksheet updated successfully!' 
+          : 'Marksheet saved successfully!';
+        showToast(message, 'success');
+        
+        // Don't reset form if updating - allow adding more subjects
+        if (!existingMarksheetId) {
+          // Reset form
+          setSelectedStudent(null);
+          setSubjects([]);
+          setSelectedCourse("");
+          setSemester("");
+          setExistingMarksheetId(null);
+          setCurrentSubject({
+            subjectName: '',
+            marks: '',
+            internal: '',
+            total: '',
+            minMarks: '',
+            maxMarks: '',
+          });
+        }
         setErrors({});
         setIsSubmitting(false);
       },
@@ -200,6 +353,9 @@ const AddMarksheetPageCenter = () => {
   const handleCancel = () => {
     setSelectedStudent(null);
     setSubjects([]);
+    setSelectedCourse("");
+    setSemester("");
+    setExistingMarksheetId(null);
     setCurrentSubject({
       subjectName: '',
       marks: '',
@@ -353,9 +509,9 @@ const AddMarksheetPageCenter = () => {
         </Card>
       </Slide>
 
-      {/* Add Subject Form */}
+      {/* Semester Selection */}
       {selectedStudent && (
-        <Slide direction="up" in timeout={1000}>
+        <Slide direction="up" in timeout={900}>
           <Card sx={{ 
             mb: 4,
             borderRadius: 3,
@@ -364,11 +520,68 @@ const AddMarksheetPageCenter = () => {
             overflow: 'hidden',
           }}>
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                <AddIcon sx={{ color: '#10b981', fontSize: '1.5rem' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                  Add Subject
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#1e293b' }}>
+                Semester Selection
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Semester *</InputLabel>
+                    <Select
+                      value={semester}
+                      label="Semester *"
+                      onChange={(e) => handleSemesterChange(e.target.value)}
+                      error={!!errors.semester}
+                      disabled={subjects.length > 0}
+                    >
+                      {[1, 2].map((s) => (
+                        <MenuItem key={s} value={s}>
+                          Semester {s}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {errors.semester && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {errors.semester}
+                    </Typography>
+                  )}
+                  {subjects.length > 0 && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                      Semester cannot be changed once subjects are added
+                    </Typography>
+                  )}
+                  {!semester && (
+                    <Typography variant="caption" color="warning.main" sx={{ mt: 0.5, ml: 1.75 }}>
+                      Note: Total marks cannot exceed 80 for center role
+                    </Typography>
+                  )}
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Slide>
+      )}
+
+      {/* Add Subject Form */}
+      {selectedStudent && semester && (
+        <Slide direction="up" in timeout={900}>
+          <Card sx={{ 
+            mb: 4,
+            borderRadius: 3,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+            border: '1px solid #e2e8f0',
+            overflow: 'hidden',
+          }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 600, color: '#1e293b', display: 'flex', gap: 1, alignItems: 'center' }}
+                >
+                  <AddIcon sx={{ color: '#10b981' }} /> Add Subject
                 </Typography>
+
                 <Chip 
                   label={`${subjects.length}/7`} 
                   size="small" 
@@ -377,155 +590,316 @@ const AddMarksheetPageCenter = () => {
                 />
               </Box>
 
-              <Grid container spacing={2} alignItems="flex-end">
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Subject Name *"
-                    value={currentSubject.subjectName}
-                    onChange={(e) => handleInputChange('subjectName', e.target.value)}
-                    error={!!errors.subjectName}
-                    helperText={errors.subjectName}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Description sx={{ color: '#64748b', fontSize: '1.2rem' }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: '#ffffff',
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    label="Marks *"
-                    type="number"
-                    value={currentSubject.marks}
-                    onChange={(e) => handleInputChange('marks', e.target.value)}
-                    error={!!errors.marks}
-                    helperText={errors.marks}
-                    inputProps={{ min: 0, max: 100 }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: '#ffffff',
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    label="Internal *"
-                    type="number"
-                    value={currentSubject.internal}
-                    onChange={(e) => handleInputChange('internal', e.target.value)}
-                    error={!!errors.internal}
-                    helperText={errors.internal}
-                    inputProps={{ min: 0, max: 100 }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: '#ffffff',
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    label="Total *"
-                    type="number"
-                    value={currentSubject.total}
-                    disabled
-                    error={!!errors.total}
-                    helperText={errors.total}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
+              <Grid container spacing={3} alignItems="flex-start">
+                {/* Course */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Box sx={{ mb: 1 }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5, color: '#1e293b' }}>
+                      Course *
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      Select the course for this subject
+                    </Typography>
+                  </Box>
+                  <FormControl fullWidth error={!!errors.course}>
+                    <Select
+                      displayEmpty
+                      value={selectedCourse}
+                      onChange={(e) => handleCourseChange(e.target.value)}
+                      disabled={isLoadingCourses}
+                      sx={{
                         backgroundColor: '#f8fafc',
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    label="Min Marks *"
-                    type="number"
-                    value={currentSubject.minMarks}
-                    onChange={(e) => handleInputChange('minMarks', e.target.value)}
-                    error={!!errors.minMarks}
-                    helperText={errors.minMarks}
-                    inputProps={{ min: 0 }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
-                        backgroundColor: '#ffffff',
-                      },
-                    }}
-                  />
+                        '& .MuiSelect-select': { 
+                          padding: '12px 14px',
+                          fontSize: '0.95rem',
+                        },
+                        '&:hover': {
+                          backgroundColor: '#ffffff',
+                        },
+                        '&.Mui-focused': {
+                          backgroundColor: '#ffffff',
+                        },
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        {isLoadingCourses ? "Loading courses..." : "Select Course"}
+                      </MenuItem>
+                      {courses.map((c) => (
+                        <MenuItem key={c._id} value={c._id}>
+                          {c.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {errors.course && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.course}
+                    </Typography>
+                  )}
                 </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    label="Max Marks *"
-                    type="number"
-                    value={currentSubject.maxMarks}
-                    onChange={(e) => handleInputChange('maxMarks', e.target.value)}
-                    error={!!errors.maxMarks}
-                    helperText={errors.maxMarks}
-                    inputProps={{ min: 0 }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
+
+                {/* Subject */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Box sx={{ mb: 1 }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5, color: '#1e293b' }}>
+                      Subject *
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      Choose the subject from the selected course
+                    </Typography>
+                  </Box>
+                  <FormControl fullWidth disabled={!selectedCourse || !semester || isLoadingSubjects}>
+                    <Select
+                      displayEmpty
+                      value={currentSubject.subjectName}
+                      onChange={(e) => handleInputChange('subjectName', e.target.value)}
+                      sx={{
+                        backgroundColor: '#f8fafc',
                         borderRadius: 2,
-                        backgroundColor: '#ffffff',
-                      },
-                    }}
-                  />
+                        '& .MuiSelect-select': { 
+                          padding: '12px 14px',
+                          fontSize: '0.95rem',
+                        },
+                        '&:hover': {
+                          backgroundColor: '#ffffff',
+                        },
+                        '&.Mui-focused': {
+                          backgroundColor: '#ffffff',
+                        },
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        {isLoadingSubjects 
+                          ? "Loading subjects..." 
+                          : !selectedCourse || !semester
+                          ? "Select Course and Semester first"
+                          : "Select Subject"}
+                      </MenuItem>
+                      {courseSubjects.map((sub, idx) => {
+                        const isAlreadyAdded = subjects.some(s => s.subjectName === sub);
+                        return (
+                          <MenuItem 
+                            key={idx} 
+                            value={sub}
+                            disabled={isAlreadyAdded}
+                            sx={{
+                              ...(isAlreadyAdded && {
+                                opacity: 0.5,
+                                color: 'text.disabled',
+                                cursor: 'not-allowed',
+                              }),
+                            }}
+                          >
+                            {sub} {isAlreadyAdded && '(Already Added)'}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  {errors.subjectName && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.subjectName}
+                    </Typography>
+                  )}
                 </Grid>
-                <Grid size={{ xs: 6, sm: 3, md: 1.5 }}>
+
+                {/* Marks Section */}
+                <Grid size={{ xs: 12 }}>
+                  <Box
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      backgroundColor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 2, color: '#1e293b' }}>
+                      Marks Information
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5, color: '#334155' }}>
+                          Marks *
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          placeholder="0-100"
+                          value={currentSubject.marks}
+                          onChange={(e) => handleInputChange('marks', e.target.value)}
+                          error={!!errors.marks}
+                          helperText={errors.marks}
+                          inputProps={{ min: 0, max: 100 }}
+                          sx={{
+                            backgroundColor: '#ffffff',
+                            borderRadius: 2,
+                            '& .MuiOutlinedInput-root': {
+                              '&:hover': {
+                                backgroundColor: '#fafafa',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5, color: '#334155' }}>
+                          Internal *
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          placeholder="0-100"
+                          value={currentSubject.internal}
+                          onChange={(e) => handleInputChange('internal', e.target.value)}
+                          error={!!errors.internal}
+                          helperText={errors.internal}
+                          inputProps={{ min: 0, max: 100 }}
+                          sx={{
+                            backgroundColor: '#ffffff',
+                            borderRadius: 2,
+                            '& .MuiOutlinedInput-root': {
+                              '&:hover': {
+                                backgroundColor: '#fafafa',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5, color: '#334155' }}>
+                          Total (Auto-calculated)
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          disabled
+                          value={currentSubject.total || '0'}
+                          error={!!errors.total}
+                          helperText={errors.total || (parseFloat(currentSubject.total) > 80 ? 'Center limit: Max 80' : '')}
+                          sx={{
+                            backgroundColor: '#f1f5f9',
+                            borderRadius: 2,
+                            '& .MuiInputBase-input': {
+                              fontWeight: 600,
+                              color: parseFloat(currentSubject.total) > 80 ? '#ef4444' : '#059669',
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+
+                {/* Min/Max Marks Section */}
+                <Grid size={{ xs: 12 }}>
+                  <Box
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      backgroundColor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 2, color: '#1e293b' }}>
+                      Passing Criteria
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5, color: '#334155' }}>
+                          Min Marks *
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          placeholder="Minimum passing marks"
+                          value={currentSubject.minMarks}
+                          onChange={(e) => handleInputChange('minMarks', e.target.value)}
+                          error={!!errors.minMarks}
+                          helperText={errors.minMarks}
+                          inputProps={{ min: 0 }}
+                          sx={{
+                            backgroundColor: '#ffffff',
+                            borderRadius: 2,
+                            '& .MuiOutlinedInput-root': {
+                              '&:hover': {
+                                backgroundColor: '#fafafa',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5, color: '#334155' }}>
+                          Max Marks *
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          placeholder="Maximum possible marks"
+                          value={currentSubject.maxMarks}
+                          onChange={(e) => handleInputChange('maxMarks', e.target.value)}
+                          error={!!errors.maxMarks}
+                          helperText={errors.maxMarks}
+                          inputProps={{ min: 0 }}
+                          sx={{
+                            backgroundColor: '#ffffff',
+                            borderRadius: 2,
+                            '& .MuiOutlinedInput-root': {
+                              '&:hover': {
+                                backgroundColor: '#fafafa',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+
+                {/* Add Button */}
+                <Grid size={{ xs: 12 }}>
                   <Button
                     fullWidth
                     variant="contained"
+                    startIcon={<AddIcon />}
                     onClick={handleAddSubject}
                     disabled={subjects.length >= 7}
-                    startIcon={<AddIcon />}
                     sx={{
-                      height: '56px',
+                      height: 50,
                       borderRadius: 2,
-                      backgroundColor: subjects.length >= 7 ? '#d1d5db' : '#3b82f6',
-                      color: 'white',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                       fontWeight: 600,
                       textTransform: 'none',
-                      fontSize: '0.875rem',
+                      fontSize: '1rem',
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)',
                       '&:hover': {
-                        backgroundColor: subjects.length >= 7 ? '#d1d5db' : '#2563eb',
+                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                        boxShadow: '0 6px 16px rgba(59, 130, 246, 0.5)',
                         transform: 'translateY(-1px)',
-                        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)',
                       },
                       '&:disabled': {
-                        backgroundColor: '#d1d5db',
-                        color: '#9ca3af',
+                        background: '#cbd5e1',
+                        boxShadow: 'none',
                       },
                     }}
                   >
-                    Add Subject
+                    {subjects.length >= 7 ? 'Maximum Subjects Reached' : 'Add Subject to Marksheet'}
                   </Button>
                 </Grid>
               </Grid>
-              
-              {subjects.length >= 7 && (
-                <Alert severity="warning" sx={{ mt: 2 }}>
-                  Maximum 7 subjects allowed
-                </Alert>
-              )}
+
+              <Box sx={{ mt: 2 }}>
+                {subjects.length >= 7 ? (
+                  <Alert severity="warning">Maximum 7 subjects allowed</Alert>
+                ) : (
+                  <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    Select course & subject, fill marks (max 80 total) and click Add Subject
+                  </Typography>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Slide>
@@ -549,7 +923,8 @@ const AddMarksheetPageCenter = () => {
                     Added Subjects ({subjects.length}/7)
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Chip label={`Semester ${semester}`} color="info" sx={{ fontWeight: 600 }} />
                   <Chip 
                     label={`Total: ${totalMarks.toFixed(1)}`} 
                     color="primary" 

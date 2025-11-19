@@ -36,6 +36,8 @@ export interface MarksheetData {
   _id: string;
   studentId: StudentData;
   subjects: SubjectData[];
+  courseId?: string; // Course ID associated with this marksheet
+  semester?: string; // Semester number
   createdAt: string;
   updatedAt: string;
 }
@@ -44,10 +46,8 @@ export const useGetMarksheet = (studentId: string, enabled: boolean = true) => {
   return useQuery<MarksheetData>({
     queryKey: ['marksheet', studentId],
     queryFn: async () => {
-      const response = await axiosInstance.get('/api/marksheet/show-marksheet', {
-        params: {
-          studentId: studentId
-        }
+      const response = await axiosInstance.post('/api/marksheet/show-marksheet', {
+        studentId: studentId
       });
       // Extract data from the wrapped response structure
       return response.data.data;

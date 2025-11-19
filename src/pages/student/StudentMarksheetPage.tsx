@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import {
   Box,
@@ -8,28 +8,61 @@ import {
   Paper,
   Container,
   Button,
+  Chip,
 } from '@mui/material';
 import { Download } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useGetMarksheet } from '../../hooks/useGetMarksheet';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
 import { useStudentProfile } from '../../hooks/useStudentProfile';
 import StudentLayout from '../../components/student/StudentLayout';
 
 const StudentMarksheetPage = () => {
   const navigate = useNavigate();
+  const { semester: semesterFromUrl } = useParams<{ semester?: string }>();
   const marksheetRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedSemester, setSelectedSemester] = useState<string>('');
   
   // Get student profile to check approval status and get student ID
   const { data: profile, isLoading: profileLoading } = useStudentProfile();
   
   // Only fetch marksheet if approved and student ID is available
   const studentId = profile?._id || '';
-  const isApproved = profile?.isMarksheetAndCertificateApproved || false;
-  const shouldFetchMarksheet = isApproved && !!studentId;
   
-  const { data: marksheet, isLoading: marksheetLoading, error } = useGetMarksheet(
-    studentId, 
+  // Get available semesters from profile
+  const semestersWithMarksheet: string[] = profile?.whichSemesterMarksheetIsGenerated || [];
+  
+  // Get approved semesters - only these should be visible to students
+  const approvedSemesters: string[] = profile?.approvedSemesters || [];
+  
+  // For backward compatibility: if approvedSemesters is empty but isMarksheetAndCertificateApproved is true,
+  // treat all semesters as approved (migration scenario)
+  const allSemestersApproved = profile?.isMarksheetAndCertificateApproved && approvedSemesters.length === 0;
+  const visibleSemesters = allSemestersApproved 
+    ? semestersWithMarksheet 
+    : semestersWithMarksheet.filter(sem => approvedSemesters.includes(sem));
+  
+  // Set default semester if not selected and semesters are available
+  useEffect(() => {
+    // If semester is in URL, use it (but only if it's approved)
+    if (semesterFromUrl && visibleSemesters.includes(semesterFromUrl)) {
+      setSelectedSemester(semesterFromUrl);
+    } else if (!selectedSemester && visibleSemesters.length > 0) {
+      setSelectedSemester(visibleSemesters[0]);
+    } else if (!selectedSemester && semestersWithMarksheet.length === 0 && profile?.isMarksheetGenerated && allSemestersApproved) {
+      // Fallback for backward compatibility
+      setSelectedSemester('1');
+    }
+  }, [profile, semestersWithMarksheet, visibleSemesters, selectedSemester, semesterFromUrl, allSemestersApproved]);
+  
+  // Use selected semester or default to first visible semester
+  const semesterToFetch = selectedSemester || (visibleSemesters.length > 0 ? visibleSemesters[0] : '');
+  const isSemesterApproved = semesterToFetch ? (allSemestersApproved || approvedSemesters.includes(semesterToFetch)) : false;
+  const shouldFetchMarksheet = isSemesterApproved && !!studentId && !!semesterToFetch;
+  
+  const { data: marksheet, isLoading: marksheetLoading, error } = useGetMarksheetBySemester(
+    studentId,
+    semesterToFetch,
     shouldFetchMarksheet && !profileLoading
   );
   
@@ -108,8 +141,25 @@ const StudentMarksheetPage = () => {
     );
   }
 
-  // Show message if marksheet is not approved
-  if (!isApproved && !profileLoading) {
+  // Show message if no approved semesters
+  if (!profileLoading && visibleSemesters.length === 0 && semestersWithMarksheet.length > 0) {
+    return (
+      <StudentLayout 
+        activeMenuItem="marksheet" 
+        pageTitle="Marksheet"
+        onMenuItemClick={handleMenuItemClick}
+      >
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Alert severity="info">
+            Your marksheet(s) are pending approval. Please check back later once the admin approves your marksheet.
+          </Alert>
+        </Container>
+      </StudentLayout>
+    );
+  }
+  
+  // Show message if marksheet is not approved (backward compatibility)
+  if (!profileLoading && semestersWithMarksheet.length === 0 && !profile?.isMarksheetAndCertificateApproved) {
     return (
       <StudentLayout 
         activeMenuItem="marksheet" 
@@ -125,7 +175,7 @@ const StudentMarksheetPage = () => {
     );
   }
 
-  if (!marksheet && !isLoading && isApproved) {
+  if (!marksheet && !isLoading && isSemesterApproved) {
     return (
       <StudentLayout 
         activeMenuItem="marksheet" 
@@ -155,12 +205,50 @@ const StudentMarksheetPage = () => {
       onMenuItemClick={handleMenuItemClick}
     >
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        {/* Semester Selection - Only show approved semesters */}
+        {visibleSemesters.length > 1 && (
+          <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+            <Typography variant="body1" sx={{ fontWeight: 600, mr: 1 }}>
+              Select Semester:
+            </Typography>
+            {visibleSemesters.map((sem: string) => (
+              <Chip
+                key={sem}
+                label={`Semester ${sem}`}
+                onClick={() => setSelectedSemester(sem)}
+                color={selectedSemester === sem ? 'primary' : 'default'}
+                variant={selectedSemester === sem ? 'filled' : 'outlined'}
+                sx={{
+                  cursor: 'pointer',
+                  fontWeight: selectedSemester === sem ? 600 : 400,
+                  '&:hover': {
+                    backgroundColor: selectedSemester === sem ? undefined : 'action.hover',
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        )}
+        
+        {/* Show warning if there are unapproved semesters */}
+        {semestersWithMarksheet.length > visibleSemesters.length && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            You have {semestersWithMarksheet.length - visibleSemesters.length} semester(s) pending approval. 
+            Only approved semesters are visible.
+          </Alert>
+        )}
+        
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {semestersWithMarksheet.length > 0 && (
+            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              {selectedSemester ? `Semester ${selectedSemester} Marksheet` : 'Marksheet'}
+            </Typography>
+          )}
           <Button
             variant="contained"
             startIcon={<Download />}
             onClick={handleDownload}
-            disabled={isDownloading}
+            disabled={isDownloading || !marksheet}
             sx={{
               backgroundColor: '#10b981',
               '&:hover': { backgroundColor: '#059669' },

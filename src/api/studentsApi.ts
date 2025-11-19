@@ -16,6 +16,8 @@ export interface Student {
   isApprovedByAdmin?: boolean;
   isMarksheetGenerated?: boolean;
   isMarksheetAndCertificateApproved?: boolean;
+  whichSemesterMarksheetIsGenerated?: string[]; // Array of semester numbers
+  approvedSemesters?: string[]; // Array of approved semester numbers
   studentId?: string;
 }
 

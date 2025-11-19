@@ -34,46 +34,75 @@ export const validateSubject = (
 
   if (!subject.marks) {
     errors.marks = 'Marks is required';
-  } else if (parseFloat(subject.marks) < 0) {
-    errors.marks = 'Marks cannot be negative';
+  } else {
+    const marksNum = parseFloat(subject.marks);
+    if (isNaN(marksNum) || marksNum < 0) {
+      errors.marks = 'Marks must be a valid number (0 or greater)';
+    } else if (marksNum > 100) {
+      errors.marks = 'Marks cannot exceed 100';
+    }
   }
 
   if (!subject.internal) {
     errors.internal = 'Internal is required';
-  } else if (parseFloat(subject.internal) < 0) {
-    errors.internal = 'Internal cannot be negative';
+  } else {
+    const internalNum = parseFloat(subject.internal);
+    if (isNaN(internalNum) || internalNum < 0) {
+      errors.internal = 'Internal must be a valid number (0 or greater)';
+    } else if (internalNum > 100) {
+      errors.internal = 'Internal cannot exceed 100';
+    }
   }
 
   if (!subject.minMarks) {
     errors.minMarks = 'Min Marks is required';
-  } else if (parseFloat(subject.minMarks) < 0) {
-    errors.minMarks = 'Min Marks cannot be negative';
+  } else {
+    const minNum = parseFloat(subject.minMarks);
+    if (isNaN(minNum) || minNum < 0) {
+      errors.minMarks = 'Min Marks must be a valid number (0 or greater)';
+    }
   }
 
   if (!subject.maxMarks) {
     errors.maxMarks = 'Max Marks is required';
-  } else if (parseFloat(subject.maxMarks) < 0) {
-    errors.maxMarks = 'Max Marks cannot be negative';
+  } else {
+    const maxNum = parseFloat(subject.maxMarks);
+    if (isNaN(maxNum) || maxNum < 0) {
+      errors.maxMarks = 'Max Marks must be a valid number (0 or greater)';
+    }
   }
 
-  const total = parseFloat(subject.total);
-  const min = parseFloat(subject.minMarks);
-  const max = parseFloat(subject.maxMarks);
+  const total = parseFloat(subject.total) || 0;
+  const min = parseFloat(subject.minMarks) || 0;
+  const max = parseFloat(subject.maxMarks) || 0;
+  const marks = parseFloat(subject.marks) || 0;
+  const internal = parseFloat(subject.internal) || 0;
 
   // Center limitation: Total marks cannot exceed 80 (only for center role)
-  if (role === 'center' && total && total > 80) {
-    errors.total = 'Total marks cannot exceed 80';
+  if (role === 'center' && total > 80) {
+    errors.total = 'Total marks cannot exceed 80 for center role';
   }
 
-  if (total && max && total > max) {
-    errors.maxMarks = 'Max Marks must be greater than or equal to Total';
+  // Validate marks + internal equals total
+  if (total && (marks + internal !== total)) {
+    errors.total = 'Total should equal Marks + Internal';
   }
 
-  if (min && max && min > max) {
+  // Validate total is within min and max range
+  if (total > 0 && min > 0 && total < min) {
+    errors.total = `Total must be at least ${min} (Min Marks)`;
+  }
+
+  if (total > 0 && max > 0 && total > max) {
+    errors.maxMarks = `Max Marks (${max}) must be at least equal to Total (${total})`;
+  }
+
+  // Validate min and max relationship
+  if (min > 0 && max > 0 && min > max) {
     errors.minMarks = 'Min Marks cannot be greater than Max Marks';
   }
 
-  if (min && max && min === max) {
+  if (min > 0 && max > 0 && min === max) {
     errors.minMarks = 'Min Marks and Max Marks cannot be equal';
   }
 

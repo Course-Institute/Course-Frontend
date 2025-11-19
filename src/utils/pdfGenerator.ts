@@ -321,6 +321,7 @@ export const generateStudentFormPDF = async (formData: StudentFormData): Promise
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+
   async function urlToBase64(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -332,10 +333,10 @@ export const generateStudentFormPDF = async (formData: StudentFormData): Promise
 if(formData.photo){
 const base64Photo = await urlToBase64(formData.photo);
 
-  const imgWidth = 28;
-  const imgHeight = 28;
+  const imgWidth = 23;
+  const imgHeight = 23;
 
-  const imgX = pageWidth - imgWidth - 28;  // your positioning
+  const imgX = pageWidth - imgWidth - 20;  // your positioning
   const imgY = 63;
 
   // ✅ Draw image
@@ -375,9 +376,9 @@ let yPosition = 80;
   const leftColumn = 20;
   // const rightColumn = 110;
 
-const fieldWidth = 80;
+const fieldWidth = 55;
 const fieldHeight = 8;
-const gap = 10;
+const gap = 7;
 
 const drawField = (x: number, y: number, label: string, value: string) => {
  const safeLabel = label ? label.toUpperCase() : "";
@@ -398,14 +399,16 @@ const drawField = (x: number, y: number, label: string, value: string) => {
   doc.text(safeValue, x + 2, y + 2 + 6);
 };
 
-const addRow = (label1: any, value1: any, label2?: any, value2?: any) => {
+const addRow = (label1: any, value1: any, label2?: any, value2?: any, label3?: any, value3?: any) => {
   const x1 = 15;
   const x2 = x1 + fieldWidth + gap;
+  const x3 = x2 + fieldWidth + gap;
 
   const rowY = yPosition; // lock starting Y for row
 
   drawField(x1, rowY, label1, value1);
   drawField(x2, rowY, label2, value2);
+  drawField(x3, rowY, label3, value3);
 
   // move down for next row AFTER both fields
   yPosition += fieldHeight + 14
@@ -438,11 +441,10 @@ yPosition = 80; // after logo + heading
 
 addSection("Personal Details");
 
-addRow("Name", formData.candidateName, "Father's Name", formData.fatherName);
-addRow("Mother's Name", formData.motherName, "Date Of Birth", formData.dateOfBirth);
-addRow("Gender", formData.gender, "Category", formData.category);
-addRow("Aadhar Card No", formData.adharCardNo, "Contact Number", formData.contactNumber);
-addRow("Alternate Number", formData.alternateNumber, "Email", formData.emailAddress);
+addRow("Name", formData.candidateName, "Father's Name", formData.fatherName , "Mother's Name", formData.motherName);
+addRow("Date Of Birth", formData.dateOfBirth, "Gender", formData.gender, "Category", formData.category);
+addRow("Aadhar Card No", formData.adharCardNo, "Contact Number", formData.contactNumber, "Alternate Number", formData.alternateNumber);
+addRow("Email", formData.emailAddress);
 
 
   
@@ -455,8 +457,7 @@ addRow("Alternate Number", formData.alternateNumber, "Email", formData.emailAddr
   // Contact Information Section
 addSection("Contact Information");
 
-  addRow('Contact Number:', formData.contactNumber, 'Alternate Number:', formData.alternateNumber || '');
-  addRow('Email Address:', formData.emailAddress);
+  addRow('Contact Number:', formData.contactNumber, 'Alternate Number:', formData.alternateNumber || '' , 'Email Address:', formData.emailAddress);
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -467,9 +468,8 @@ addSection("Contact Information");
   // Address Information Section
   addSection("Address Information");
 
-  addRow('Permanent Address:', formData.permanentAddress, 'City:', formData.city);
-  addRow('Current Address:', formData.currentAddress, 'State:', formData.state);
-  addRow('Country:', formData.country, 'Pincode:', formData.pincode);
+  addRow('Permanent Address:', formData.permanentAddress, 'City:', formData.city, 'Current Address:', formData.currentAddress);
+  addRow('State:', formData.state, 'Country:', formData.country, 'Pincode:', formData.pincode);
   addRow('Nationality:', formData.nationality);
   
   // Check if we need a new page
@@ -488,8 +488,7 @@ addSection("Contact Information");
 );
   // Employment Information Section
 addSection("Employment Information");
-  addRow('Employed:', formData.isEmployed, 'Employer Name:', formData.employerName || '');
-  addRow('Designation:', formData.designation || '');
+  addRow('Employed:', formData.isEmployed, 'Employer Name:', formData.employerName || '', 'Designation:', formData.designation || '');
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -499,12 +498,11 @@ addSection("Employment Information");
   
   // Academic Information Section
 addSection("Academic Information");
-  addRow('Course Type:', formData.courseType, 'Grade:', formData.grade);
-  addRow('Course:', formData.course, 'Stream:', formData.stream);
-  addRow('Year:', formData.year, 'Session:', formData.session);
-  addRow('Month Session:', formData.monthSession || '', 'Duration:', formData.duration || '');
-  addRow('Course Fee:', formData.courseFee ? `${formData.courseFee}` : 'N/A', 'Hostel Facility:', formData.hostelFacility || '');
-  
+  addRow('Course Type:', formData.courseType, 'Grade:', formData.grade, 'Course:', formData.course);
+  addRow('Stream:', formData.stream, 'Year:', formData.year, 'Session:', formData.session);
+  addRow('Month Session:', formData.monthSession || '', 'Duration:', formData.duration || '', 'Course Fee:', formData.courseFee ? `${formData.courseFee}` : 'N/A');
+  addRow('Hostel Facility:', formData.hostelFacility || '');
+
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
     doc.addPage();
@@ -526,6 +524,20 @@ addSection("Academic Information");
   
   yPosition += 15;
   doc.text('Student Signature:', leftColumn, yPosition);
+
+const pageCount = (doc as any).getNumberOfPages
+  ? (doc as any).getNumberOfPages()
+  : doc.internal && (doc as any).internal.pages
+  ? Object.keys((doc as any).internal.pages).length
+  : 1;
+
+for (let i = 1; i <= pageCount; i++) {
+  doc.setPage(i);
+  doc.setDrawColor(14, 68, 85);
+  doc.setLineWidth(0.8);
+  doc.rect(2, 2, pageWidth - 4, pageHeight - 4, "S");
+}
+
 
   // Save the PDF
   const fileName = `Student_Registration_${formData.candidateName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

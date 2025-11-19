@@ -15,6 +15,7 @@ interface ApproveMarksheetRequest {
   registrationNo: string;
   subjects?: SubjectData[];
   marksheetId?: string;
+  semester?: string; // NEW: Semester number to approve
 }
 
 interface ApproveMarksheetResponse {
@@ -37,6 +38,8 @@ export const useApproveMarksheet = () => {
       // Invalidate and refetch students list and marksheet data
       queryClient.invalidateQueries({ queryKey: ['students'] });
       queryClient.invalidateQueries({ queryKey: ['marksheet'] });
+      // Also invalidate individual student queries so center view marksheet page updates
+      queryClient.invalidateQueries({ queryKey: ['student'] });
     },
   });
 };

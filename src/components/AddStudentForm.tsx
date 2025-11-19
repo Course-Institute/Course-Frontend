@@ -12,6 +12,7 @@ import {
   Typography,
   Alert,
   CircularProgress,
+  Autocomplete,
 } from '@mui/material';
 import { useAddStudent, type AddStudentData } from '../hooks/useAddStudent';
 import { useToast } from '../contexts/ToastContext';
@@ -19,6 +20,7 @@ import DateInput from './DateInput';
 import StudentFormPreviewDialog from './StudentFormPreviewDialog';
 import ApiBasedAutoComplete from './core-components/apiBasedAutoComplete';
 import { programsData } from '../constants/programsData';
+import { statesAndCities } from '../api/statesAndCitites';
 
 interface AddStudentFormProps {
   onClose: () => void;
@@ -184,7 +186,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
   };
 
   const handleInputChange = (field: keyof FormData, value: string | File | null) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value, ...(field === 'state' ? {city : ''} : {}) }));
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -232,10 +234,10 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
       newErrors.contactNumber = 'Contact Number must be exactly 10 digits';
     }
     
-    // Alternate number validation (10 digits, numbers only)
-    if (formData.alternateNumber && !/^\d{10}$/.test(formData.alternateNumber)) {
-      newErrors.alternateNumber = 'Alternate Number must be exactly 10 digits';
-    }
+    // // Alternate number validation (10 digits, numbers only)
+    // if (formData.alternateNumber && !/^\d{10}$/.test(formData.alternateNumber)) {
+    //   newErrors.alternateNumber = 'Alternate Number must be exactly 10 digits';
+    // }
     
     // Email validation
     if (!formData.emailAddress) {
@@ -265,11 +267,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
     }
     
     // Course fee validation (numbers only)
-    if (!formData.courseFee) {
-      newErrors.courseFee = 'Course Fee is required';
-    } else if (!/^\d+$/.test(formData.courseFee)) {
-      newErrors.courseFee = 'Course Fee must contain only numbers';
-    }
+    // if (!formData.courseFee) {
+    //   newErrors.courseFee = 'Course Fee is required';
+    // } else if (!/^\d+$/.test(formData.courseFee)) {
+    //   newErrors.courseFee = 'Course Fee must contain only numbers';
+    // }
     
     // Center validation
     if (!formData.centerId) {
@@ -277,38 +279,38 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
     }
     
     // Other required fields
-    const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'nationality', 'courseType', 'course', 'grade', 'year', 'session'];
+    const otherRequiredFields = ['gender', 'category', 'state', 'city', 'country', 'courseType', 'course', 'grade', 'year', 'session'];
     otherRequiredFields.forEach(field => {
       if (!formData[field as keyof FormData]) {
         newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
       }
     });
     
-    // File validations with size limits (2MB = 2 * 1024 * 1024 bytes)
-    const maxFileSize = 2 * 1024 * 1024; // 2MB
+    // File validations with size limits (200KB = 200 * 1024 bytes)
+    const maxFileSize = 200 * 1024; // 200KB
     
     if (!formData.photo) {
       newErrors.photo = 'Photo is required';
     } else if (formData.photo.size > maxFileSize) {
-      newErrors.photo = 'Photo size cannot exceed 2MB';
+      newErrors.photo = 'Photo size cannot exceed 200KB';
     }
     
     if (!formData.adharCardFront) {
       newErrors.adharCardFront = 'Aadhar Card Front is required';
     } else if (formData.adharCardFront.size > maxFileSize) {
-      newErrors.adharCardFront = 'Aadhar Card Front size cannot exceed 2MB';
+      newErrors.adharCardFront = 'Aadhar Card Front size cannot exceed 200KB';
     }
     
     if (!formData.adharCardBack) {
       newErrors.adharCardBack = 'Aadhar Card Back is required';
     } else if (formData.adharCardBack.size > maxFileSize) {
-      newErrors.adharCardBack = 'Aadhar Card Back size cannot exceed 2MB';
+      newErrors.adharCardBack = 'Aadhar Card Back size cannot exceed 200KB';
     }
     
     if (!formData.signature) {
       newErrors.signature = 'Signature is required';
     } else if (formData.signature.size > maxFileSize) {
-      newErrors.signature = 'Signature size cannot exceed 2MB';
+      newErrors.signature = 'Signature size cannot exceed 200KB';
     }
     
     setErrors(newErrors);
@@ -531,10 +533,10 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   </label>
                   <Typography
                     variant="caption"
-                    color="text.secondary"
+                    color="error"
                     sx={{ mt: 1, display: "block" }}
                   >
-                    Image only in jpg
+                    Image only in jpg. File size should be within 200KB
                   </Typography>
                   {errors.photo && (
                     <Typography variant="caption" color="error">
@@ -610,6 +612,18 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                         : "Choose Aadhar Back"}
                     </Button>
                   </label>
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 1, display: "block" }}
+                  >
+                    Image only in jpg. File size should be within 200KB
+                  </Typography>
+                  {errors.adharCardBack && (
+                    <Typography variant="caption" color="error">
+                      {errors.adharCardBack}
+                    </Typography>
+                  )}
                 </Box>
               </Grid>
 
@@ -678,16 +692,29 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 />
               </Grid>
 
-              {/* State */}
+              {/* City */}
               <Grid size={12}>
-                <TextField
+                <Autocomplete
                   fullWidth
-                  label="State *"
-                  value={formData.state}
-                  onChange={(e) => handleInputChange("state", e.target.value)}
-                  error={!!errors.state}
-                  helperText={errors.state}
-                  placeholder="State"
+                  options={
+                    statesAndCities[
+                      formData.state as keyof typeof statesAndCities
+                    ] || []
+                  }
+                  value={formData.city || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange("city", newValue || "");
+                  }}
+                  disabled={!formData.state}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="City *"
+                      error={!!errors.city}
+                      helperText={errors.city}
+                      placeholder={formData.state ? "Search or select city" : "Select state first"}
+                    />
+                  )}
                 />
               </Grid>
 
@@ -711,32 +738,6 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   </Select>
                   {errors.country && (
                     <FormHelperText>{errors.country}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
-
-              {/* Course Type */}
-              <Grid size={12}>
-                <FormControl fullWidth error={!!errors.courseType}>
-                  <InputLabel>Course Type *</InputLabel>
-                  <Select
-                    value={formData.courseType}
-                    onChange={(e) => {
-                      handleInputChange("courseType", e.target.value);
-                      // Clear course field when course type changes
-                      handleInputChange("course", "");
-                    }}
-                    label="Course Type *"
-                  >
-                    <MenuItem value="">Select course Type</MenuItem>
-                    {courseTypes.map((courseType) => (
-                      <MenuItem key={courseType} value={courseType}>
-                        {courseType}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.courseType && (
-                    <FormHelperText>{errors.courseType}</FormHelperText>
                   )}
                 </FormControl>
               </Grid>
@@ -772,33 +773,35 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   )}
                 </FormControl>
               </Grid>
-
-              {/* Year */}
+              {/* Month Session */}
               <Grid size={12}>
-                <TextField
-                  fullWidth
-                  label="Year *"
-                  value={formData.year}
-                  onChange={(e) => handleInputChange("year", e.target.value)}
-                  error={!!errors.year}
-                  helperText={errors.year}
-                />
-              </Grid>
-
-              {/* Session */}
-              <Grid size={12}>
-                <TextField
-                  fullWidth
-                  label="Session *"
-                  value={formData.session}
-                  onChange={(e) => handleInputChange("session", e.target.value)}
-                  error={!!errors.session}
-                  helperText={errors.session}
-                />
+                <FormControl fullWidth>
+                  <InputLabel>Month Session</InputLabel>
+                  <Select
+                    value={formData.monthSession}
+                    onChange={(e) =>
+                      handleInputChange("monthSession", e.target.value)
+                    }
+                    label="Month Session"
+                  >
+                    <MenuItem value="January">January</MenuItem>
+                    <MenuItem value="February">February</MenuItem>
+                    <MenuItem value="March">March</MenuItem>
+                    <MenuItem value="April">April</MenuItem>
+                    <MenuItem value="May">May</MenuItem>
+                    <MenuItem value="June">June</MenuItem>
+                    <MenuItem value="July">July</MenuItem>
+                    <MenuItem value="August">August</MenuItem>
+                    <MenuItem value="September">September</MenuItem>
+                    <MenuItem value="October">October</MenuItem>
+                    <MenuItem value="November">November</MenuItem>
+                    <MenuItem value="December">December</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
 
               {/* Course Fee */}
-              <Grid size={12}>
+              {/* <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Course Fee (in Rs.)"
@@ -810,8 +813,8 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   placeholder="Course Fee in Rs."
                   error={!!errors.courseFee}
                   helperText={errors.courseFee}
-                />
-              </Grid>
+                />  
+              </Grid> */}
             </Grid>
           </Grid>
 
@@ -872,10 +875,10 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   </label>
                   <Typography
                     variant="caption"
-                    color="text.secondary"
+                    color="error"
                     sx={{ mt: 1, display: "block" }}
                   >
-                    Image only in jpg
+                    Image only in jpg. File size should be within 200KB
                   </Typography>
                   {errors.signature && (
                     <Typography variant="caption" color="error">
@@ -937,6 +940,18 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                         : "Choose Aadhar Front"}
                     </Button>
                   </label>
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 1, display: "block" }}
+                  >
+                    Image only in jpg. File size should be within 200KB
+                  </Typography>
+                  {errors.adharCardFront && (
+                    <Typography variant="caption" color="error">
+                      {errors.adharCardFront}
+                    </Typography>
+                  )}
                 </Box>
               </Grid>
 
@@ -974,7 +989,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
               </Grid>
 
               {/* Alternate Number */}
-              <Grid size={12}>
+              {/* <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Alternate No."
@@ -988,7 +1003,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   placeholder="10-digit Alternate Number"
                   inputProps={{ maxLength: 10 }}
                 />
-              </Grid>
+              </Grid> */}
 
               {/* Current Address */}
               <Grid size={12}>
@@ -1009,20 +1024,28 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 />
               </Grid>
 
-              {/* City */}
+              {/* State */}
               <Grid size={12}>
-                <TextField
+                <Autocomplete
                   fullWidth
-                  label="City *"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange("city", e.target.value)}
-                  error={!!errors.city}
-                  helperText={errors.city}
-                  placeholder="City"
+                  options={Object.keys(statesAndCities)}
+                  value={formData.state || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange("state", newValue || "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="State *"
+                      error={!!errors.state}
+                      helperText={errors.state}
+                      placeholder="Search or select state"
+                    />
+                  )}
                 />
               </Grid>
 
-              {/* Nationality */}
+              {/* Nationality
               <Grid size={12}>
                 <TextField
                   fullWidth
@@ -1035,7 +1058,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   helperText={errors.nationality}
                   placeholder="Nationality"
                 />
-              </Grid>
+              </Grid> */}
 
               {/* Pincode */}
               <Grid size={12}>
@@ -1058,9 +1081,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   <InputLabel>Grade *</InputLabel>
                   <Select
                     value={formData.grade}
-                    onChange={(e) =>
-                      handleInputChange("grade", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("grade", e.target.value)}
                     label="Grade *"
                   >
                     <MenuItem value="">Select Grade</MenuItem>
@@ -1074,7 +1095,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
               </Grid>
 
               {/* Stream */}
-              <Grid size={12}>
+              {/* <Grid size={12}>
                 <FormControl
                   fullWidth
                   error={!!errors.stream}
@@ -1092,47 +1113,46 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                     <MenuItem value="Arts">Arts</MenuItem>
                     <MenuItem value="Biology">Biology</MenuItem>
                     <MenuItem value="Commerce">Commerce</MenuItem>
-                    <MenuItem value="Computer Science">Computer Science</MenuItem>
-                    <MenuItem value="Mathematics">
-                      Mathematics
+                    <MenuItem value="Computer Science">
+                      Computer Science
                     </MenuItem>
+                    <MenuItem value="Mathematics">Mathematics</MenuItem>
                     <MenuItem value="Other">Other</MenuItem>
                   </Select>
                   {errors.stream && (
                     <FormHelperText>{errors.stream}</FormHelperText>
                   )}
                 </FormControl>
-              </Grid>
+              </Grid> */}
 
-              {/* Month Session */}
+              {/* Course Type */}
               <Grid size={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Month Session</InputLabel>
+                <FormControl fullWidth error={!!errors.courseType}>
+                  <InputLabel>Course Type *</InputLabel>
                   <Select
-                    value={formData.monthSession}
-                    onChange={(e) =>
-                      handleInputChange("monthSession", e.target.value)
-                    }
-                    label="Month Session"
+                    value={formData.courseType}
+                    onChange={(e) => {
+                      handleInputChange("courseType", e.target.value);
+                      // Clear course field when course type changes
+                      handleInputChange("course", "");
+                    }}
+                    label="Course Type *"
                   >
-                    <MenuItem value="January">January</MenuItem>
-                    <MenuItem value="February">February</MenuItem>
-                    <MenuItem value="March">March</MenuItem>
-                    <MenuItem value="April">April</MenuItem>
-                    <MenuItem value="May">May</MenuItem>
-                    <MenuItem value="June">June</MenuItem>
-                    <MenuItem value="July">July</MenuItem>
-                    <MenuItem value="August">August</MenuItem>
-                    <MenuItem value="September">September</MenuItem>
-                    <MenuItem value="October">October</MenuItem>
-                    <MenuItem value="November">November</MenuItem>
-                    <MenuItem value="December">December</MenuItem>
+                    <MenuItem value="">Select course Type</MenuItem>
+                    {courseTypes.map((courseType) => (
+                      <MenuItem key={courseType} value={courseType}>
+                        {courseType}
+                      </MenuItem>
+                    ))}
                   </Select>
+                  {errors.courseType && (
+                    <FormHelperText>{errors.courseType}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
 
               {/* Hostel Facility */}
-              <Grid size={12}>
+              {/* <Grid size={12}>
                 <FormControl fullWidth>
                   <InputLabel>Hostel Facility</InputLabel>
                   <Select
@@ -1146,10 +1166,31 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                     <MenuItem value="Yes">Yes</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-
-              {/* Duration */}
+              </Grid> */}
+              {/* Year */}
               <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Year *"
+                  value={formData.year}
+                  onChange={(e) => handleInputChange("year", e.target.value)}
+                  error={!!errors.year}
+                  helperText={errors.year}
+                />
+              </Grid>
+              {/* Session */}
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  label="Session *"
+                  value={formData.session}
+                  onChange={(e) => handleInputChange("session", e.target.value)}
+                  error={!!errors.session}
+                  helperText={errors.session}
+                />
+              </Grid>
+              {/* Duration */}
+              {/* <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Duration"
@@ -1159,7 +1200,7 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                   }
                   placeholder="Duration"
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         </Grid>

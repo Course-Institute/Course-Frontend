@@ -39,6 +39,7 @@ import EnquiryListPage from './pages/admin/EnquiryListPage';
 import StudentMarksheetPage from './pages/student/StudentMarksheetPage';
 import ViewMarksheetPage from './pages/admin/ViewMarksheetPage';
 import CenterViewMarksheetPage from './pages/center/ViewMarksheetPage';
+import CourseManagementPage from './pages/admin/CourseManagementPage';
 import EditStudentPage from './pages/admin/EditStudentPage';
 
 function App() {
@@ -120,12 +121,17 @@ function App() {
               <AddMarksheetPageAdmin />
             </AdminLayout>
           } />
+          <Route path="/admin/courses" element={
+            <AdminLayout title="COURSE MANAGEMENT">
+              <CourseManagementPage />
+            </AdminLayout>
+          } />
           <Route path="/admin/enquiry-list" element={
             <AdminLayout title="ENQUIRY LIST">
               <EnquiryListPage />
             </AdminLayout>
           } />
-          <Route path="/admin/view-marksheet/:marksheetId" element={
+          <Route path="/admin/view-marksheet/:marksheetId/:semester?" element={
             <AdminLayout title="VIEW MARKSHEET">
               <ViewMarksheetPage />
             </AdminLayout>
@@ -138,7 +144,7 @@ function App() {
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
-          <Route path="/student/marksheet" element={<StudentMarksheetPage />} />
+          <Route path="/student/marksheet/:semester?" element={<StudentMarksheetPage />} />
 
           {/* Center Routes with Layout */}
           <Route path="/center-dashboard" element={
@@ -176,7 +182,7 @@ function App() {
               <AddMarksheetPageCenter />
             </CenterLayout>
           } />
-          <Route path="/center/view-marksheet/:marksheetId" element={
+          <Route path="/center/view-marksheet/:marksheetId/:semester?" element={
             <CenterLayout title="VIEW MARKSHEET">
               <CenterViewMarksheetPage />
             </CenterLayout>

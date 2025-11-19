@@ -20,7 +20,8 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { useGetMarksheet, type SubjectData } from '../hooks/useGetMarksheet';
+import { type SubjectData } from '../hooks/useGetMarksheet';
+import { useGetMarksheetBySemester } from '../hooks/useGetMarksheetBySemester';
 import { useApproveMarksheet } from '../hooks/useApproveMarksheet';
 import { useToast } from '../contexts/ToastContext';
 
@@ -31,6 +32,7 @@ interface EditableMarksheetDialogProps {
   registrationNo: string;
   studentName: string;
   marksheetId?: string;
+  semester?: string; // NEW: Semester to approve
 }
 
 const EditableMarksheetDialog = ({
@@ -39,11 +41,18 @@ const EditableMarksheetDialog = ({
   studentId,
   registrationNo,
   studentName,
+  semester,
 }: EditableMarksheetDialogProps) => {
   const [editedSubjects, setEditedSubjects] = useState<SubjectData[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   
-  const { data: marksheet, isLoading, error } = useGetMarksheet(studentId, open && !!studentId);
+  // Use semester-aware hook if semester is provided, otherwise fallback to old hook
+  const semesterToUse = semester || '1'; // Default to semester 1 if not provided
+  const { data: marksheet, isLoading, error } = useGetMarksheetBySemester(
+    studentId,
+    semesterToUse,
+    open && !!studentId
+  );
   const approveMarksheetMutation = useApproveMarksheet();
   const { showToast } = useToast();
 
@@ -83,10 +92,14 @@ const EditableMarksheetDialog = ({
   const handleSubmitAndApprove = () => {
     if (!marksheet) return;
 
+    // Get semester from marksheet or use provided semester
+    const semesterToApprove = marksheet.semester || semester || '1';
+
     const approveData = {
       registrationNo,
       subjects: editedSubjects,
       marksheetId: marksheet._id,
+      semester: semesterToApprove, // Include semester in approval request
     };
 
     approveMarksheetMutation.mutate(approveData as any, {

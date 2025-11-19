@@ -282,6 +282,9 @@ const AddCenterPage = () => {
             {formValues.photo ? (Array.isArray(formValues.photo) ? `${formValues.photo.length} file(s) selected` : formValues.photo.name) : 'Upload Photograph'}
             <input hidden type="file" accept="image/*" onChange={handleFileChange('photo')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.photo && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.photo}
@@ -376,6 +379,9 @@ const AddCenterPage = () => {
             {formValues.infraPhotos && Array.isArray(formValues.infraPhotos) ? `${formValues.infraPhotos.length} file(s) selected` : 'Upload Infrastructure Photos'}
             <input hidden type="file" multiple accept="image/*" onChange={handleFileChange('infraPhotos')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB per file
+          </Typography>
           {errors.infraPhotos && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.infraPhotos}
@@ -460,6 +466,9 @@ const AddCenterPage = () => {
             {formValues.cancelledCheque ? (Array.isArray(formValues.cancelledCheque) ? `${formValues.cancelledCheque.length} file(s) selected` : formValues.cancelledCheque.name) : 'Upload Cancelled Cheque'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('cancelledCheque')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.cancelledCheque && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.cancelledCheque}
@@ -488,6 +497,9 @@ const AddCenterPage = () => {
             {formValues.gstCertificate ? (Array.isArray(formValues.gstCertificate) ? `${formValues.gstCertificate.length} file(s) selected` : formValues.gstCertificate.name) : 'Upload Registration/GST Certificate'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('gstCertificate')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.gstCertificate && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.gstCertificate}
@@ -508,6 +520,9 @@ const AddCenterPage = () => {
             {formValues.panCard ? (Array.isArray(formValues.panCard) ? `${formValues.panCard.length} file(s) selected` : formValues.panCard.name) : 'Upload PAN Card'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('panCard')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.panCard && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.panCard}
@@ -528,6 +543,9 @@ const AddCenterPage = () => {
             {formValues.addressProof ? (Array.isArray(formValues.addressProof) ? `${formValues.addressProof.length} file(s) selected` : formValues.addressProof.name) : 'Upload Address Proof'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('addressProof')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.addressProof && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.addressProof}
@@ -548,6 +566,9 @@ const AddCenterPage = () => {
             {formValues.directorIdProof ? (Array.isArray(formValues.directorIdProof) ? `${formValues.directorIdProof.length} file(s) selected` : formValues.directorIdProof.name) : 'Upload Director ID Proof'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('directorIdProof')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.directorIdProof && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.directorIdProof}
@@ -568,6 +589,9 @@ const AddCenterPage = () => {
             {formValues.signature ? (Array.isArray(formValues.signature) ? `${formValues.signature.length} file(s) selected` : formValues.signature.name) : 'Upload Signature'}
             <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('signature')} />
           </Button>
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            File size should be within 200KB
+          </Typography>
           {errors.signature && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.signature}

@@ -183,8 +183,24 @@ const ManageStudentsPage = () => {
   };
 
   // Handle approve marksheet - opens editable dialog
-  const handleApproveMarksheetClick = (student: any) => {
-    setSelectedStudent(student);
+  const handleApproveMarksheetClick = (student: any, semester?: string) => {
+    // If semester is provided, use it; otherwise determine which semester to approve
+    let semesterToApprove = semester;
+    
+    if (!semesterToApprove) {
+      // Determine which semester to approve
+      // Priority: First unapproved semester, or first semester if all are approved
+      const semestersWithMarksheet: string[] = student.whichSemesterMarksheetIsGenerated || [];
+      const approvedSemesters: string[] = student.approvedSemesters || [];
+      
+      // Find first unapproved semester
+      const unapprovedSemester = semestersWithMarksheet.find((sem: string) => !approvedSemesters.includes(sem));
+      
+      // Use unapproved semester, or first semester if all are approved, or default to "1"
+      semesterToApprove = unapprovedSemester || semestersWithMarksheet[0] || '1';
+    }
+    
+    setSelectedStudent({ ...student, semesterToApprove });
     setApproveMarksheetDialogOpen(true);
   };
 
@@ -367,49 +383,177 @@ const ManageStudentsPage = () => {
     {
       field: 'marksheet',
       headerName: 'Marksheet',
-      width: '200px',
+      width: '250px',
       align: 'center',
-      getActions: (row: any) => (
-        row.isMarksheetGenerated ? (
-          row.isMarksheetAndCertificateApproved ? (
-            <Button size="small" variant="outlined" disabled sx={{ color: '#8b5cf6', borderColor: '#8b5cf6', background: 'rgba(139,92,246,0.08)', borderRadius: 10, height: 26, px: 1.5, minWidth: 160, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap' }}>
-              Marksheet Approved
+      getActions: (row: any) => {
+        const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
+        const approvedSemesters: string[] = row.approvedSemesters || [];
+        
+        if (!row.isMarksheetGenerated || semestersWithMarksheet.length === 0) {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
+              Not generated
+            </Typography>
+          );
+        }
+        
+        // Find unapproved semesters
+        const unapprovedSemesters = semestersWithMarksheet.filter((sem: string) => !approvedSemesters.includes(sem));
+        
+        if (unapprovedSemesters.length === 0) {
+          // All semesters approved
+          return (
+            <Button 
+              size="small" 
+              variant="outlined" 
+              disabled 
+              sx={{ 
+                color: '#8b5cf6', 
+                borderColor: '#8b5cf6', 
+                background: 'rgba(139,92,246,0.08)', 
+                borderRadius: 10, 
+                height: 26, 
+                px: 1.5, 
+                minWidth: 160, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap' 
+              }}
+            >
+              All Approved
             </Button>
-          ) : (
+          );
+        }
+        
+        // Show approval buttons for each unapproved semester
+        if (unapprovedSemesters.length === 1) {
+          // Single unapproved semester
+          return (
             <Button
               size="small"
               variant="contained"
-              onClick={() => handleApproveMarksheetClick(row)}
+              onClick={() => handleApproveMarksheetClick(row, unapprovedSemesters[0])}
               disabled={approveMarksheetMutation.isPending}
-              sx={{ background: '#6366f1', color: '#fff', borderRadius: 10, height: 26, px: 1.5, minWidth: 150, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', boxShadow: 'none', '&:hover': { background: '#4f46e5' } }}
+              sx={{ 
+                background: '#6366f1', 
+                color: '#fff', 
+                borderRadius: 10, 
+                height: 26, 
+                px: 1.5, 
+                minWidth: 150, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap', 
+                boxShadow: 'none', 
+                '&:hover': { background: '#4f46e5' } 
+              }}
             >
-              Approve Marksheet
+              Approve Sem {unapprovedSemesters[0]}
             </Button>
-          )
-        ) : (
-          <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>Not generated</Typography>
-        )
-      ),
+          );
+        }
+        
+        // Multiple unapproved semesters - show dropdown or buttons
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
+            {unapprovedSemesters.map((sem: string) => (
+              <Button
+                key={sem}
+                size="small"
+                variant="contained"
+                onClick={() => handleApproveMarksheetClick(row, sem)}
+                disabled={approveMarksheetMutation.isPending}
+                sx={{ 
+                  background: '#6366f1', 
+                  color: '#fff', 
+                  borderRadius: 10, 
+                  height: 24, 
+                  px: 1.5, 
+                  minWidth: 130, 
+                  fontSize: 10, 
+                  textTransform: 'none', 
+                  whiteSpace: 'nowrap', 
+                  boxShadow: 'none', 
+                  '&:hover': { background: '#4f46e5' } 
+                }}
+              >
+                Approve Sem {sem}
+              </Button>
+            ))}
+          </Box>
+        );
+      },
     },
     {
       field: 'view',
       headerName: 'View',
-      width: '170px',
+      width: '200px',
       align: 'center',
-      getActions: (row: any) => (
-        row.isMarksheetGenerated ? (
-          <Button
-            size="small"
-            variant="outlined"
-            sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
-            onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}`)}
-          >
-            Show Marksheet
-          </Button>
-        ) : (
-          <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>N/A</Typography>
-        )
-      ),
+      getActions: (row: any) => {
+        // Check if student has whichSemesterMarksheetIsGenerated array
+        const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
+        
+        if (semestersWithMarksheet.length > 0) {
+          // If multiple semesters, show dropdown menu
+          if (semestersWithMarksheet.length > 1) {
+            return (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
+                {semestersWithMarksheet.map((sem: string) => (
+                  <Button
+                    key={sem}
+                    size="small"
+                    variant="outlined"
+                    sx={{ 
+                      color: '#6366f1', 
+                      borderColor: '#6366f1', 
+                      borderRadius: 10, 
+                      height: 24, 
+                      px: 1, 
+                      minWidth: 120, 
+                      fontWeight: 600, 
+                      fontSize: 10, 
+                      textTransform: 'none', 
+                      whiteSpace: 'nowrap', 
+                      background: 'white' 
+                    }}
+                    onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
+                  >
+                    Semester {sem}
+                  </Button>
+                ))}
+              </Box>
+            );
+          } else {
+            // Single semester
+            return (
+              <Button
+                size="small"
+                variant="outlined"
+                sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
+                onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/${semestersWithMarksheet[0]}`)}
+              >
+                Show Marksheet
+              </Button>
+            );
+          }
+        } else if (row.isMarksheetGenerated) {
+          // Fallback for backward compatibility - default to semester 1
+          return (
+            <Button
+              size="small"
+              variant="outlined"
+              sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
+              onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/1`)}
+            >
+              Show Marksheet
+            </Button>
+          );
+        } else {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>N/A</Typography>
+          );
+        }
+      },
     },
   ];
   return (
@@ -1093,6 +1237,7 @@ const ManageStudentsPage = () => {
             registrationNo={selectedStudent.registrationNo}
             studentName={selectedStudent.candidateName}
             marksheetId={selectedStudent.marksheetId}
+            semester={selectedStudent.semesterToApprove} // Pass semester to dialog
           />
         )}
       </Container>

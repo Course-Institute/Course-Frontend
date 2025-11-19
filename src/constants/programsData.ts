@@ -409,6 +409,7 @@ export const programsData: Program[] = [
       }
     ]
   },
+  
   // Import IT, Vocational, Beauty & Wellness, Apparel, and Agriculture programs
   itProgramsData,
   vocationalProgramsData,

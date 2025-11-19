@@ -339,63 +339,105 @@ const CenterManageStudentsPage = () => {
       headerName: 'Actions',
       width: '150px',
       align: 'center',
-      getActions: (row: any) => (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
-          {row.isMarksheetGenerated && (
-            <>
-              {row.isMarksheetAndCertificateApproved ? (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}`)}
-                  sx={{
-                    borderColor: '#10b981',
-                    color: '#10b981',
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    '&:hover': {
-                      borderColor: '#059669',
-                      backgroundColor: '#ecfdf5',
-                    },
-                  }}
-                >
-                  VIEW MARKSHEET
-                </Button>
+      getActions: (row: any) => {
+        // Check if student has whichSemesterMarksheetIsGenerated array
+        const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
+        const approvedSemesters: string[] = row.approvedSemesters || [];
+        
+        // For backward compatibility: if approvedSemesters is empty but isMarksheetAndCertificateApproved is true,
+        // treat all semesters as approved
+        const allSemestersApproved = row.isMarksheetAndCertificateApproved && approvedSemesters.length === 0;
+        
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
+            {row.isMarksheetGenerated && semestersWithMarksheet.length > 0 ? (
+              semestersWithMarksheet.length > 1 ? (
+                // Multiple semesters - show all with different labels for approved/unapproved
+                semestersWithMarksheet.map((sem: string) => {
+                  const isApproved = allSemestersApproved || approvedSemesters.includes(sem);
+                  return (
+                    <Button
+                      key={sem}
+                      size="small"
+                      variant="outlined"
+                      onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
+                      sx={{
+                        borderColor: isApproved ? '#10b981' : '#3b82f6',
+                        color: isApproved ? '#10b981' : '#3b82f6',
+                        textTransform: 'none',
+                        fontSize: '0.7rem',
+                        fontWeight: 500,
+                        px: 1.5,
+                        py: 0.4,
+                        borderRadius: 2,
+                        minWidth: 100,
+                        '&:hover': {
+                          borderColor: isApproved ? '#059669' : '#2563eb',
+                          backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
+                        },
+                      }}
+                    >
+                      {isApproved ? `Sem ${sem}` : `View Marks ${sem}`}
+                    </Button>
+                  );
+                })
               ) : (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => {
-                    const idToUse = row.studentId || row._id || '';
-                    setSelectedStudentId(idToUse);
-                    setPreviewDialogOpen(true);
-                  }}
-                  sx={{
-                    borderColor: '#3b82f6',
-                    color: '#3b82f6',
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    '&:hover': {
-                      borderColor: '#2563eb',
-                      backgroundColor: '#eff6ff',
-                    },
-                  }}
-                >
-                  PREVIEW MARKSHEET
-                </Button>
-              )}
-            </>
-          )}
-        </Box>
-      ),
+                // Single semester
+                (() => {
+                  const sem = semestersWithMarksheet[0];
+                  const isApproved = allSemestersApproved || approvedSemesters.includes(sem);
+                  return (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
+                      sx={{
+                        borderColor: isApproved ? '#10b981' : '#3b82f6',
+                        color: isApproved ? '#10b981' : '#3b82f6',
+                        textTransform: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 500,
+                        px: 2,
+                        py: 0.5,
+                        borderRadius: 2,
+                        '&:hover': {
+                          borderColor: isApproved ? '#059669' : '#2563eb',
+                          backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
+                        },
+                      }}
+                    >
+                      {isApproved ? 'VIEW MARKSHEET' : 'VIEW MARKS'}
+                    </Button>
+                  );
+                })()
+              )
+            ) : row.isMarksheetGenerated ? (
+              // Fallback for backward compatibility
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/1`)}
+                sx={{
+                  borderColor: '#10b981',
+                  color: '#10b981',
+                  textTransform: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 2,
+                  '&:hover': {
+                    borderColor: '#059669',
+                    backgroundColor: '#ecfdf5',
+                  },
+                }}
+              >
+                VIEW MARKSHEET
+              </Button>
+            ) : null}
+          </Box>
+        );
+      },
     },
   ];
 

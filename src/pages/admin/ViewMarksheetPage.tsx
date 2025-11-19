@@ -11,15 +11,22 @@ import {
   Button,
 } from '@mui/material';
 import { ArrowBack, Download } from '@mui/icons-material';
-import { useGetMarksheet } from '../../hooks/useGetMarksheet';
+import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
 
 const AdminMarksheetPage = () => {
-  const { marksheetId } = useParams<{ marksheetId: string }>();
+  const { marksheetId, semester } = useParams<{ marksheetId: string; semester?: string }>();
   const navigate = useNavigate();
   const marksheetRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   
-  const { data: marksheet, isLoading, error } = useGetMarksheet(marksheetId || '', !!marksheetId);
+  // Use semester if provided, otherwise default to "1" for backward compatibility
+  const semesterValue = semester || "1";
+  
+  const { data: marksheet, isLoading, error } = useGetMarksheetBySemester(
+    marksheetId || '', 
+    semesterValue,
+    !!marksheetId
+  );
 
   if (isLoading) {
     return (
