@@ -191,7 +191,7 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
           {/* SVG Template Background */}
           <Box
             component="img"
-            src="/mivpsa-student-form-template.svg"
+            src="/studentFormTemplate.svg"
             alt="Student Form Template"
             sx={{
               position: 'absolute',
