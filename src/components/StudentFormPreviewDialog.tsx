@@ -1,30 +1,15 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Grid,
-  Avatar,
-  Divider,
-  Chip,
-  Card,
-  CardContent,
   IconButton,
   Tooltip,
 } from '@mui/material';
-import {
-  Download,
-  Person,
-  School,
-  LocationOn,
-  Phone,
-  Email,
-  Work,
-  Home,
-} from '@mui/icons-material';
+import { Download, Check } from '@mui/icons-material';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import DialogBox from './core-components/DialogBox/DialogBox';
 import { type AddStudentData } from '../hooks/useAddStudent';
-import { generateStudentFormPDF } from '../utils/pdfGenerator';
-import InstituteLogo from './InstituteLogo';
 
 interface StudentFormPreviewDialogProps {
   open: boolean;
@@ -43,126 +28,97 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
   formData,
   isSubmitting = false,
 }) => {
-  const handleDownload = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  useEffect(() => {
+    // Handle photo URL
+    if (formData.photo) {
+      if (formData.photo instanceof File) {
+        const url = URL.createObjectURL(formData.photo);
+        setPhotoUrl(url);
+        return () => URL.revokeObjectURL(url);
+      } else if (typeof formData.photo === 'string') {
+        setPhotoUrl(formData.photo);
+      }
+    }
+  }, [formData.photo]);
+
+  const handleDownload = async () => {
+    if (!formRef.current) return;
+
+    setIsDownloading(true);
     try {
-      generateStudentFormPDF(formData);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      // Fallback to text download if PDF generation fails
-      const formText = `
-STUDENT REGISTRATION FORM - PREVIEW
-=====================================
+      // 1. Wait for images to load
+      const images = formRef.current.querySelectorAll("img");
+      await Promise.all(
+        Array.from(images).map(
+          (img) =>
+            new Promise((resolve) => {
+              if (img.complete) resolve(true);
+              img.onload = () => resolve(true);
+              img.onerror = () => resolve(true);
+            })
+        )
+      );
 
-PERSONAL INFORMATION
--------------------
-Name: ${formData.candidateName}
-Father's Name: ${formData.fatherName}
-Mother's Name: ${formData.motherName}
-Date of Birth: ${formData.dateOfBirth}
-Gender: ${formData.gender}
-Category: ${formData.category}
-Aadhar Card No: ${formData.adharCardNo}
+      await new Promise((r) => setTimeout(r, 200));
 
-CONTACT INFORMATION
-------------------
-Contact Number: ${formData.contactNumber}
-Alternate Number: ${formData.alternateNumber || 'N/A'}
-Email: ${formData.emailAddress}
+      // Your template is EXACT A4 size (595.5 × 842.25)
+      const a4WidthPx = 595.5;
+      const a4HeightPx = 842.25;
 
-ADDRESS INFORMATION
-------------------
-Permanent Address: ${formData.permanentAddress}
-Current Address: ${formData.currentAddress}
-City: ${formData.city}
-State: ${formData.state}
-Country: ${formData.country}
-Nationality: ${formData.nationality}
-Pincode: ${formData.pincode}
+      // 2. Capture at high resolution (2x scale for sharp PDF)
+      const scale = 2;
+      const canvas = await html2canvas(formRef.current, {
+        scale,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false,
+      });
 
-EMPLOYMENT INFORMATION
---------------------
-Employed: ${formData.isEmployed}
-Employer Name: ${formData.employerName || 'N/A'}
-Designation: ${formData.designation || 'N/A'}
+      const imgData = canvas.toDataURL("image/png", 1.0);
 
-ACADEMIC INFORMATION
--------------------
-Course Type: ${formData.courseType}
-Grade: ${formData.grade}
-Course: ${formData.course}
-Stream: ${formData.stream}
-Year: ${formData.year}
-Session: ${formData.session}
-Month Session: ${formData.monthSession}
-Duration: ${formData.duration || 'N/A'}
-Course Fee: ₹${formData.courseFee}
-Hostel Facility: ${formData.hostelFacility}
+      // 3. Create A4 PDF in EXACT size
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [a4WidthPx, a4HeightPx], // REAL A4 SIZE
+        compress: false,
+      });
 
-DOCUMENTS UPLOADED
------------------
-Photo: ${formData.photo ? 'Uploaded' : 'Not uploaded'}
-Aadhar Front: ${formData.adharCardFront ? 'Uploaded' : 'Not uploaded'}
-Aadhar Back: ${formData.adharCardBack ? 'Uploaded' : 'Not uploaded'}
-Signature: ${formData.signature ? 'Uploaded' : 'Not uploaded'}
+      // 4. Draw image EXACTLY in A4 dimensions — no stretch, no shift
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        a4WidthPx,
+        862.25,
+        undefined,
+        "SLOW"
+      );
 
-Generated on: ${new Date().toLocaleString()}
-      `.trim();
+      // 5. Save file
+      const fileName = `Student_Registration_${formData.candidateName
+        .replace(/\s+/g, "_")
+        .trim()}_${new Date().toISOString().slice(0, 10)}.pdf`;
 
-      // Create and download the text file as fallback
-      const blob = new Blob([formText], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Student_Registration_${formData.candidateName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      pdf.save(fileName);
+    } catch (err) {
+      console.error("PDF Error:", err);
+    } finally {
+      setIsDownloading(false);
     }
   };
-
-  const InfoCard = ({ title, children, icon }: { title: string; children: React.ReactNode; icon: React.ReactNode }) => (
-    <Card sx={{ mb: 1.5, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-      <CardContent sx={{ p: 1.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-          {icon}
-          <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold', color: '#1e293b', fontSize: '1rem' }}>
-            {title}
-          </Typography>
-        </Box>
-        {children}
-      </CardContent>
-    </Card>
-  );
-
-  const InfoRow = ({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-      {icon && <Box sx={{ mr: 1, color: 'text.secondary' }}>{icon}</Box>}
-      <Typography variant="body2" sx={{ fontWeight: 'medium', minWidth: '120px', color: '#64748b', fontSize: '0.875rem' }}>
-        {label}:
-      </Typography>
-      <Typography variant="body2" sx={{ ml: 1, color: '#1e293b', fontSize: '0.875rem' }}>
-        {value || 'N/A'}
-      </Typography>
-    </Box>
-  );
-
-  // Robust avatar/photo preview
-  let photoUrl: string | undefined = undefined;
-  if (formData.photo) {
-    if (formData.photo instanceof File) {
-      photoUrl = URL.createObjectURL(formData.photo);
-    } else if (typeof formData.photo === 'string') {
-      photoUrl = formData.photo;
-    }
-  }
 
   return (
     <DialogBox
       open={open}
       onClose={onClose}
       title="Student Registration Preview"
-    //   maxWidth="lg"
       width="95%"
       maxHeight="90vh"
       hideScrollbar={true}
@@ -184,147 +140,449 @@ Generated on: ${new Date().toLocaleString()}
         },
       ]}
     >
-      <Box sx={{ 
+      <Box
+        ref={containerRef}
+        sx={{
         position: 'relative', 
-        boxSizing: 'border-box',
+          width: '100%',
         maxHeight: 'calc(90vh - 120px)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        {/* Branding Header */}
-        <Box sx={{
+          overflow: 'auto',
           display: 'flex',
-          alignItems: 'center',
-          gap: 1.5,
-          p: 1.5,
-          borderRadius: 2,
-          mb: 1.5,
-          background: 'linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)',
-          border: '1px solid #e2e8f0',
-          flexShrink: 0,
-        }}>
-          <Box sx={{ p: 1, borderRadius: 2, backgroundColor: 'white', border: '1px solid #e5e7eb' }}>
-            <InstituteLogo width={44} height={44} sx={{ borderRadius: 1 }} />
-          </Box>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
-              Mahavir Institute of Vocational & Paramedical Science
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#475569' }}>
-              Student Registration Preview
-            </Typography>
-          </Box>
-        </Box>
+          justifyContent: 'center',
+          backgroundColor: '#f5f5f5',
+          p: 2,
+        }}
+      >
         {/* Download Button */}
-        <Tooltip title="Download PDF">
+        <Tooltip title={isDownloading ? 'Generating PDF...' : 'Download PDF'}>
           <IconButton
             onClick={handleDownload}
+            disabled={isDownloading}
             sx={{
               position: 'absolute',
-              top: 0,
-              right: 0,
+              top: 16,
+              right: 16,
               backgroundColor: '#10b981',
               color: 'white',
+              zIndex: 10,
               '&:hover': {
                 backgroundColor: '#059669',
               },
-              zIndex: 1,
+              '&:disabled': {
+                backgroundColor: '#9ca3af',
+              },
             }}
           >
             <Download />
           </IconButton>
         </Tooltip>
 
-        {/* Header with Photo */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 1.5, backgroundColor: '#f8fafc', borderRadius: 2, flexShrink: 0 }}>
-          <Avatar
-            src={photoUrl}
-            sx={{ width: 60, height: 60, mr: 2, border: '2px solid #e2e8f0' }}
+        {/* Form Template Container */}
+        <Box
+          ref={formRef}
+          sx={{
+            position: 'relative',
+            width: '595.5px',
+            height: '842.25px',
+            backgroundColor: 'white',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          }}
+        >
+          {/* SVG Template Background */}
+          <Box
+            component="img"
+            src="/mivpsa-student-form-template.svg"
+            alt="Student Form Template"
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              zIndex: 1,
+            }}
+          />
+
+          {/* Overlay Content - Form Data */}
+          <Box
+            sx={{
+              position: 'relative',
+              zIndex: 2,
+              width: '100%',
+              height: '100%',
+            }}
           >
-            {formData.candidateName?.charAt(0)?.toUpperCase()}
-          </Avatar>
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b', mb: 0.5, fontSize: '1.5rem' }}>
-              {formData.candidateName}
+            {/* Photo Box - Top Right */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '52px',
+                right: '41px',
+                width: '105px',
+                height: '110px',
+                border: '2px solid #000',
+                backgroundColor: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              {photoUrl ? (
+                <Box
+                  component="img"
+                  src={photoUrl}
+                  alt="Student Photo"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'fill',
+                  }}
+                />
+              ) : null}
+            </Box>
+
+            {/* Personal Information - Values Only */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '183px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.candidateName || ''}
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 1, fontSize: '1rem' }}>
-              {formData.course} - {formData.stream}
+
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '183px',
+                right: '147px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.fatherName || ''}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <Chip label={formData.gender} size="small" color="primary" variant="outlined" />
-              <Chip label={formData.category} size="small" color="secondary" variant="outlined" />
-              <Chip label={`₹${formData.courseFee}`} size="small" color="success" variant="outlined" />
+
+            {/* Date of Birth - Left Column, Row 2 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '211px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.dateOfBirth || ''}
+            </Typography>
+
+            {/* Mother Name - Right Column, Row 2 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '211px',
+                right: '147px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.motherName || ''}
+            </Typography>
+
+            {/* Email - Left Column, Row 3 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '238px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.emailAddress || ''}
+            </Typography>
+
+            {/* Phone - Right Column, Row 3 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '241px',
+                right: '120px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.contactNumber || ''}
+            </Typography>
+
+            {/* Current Address - Left Column, Row 4 (full width) */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '265px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                maxWidth: '400px',
+                wordWrap: 'break-word',
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.currentAddress || ''}
+            </Typography>
+
+            {/* Aadhar Card No - Left Column, Row 5 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '295px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.adharCardNo || ''}
+            </Typography>
+
+            {/* Gender - Right Column, Row 5 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '295px',
+                right: '159px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.gender || ''}
+            </Typography>
+
+            {/* State Name - Left Column, Row 6 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '323px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.state || ''}
+            </Typography>
+
+            {/* City - Right Column, Row 6 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '319px',
+                right: '155px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.city || ''}
+            </Typography>
+
+            {/* Country - Left Column, Row 7 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '348px',
+                left: '135px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.country || ''}
+            </Typography>
+
+            {/* Pincode - Right Column, Row 7 */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '345px',
+                right: '147px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.pincode || ''}
+            </Typography>
+
+            {/* Employment Information - Values Only */}
+            {/* Employer Name - Left Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '417px',
+                left: '147px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.employerName || ''}
+            </Typography>
+
+            {/* Designation - Right Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '417px',
+                right: '147px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.designation || ''}
+            </Typography>
+
+            {/* Academic Information - Values Only */}
+            {/* Grade - Left Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '504px',
+                left: '115px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.grade || ''}
+            </Typography>
+
+            {/* Course Type - Right Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '500px',
+                right: '269px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.courseType || ''}
+            </Typography>
+
+            {/* Courses - Left Column, full width */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '540px',
+                left: '115px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                maxWidth: '400px',
+                wordWrap: 'break-word',
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.course || ''}
+            </Typography>
+
+            {/* Year - Left Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '572px',
+                left: '115px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.year || ''}
+            </Typography>
+
+            {/* Month Session - Right Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '572px',
+                right: '273px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.monthSession || ''}
+            </Typography>
+
+            {/* Session - Left Column */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '572px',
+                right: '120px',
+                fontSize: '0.65rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {formData.session || ''}
+          </Typography>
+
+            {/* Declaration Checkbox - Tick Mark Only */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '649px',
+                left: '65px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Check
+                sx={{
+                  fontSize: '1.5rem',
+                  color: '#000',
+                  fontWeight: 'bold',
+                }}
+              />
             </Box>
           </Box>
-        </Box>
-
-        <Box sx={{ flex: 1, overflow: 'auto', pr: 1 }}>
-          <Grid container spacing={2}>
-            {/* Personal Information */}
-            <Grid size={{ xs: 12, md: 6 }}>
-            <InfoCard title="Personal Information" icon={<Person color="primary" />}>
-              <InfoRow label="Full Name" value={formData.candidateName} />
-              <InfoRow label="Father's Name" value={formData.fatherName} />
-              <InfoRow label="Mother's Name" value={formData.motherName} />
-              <InfoRow label="Date of Birth" value={formData.dateOfBirth} />
-              <InfoRow label="Gender" value={formData.gender} />
-              <InfoRow label="Category" value={formData.category} />
-              <InfoRow label="Aadhar No" value={formData.adharCardNo} />
-            </InfoCard>
-
-            {/* Contact Information */}
-            <InfoCard title="Contact Information" icon={<Phone color="primary" />}>
-              <InfoRow label="Contact Number" value={formData.contactNumber} icon={<Phone fontSize="small" />} />
-              <InfoRow label="Alternate Number" value={formData.alternateNumber || 'N/A'} icon={<Phone fontSize="small" />} />
-              <InfoRow label="Email Address" value={formData.emailAddress} icon={<Email fontSize="small" />} />
-            </InfoCard>
-
-            {/* Employment Information */}
-            <InfoCard title="Employment Information" icon={<Work color="primary" />}>
-              <InfoRow label="Employed" value={formData.isEmployed} />
-              <InfoRow label="Employer Name" value={formData.employerName || 'N/A'} />
-              <InfoRow label="Designation" value={formData.designation || 'N/A'} />
-            </InfoCard>
-          </Grid>
-
-          {/* Address & Academic Information */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            {/* Address Information */}
-            <InfoCard title="Address Information" icon={<LocationOn color="primary" />}>
-              <InfoRow label="Permanent Address" value={formData.permanentAddress} icon={<Home fontSize="small" />} />
-              <InfoRow label="Current Address" value={formData.currentAddress} icon={<Home fontSize="small" />} />
-              <InfoRow label="City" value={formData.city} />
-              <InfoRow label="State" value={formData.state} />
-              <InfoRow label="Country" value={formData.country} />
-              <InfoRow label="Nationality" value={formData.nationality} />
-              <InfoRow label="Pincode" value={formData.pincode} />
-            </InfoCard>
-
-            {/* Academic Information */}
-            <InfoCard title="Academic Information" icon={<School color="primary" />}>
-              <InfoRow label="Course Type" value={formData.courseType} />
-              <InfoRow label="Grade" value={formData.grade} />
-              <InfoRow label="Course" value={formData.course} />
-              <InfoRow label="Stream" value={formData.stream} />
-              <InfoRow label="Year" value={formData.year} />
-              <InfoRow label="Session" value={formData.session} />
-              <InfoRow label="Month Session" value={formData.monthSession || ''} />
-              <InfoRow label="Duration" value={formData.duration || 'N/A'} />
-              <InfoRow label="Course Fee" value={`₹${formData.courseFee}`} />
-              <InfoRow label="Hostel Facility" value={formData.hostelFacility || 'No'} />
-            </InfoCard>
-
-          </Grid>
-        </Grid>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-        
-        <Box sx={{ textAlign: 'center', py: 1, flexShrink: 0 }}>
-          <Typography variant="body2" color="text.secondary">
-            Please review all the information above before saving. You can download a PDF copy for your records.
-          </Typography>
         </Box>
       </Box>
     </DialogBox>

@@ -84,7 +84,8 @@ export const itProgramsData: Program = {
         { id: "search-engine-optimization-1y-12th", name: "Search Engine Optimization", duration: "1", durationUnit: "Year", eligibility: "12th" },
         { id: "digital-animation-1y-12th", name: "Digital Animation", duration: "1", durationUnit: "Year", eligibility: "12th" },
         { id: "e-commerce-1y-12th", name: "E-Commerce", duration: "1", durationUnit: "Year", eligibility: "12th" },
-        { id: "graphics-animation-1y-12th", name: "Graphics and Animation", duration: "1", durationUnit: "Year", eligibility: "12th" }
+        { id: "graphics-animation-1y-12th", name: "Graphics and Animation", duration: "1", durationUnit: "Year", eligibility: "12th" },
+        { id: "pgdca-1y-12th", name: "Post Graduate Diploma in Computer Application(PGDCA)", duration: "1", durationUnit: "Year", eligibility: "12th" }
       ]
     },
     {

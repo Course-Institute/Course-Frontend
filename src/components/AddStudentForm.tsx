@@ -744,34 +744,28 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
 
               {/* Course */}
               <Grid size={12}>
-                <FormControl
+                <Autocomplete
                   fullWidth
-                  error={!!errors.course}
+                  options={availableCourses}
+                  value={formData.course || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange("course", newValue || "");
+                  }}
                   disabled={!formData.courseType}
-                >
-                  <InputLabel>Course *</InputLabel>
-                  <Select
-                    value={formData.course}
-                    onChange={(e) =>
-                      handleInputChange("course", e.target.value)
-                    }
-                    label="Cours *"
-                  >
-                    <MenuItem value="">
-                      {formData.courseType
-                        ? "Select Course"
-                        : "Select Course Type First"}
-                    </MenuItem>
-                    {availableCourses.map((course) => (
-                      <MenuItem key={course} value={course}>
-                        {course}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.course && (
-                    <FormHelperText>{errors.course}</FormHelperText>
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Course *"
+                      error={!!errors.course}
+                      helperText={errors.course}
+                      placeholder={
+                        formData.courseType
+                          ? "Search or select course"
+                          : "Select Course Type First"
+                      }
+                    />
                   )}
-                </FormControl>
+                />
               </Grid>
               {/* Month Session */}
               <Grid size={12}>
@@ -1127,28 +1121,25 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
 
               {/* Course Type */}
               <Grid size={12}>
-                <FormControl fullWidth error={!!errors.courseType}>
-                  <InputLabel>Course Type *</InputLabel>
-                  <Select
-                    value={formData.courseType}
-                    onChange={(e) => {
-                      handleInputChange("courseType", e.target.value);
-                      // Clear course field when course type changes
-                      handleInputChange("course", "");
-                    }}
-                    label="Course Type *"
-                  >
-                    <MenuItem value="">Select course Type</MenuItem>
-                    {courseTypes.map((courseType) => (
-                      <MenuItem key={courseType} value={courseType}>
-                        {courseType}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.courseType && (
-                    <FormHelperText>{errors.courseType}</FormHelperText>
+                <Autocomplete
+                  fullWidth
+                  options={courseTypes}
+                  value={formData.courseType || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange("courseType", newValue || "");
+                    // Clear course field when course type changes
+                    handleInputChange("course", "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Course Type *"
+                      error={!!errors.courseType}
+                      helperText={errors.courseType}
+                      placeholder="Search or select course type"
+                    />
                   )}
-                </FormControl>
+                />
               </Grid>
 
               {/* Hostel Facility */}

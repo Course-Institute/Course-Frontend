@@ -316,232 +316,58 @@ interface StudentFormData {
   signature?: File;
 }
 
-export const generateStudentFormPDF = async (formData: StudentFormData): Promise<void>   => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+// Simply downloads the preview element as PDF - no HTML generation, uses the preview directly
+export const generateStudentFormPDF = async (formData: StudentFormData, formElement: HTMLElement): Promise<void> => {
+  const html2canvas = (await import('html2canvas')).default;
+  
+  // Wait for all images to load
+  const images = formElement.querySelectorAll('img');
+  await Promise.all(
+    Array.from(images).map((img) => {
+      return new Promise((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          resolve(true);
+        } else {
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(true);
+        }
+      });
+    })
+  );
 
+  // Additional wait to ensure everything is rendered
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-  async function urlToBase64(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+  // A4 dimensions in pixels at 96 DPI: 595.5px × 842.25px
+  const a4WidthPx = 595.5;
+  const a4HeightPx = 842.25;
+  const scale = 2;
+  
+  const canvas = await html2canvas(formElement, {
+    backgroundColor: '#ffffff',
+    scale: scale,
+    useCORS: true,
+    allowTaint: true,
+    logging: false,
+    width: a4WidthPx,
+    height: a4HeightPx,
+    windowWidth: a4WidthPx,
+    windowHeight: a4HeightPx,
   });
-}
-if(formData.photo){
-const base64Photo = await urlToBase64(formData.photo);
 
-  const imgWidth = 23;
-  const imgHeight = 23;
-
-  const imgX = pageWidth - imgWidth - 20;  // your positioning
-  const imgY = 63;
-
-  // ✅ Draw image
-  doc.addImage(base64Photo, "JPEG", imgX, imgY, imgWidth, imgHeight);
-
-  // ✅ Add border box
-  const borderPadding = 2;
-   doc.setDrawColor(14, 68, 85); // change here
-
-doc.setLineWidth(0.3);
-doc.roundedRect(
-  imgX - borderPadding,
-  imgY - borderPadding,
-  imgWidth + borderPadding * 2,
-  imgHeight + borderPadding * 2,
-  3, 3, "S" // corner radius + style (stroke)
-);
-}
+  const imgData = canvas.toDataURL('image/png', 1.0);
   
-  // Set font
-  doc.setFont('helvetica');
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'px',
+    format: [a4WidthPx, a4HeightPx],
+    compress: false,
+  });
+
+  pdf.addImage(imgData, 'PNG', 0, 0, a4WidthPx, a4HeightPx, undefined, 'SLOW');
   
-  // Header
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  // doc.text('Mahavir Institute', pageWidth / 2, 30, { align: 'center' });
-  const logo = await loadLogoBase64();
-  doc.addImage(logo, "PNG", pageWidth / 2 - 75, 0, 150, 60);
-
-  // Section 1 heading
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bolditalic');
-  doc.text('STUDENT REGISTRATION FORM', pageWidth / 2, 70, { align: 'center' });
-
-let yPosition = 80;
-  // const lineHeight = 7;
-  const leftColumn = 20;
-  // const rightColumn = 110;
-
-const fieldWidth = 55;
-const fieldHeight = 8;
-const gap = 7;
-
-const drawField = (x: number, y: number, label: string, value: string) => {
- const safeLabel = label ? label.toUpperCase() : "";
-  const safeValue = value ? value : "";
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.text(safeLabel, x, y);
-
-  // box
-  doc.setDrawColor(14, 68, 85);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(x, y + 2, fieldWidth, fieldHeight, 2, 3, "S");
-
-  // text inside
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(safeValue, x + 2, y + 2 + 6);
-};
-
-const addRow = (label1: any, value1: any, label2?: any, value2?: any, label3?: any, value3?: any) => {
-  const x1 = 15;
-  const x2 = x1 + fieldWidth + gap;
-  const x3 = x2 + fieldWidth + gap;
-
-  const rowY = yPosition; // lock starting Y for row
-
-  drawField(x1, rowY, label1, value1);
-  drawField(x2, rowY, label2, value2);
-  drawField(x3, rowY, label3, value3);
-
-  // move down for next row AFTER both fields
-  yPosition += fieldHeight + 14
-};
-
-const addSection = (title: string) => {
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text(title.toUpperCase(), 15, yPosition + 6);
-
-  yPosition += 14;
-};
-
-const waterMark = await loadWaterMarkBase64();
-const fadedWatermark = await createFadedDataUrl(waterMark, 0.1);
-
-doc.addImage(
-  fadedWatermark,
-  "PNG",
-  (pageWidth / 2) - 60,
-  (pageHeight / 2) - 60,
-  120,
-  120
-);
-  
-  // Personal Information Section
-addSection("PERSONAL DETAILS");
-
-yPosition = 80; // after logo + heading
-
-addSection("Personal Details");
-
-addRow("Name", formData.candidateName, "Father's Name", formData.fatherName , "Mother's Name", formData.motherName);
-addRow("Date Of Birth", formData.dateOfBirth, "Gender", formData.gender, "Category", formData.category);
-addRow("Aadhar Card No", formData.adharCardNo, "Contact Number", formData.contactNumber, "Alternate Number", formData.alternateNumber);
-addRow("Email", formData.emailAddress);
-
-
-  
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  // Contact Information Section
-addSection("Contact Information");
-
-  addRow('Contact Number:', formData.contactNumber, 'Alternate Number:', formData.alternateNumber || '' , 'Email Address:', formData.emailAddress);
-  
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  // Address Information Section
-  addSection("Address Information");
-
-  addRow('Permanent Address:', formData.permanentAddress, 'City:', formData.city, 'Current Address:', formData.currentAddress);
-  addRow('State:', formData.state, 'Country:', formData.country, 'Pincode:', formData.pincode);
-  addRow('Nationality:', formData.nationality);
-  
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  doc.addImage(
-  fadedWatermark,
-  "PNG",
-  (pageWidth / 2) - 60,
-  (pageHeight / 2) - 60,
-  120,
-  120
-);
-  // Employment Information Section
-addSection("Employment Information");
-  addRow('Employed:', formData.isEmployed, 'Employer Name:', formData.employerName || '', 'Designation:', formData.designation || '');
-  
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  // Academic Information Section
-addSection("Academic Information");
-  addRow('Course Type:', formData.courseType, 'Grade:', formData.grade, 'Course:', formData.course);
-  addRow('Stream:', formData.stream, 'Year:', formData.year, 'Session:', formData.session);
-  addRow('Month Session:', formData.monthSession || '', 'Duration:', formData.duration || '', 'Course Fee:', formData.courseFee ? `${formData.courseFee}` : 'N/A');
-  addRow('Hostel Facility:', formData.hostelFacility || '');
-
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  doc.addImage(
-  fadedWatermark,
-  "PNG",
-  (pageWidth / 2) - 60,
-  (pageHeight / 2) - 60,
-  120,
-  120
-);
-  yPosition += 10;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text('I hereby declare that all information provided is true and correct to the best of my knowledge.', leftColumn, yPosition);
-  
-  yPosition += 15;
-  doc.text('Student Signature:', leftColumn, yPosition);
-
-const pageCount = (doc as any).getNumberOfPages
-  ? (doc as any).getNumberOfPages()
-  : doc.internal && (doc as any).internal.pages
-  ? Object.keys((doc as any).internal.pages).length
-  : 1;
-
-for (let i = 1; i <= pageCount; i++) {
-  doc.setPage(i);
-  doc.setDrawColor(14, 68, 85);
-  doc.setLineWidth(0.8);
-  doc.rect(2, 2, pageWidth - 4, pageHeight - 4, "S");
-}
-
-
-  // Save the PDF
   const fileName = `Student_Registration_${formData.candidateName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(fileName);
+  pdf.save(fileName);
 };
 
 export const generateCenterFormPreview = (formData: CenterFormData): string => {
