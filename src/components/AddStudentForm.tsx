@@ -19,7 +19,7 @@ import { useToast } from '../contexts/ToastContext';
 import DateInput from './DateInput';
 import StudentFormPreviewDialog from './StudentFormPreviewDialog';
 import ApiBasedAutoComplete from './core-components/apiBasedAutoComplete';
-import { programsData } from '../constants/programsData';
+import { useCourses } from '../hooks/useCourses';
 import { statesAndCities } from '../api/statesAndCitites';
 
 interface AddStudentFormProps {
@@ -120,6 +120,7 @@ const initialFormData: FormData = {
 const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, initialData, onSubmitOverride }: AddStudentFormProps) => {
   const { addStudent, isSubmitting, error: submitError } = useAddStudent();
   const { showSuccess, showError } = useToast();
+  const { courses } = useCourses();
   
   const [formData, setFormData] = useState<FormData>(() => {
     let base = initialFormData;
@@ -147,38 +148,41 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPreview, setShowPreview] = useState(false);
 
-  // Function to get unique course types from programsData
+  // Function to get unique course types from API courses
   const getCourseTypes = (): string[] => {
     const courseTypes = new Set<string>();
-    programsData.forEach(program => {
-      courseTypes.add(program.category);
+    courses.forEach(course => {
+      if (course.coursesType) {
+        courseTypes.add(course.coursesType);
+      }
     });
     return Array.from(courseTypes).sort();
   };
 
   // Function to get courses for the selected course type
-  const getCoursesForType = (courseType: string): string[] => {
+  const getCoursesForType = (courseType: string) => {
     if (!courseType) return [];
     
-    const courses = new Set<string>();
-    const selectedProgram = programsData.find(program => program.category === courseType);
-    
-    if (selectedProgram) {
-      selectedProgram.levels.forEach(level => {
-        level.courses.forEach(course => {
-          courses.add(course.name);
-        });
-      });
-    }
-    
-    return Array.from(courses).sort();
+    return courses
+      .filter(course => course.coursesType === courseType)
+      .sort((a, b) => a.name.localeCompare(b.name));
   };
 
   // Memoized course types
-  const courseTypes = useMemo(() => getCourseTypes(), []);
+  const courseTypes = useMemo(() => getCourseTypes(), [courses]);
   
   // Get courses for current course type
-  const availableCourses = useMemo(() => getCoursesForType(formData.courseType), [formData.courseType]);
+  const availableCourses = useMemo(() => getCoursesForType(formData.courseType), [formData.courseType, courses]);
+  
+  // Find the selected course object based on the stored course _id or name
+  const selectedCourse = useMemo(() => {
+    if (!formData.course) return null;
+    // Try to find by _id first (if course is stored as _id)
+    const courseById = courses.find(c => c._id === formData.course);
+    if (courseById) return courseById;
+    // Fallback to finding by name (for backward compatibility)
+    return courses.find(c => c.name === formData.course) || null;
+  }, [formData.course, courses]);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -747,9 +751,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
                 <Autocomplete
                   fullWidth
                   options={availableCourses}
-                  value={formData.course || null}
+                  getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                  value={selectedCourse}
                   onChange={(_, newValue) => {
-                    handleInputChange("course", newValue || "");
+                    // Store the course _id instead of the name
+                    handleInputChange("course", newValue ? (newValue as any)._id : "");
                   }}
                   disabled={!formData.courseType}
                   renderInput={(params) => (
@@ -1232,7 +1238,11 @@ const AddStudentForm = ({ onClose, onNext, isStepMode = false, preFilledCenter, 
         onClose={() => setShowPreview(false)}
         onSave={handlePreviewSave}
         onCancel={handlePreviewCancel}
-        formData={formData as AddStudentData}
+        formData={{
+          ...formData,
+          // Convert course _id to course name for preview display
+          course: selectedCourse?.name || formData.course || ''
+        } as AddStudentData}
         isSubmitting={isSubmitting}
       />
     </>

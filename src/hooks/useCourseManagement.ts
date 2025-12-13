@@ -6,6 +6,7 @@ export interface CreateCourseData {
   code?: string;
   duration?: number;
   description?: string;
+  coursesType?: string;
 }
 
 export interface UpdateCourseData extends CreateCourseData {
@@ -15,7 +16,8 @@ export interface UpdateCourseData extends CreateCourseData {
 export interface CreateSubjectData {
   name: string;
   courseId: string;
-  semester: number;
+  semester?: number;
+  year?: number;
   code?: string;
   credits?: number;
 }
@@ -87,7 +89,13 @@ export const useCreateSubject = () => {
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      // Invalidate queries for both semester and year
+      if (variables.semester) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      }
+      if (variables.year) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, undefined, variables.year.toString()] });
+      }
       queryClient.invalidateQueries({ queryKey: ['subjects'] });
     },
   });
@@ -104,7 +112,13 @@ export const useUpdateSubject = () => {
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      // Invalidate queries for both semester and year
+      if (variables.semester) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      }
+      if (variables.year) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, undefined, variables.year.toString()] });
+      }
       queryClient.invalidateQueries({ queryKey: ['subjects'] });
     },
   });
@@ -115,12 +129,18 @@ export const useDeleteSubject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ subjectId }: { subjectId: string; courseId: string; semester: number }) => {
+    mutationFn: async ({ subjectId }: { subjectId: string; courseId: string; semester?: number; year?: number }) => {
       const response = await axiosInstance.delete<CourseResponse>(`/api/course/deleteSubject/${subjectId}`);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      // Invalidate queries for both semester and year
+      if (variables.semester) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, variables.semester.toString()] });
+      }
+      if (variables.year) {
+        queryClient.invalidateQueries({ queryKey: ['courseSubjects', variables.courseId, undefined, variables.year.toString()] });
+      }
       queryClient.invalidateQueries({ queryKey: ['subjects'] });
     },
   });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -21,62 +21,71 @@ interface BillReceiptDialogProps {
 }
 
 const BillReceiptDialog: React.FC<BillReceiptDialogProps> = ({ open, onClose, bill }) => {
-  const handleDownloadPDF = () => {
-    if (!bill) return;
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-    const pdf = new jsPDF();
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 20;
-    let yPosition = 20;
+  const handleDownloadPDF = async () => {
+    if (!bill || !receiptRef.current) return;
 
-    pdf.setFontSize(20);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('BILL RECEIPT', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 20;
+    setIsDownloading(true);
+    try {
+      // Wait for images to load
+      const images = receiptRef.current.querySelectorAll('img');
+      await Promise.all(
+        Array.from(images).map((img) => {
+          return new Promise((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              resolve(true);
+            } else {
+              img.onload = () => resolve(true);
+              img.onerror = () => resolve(true);
+            }
+          });
+        })
+      );
 
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Receipt No: ${bill._id}`, margin, yPosition);
-    yPosition += 10;
-    pdf.text(`Date: ${new Date(bill.billDate).toLocaleDateString()}`, margin, yPosition);
-    yPosition += 20;
+      // Additional wait to ensure everything is rendered
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Student Details:', margin, yPosition);
-    yPosition += 10;
+      // Import html2canvas dynamically
+      const html2canvas = (await import('html2canvas')).default;
 
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Name: ${bill.studentName}`, margin, yPosition);
-    yPosition += 8;
-    pdf.text(`Registration No: ${bill.registrationNo}`, margin, yPosition);
-    yPosition += 8;
-    pdf.text(`Course: ${bill.course}`, margin, yPosition);
-    yPosition += 20;
+      // A4 dimensions in pixels at 96 DPI: 595.5px × 842.25px
+      const a4WidthPx = 595.5;
+      const a4HeightPx = 842.25;
+      const scale = 2;
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Payment Details:', margin, yPosition);
-    yPosition += 10;
+      const canvas = await html2canvas(receiptRef.current, {
+        backgroundColor: '#ffffff',
+        scale: scale,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        width: a4WidthPx,
+        height: a4HeightPx,
+        windowWidth: a4WidthPx,
+        windowHeight: a4HeightPx,
+      });
 
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Amount: ₹${bill.amount}`, margin, yPosition);
-    yPosition += 8;
-    pdf.text(`Payment Method: ${bill.paymentMethod}`, margin, yPosition);
-    yPosition += 8;
-    pdf.text(`Status: ${bill.status.toUpperCase()}`, margin, yPosition);
-    yPosition += 8;
-    pdf.text(`Due Date: ${new Date(bill.dueDate).toLocaleDateString()}`, margin, yPosition);
-    yPosition += 20;
+      const imgData = canvas.toDataURL('image/png', 1.0);
 
-    if (bill.description) {
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Description:', margin, yPosition);
-      yPosition += 10;
-      pdf.setFont('helvetica', 'normal');
-      const descriptionLines = pdf.splitTextToSize(bill.description, pageWidth - 2 * margin);
-      pdf.text(descriptionLines, margin, yPosition);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [a4WidthPx, a4HeightPx],
+        compress: false,
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, a4WidthPx, a4HeightPx, undefined, 'SLOW');
+
+      const fileName = `bill-receipt-${bill.registrationNo}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      setIsDownloading(false);
     }
-
-    pdf.save(`bill-receipt-${bill.registrationNo}.pdf`);
   };
 
   if (!bill) return null;
@@ -116,10 +125,7 @@ const BillReceiptDialog: React.FC<BillReceiptDialogProps> = ({ open, onClose, bi
 
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Receipt No: {bill._id}
-            </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <Box
               sx={{
                 backgroundColor: getStatusColor(bill.status),
@@ -207,6 +213,7 @@ const BillReceiptDialog: React.FC<BillReceiptDialogProps> = ({ open, onClose, bi
           onClick={handleDownloadPDF}
           variant="contained"
           startIcon={<DownloadIcon />}
+          disabled={isDownloading}
           sx={{
             backgroundColor: '#3b82f6',
             color: 'white',
@@ -220,9 +227,170 @@ const BillReceiptDialog: React.FC<BillReceiptDialogProps> = ({ open, onClose, bi
             },
           }}
         >
-          Download PDF
+          {isDownloading ? 'Generating PDF...' : 'Download PDF'}
         </Button>
       </DialogActions>
+
+      {/* Hidden receipt template for PDF generation */}
+      <Box
+        ref={receiptRef}
+        sx={{
+          position: 'absolute',
+          left: '-9999px',
+          top: '-9999px',
+          width: '595.5px',
+          height: '842.25px',
+          backgroundColor: '#ffffff',
+          overflow: 'hidden',
+        }}
+      >
+        {/* SVG Template Background */}
+        <Box
+          component="img"
+          src="/studentReceiptTemplate.svg"
+          alt="Receipt Template"
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 0,
+            objectFit: 'contain',
+          }}
+        />
+        
+        {/* Overlay Text Values */}
+        <Box
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
+            fontFamily: 'DMSans, Arial, sans-serif',
+          }}
+        >
+          {/* Student Name - positioned after "Student Name:" label */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '280px',
+              top: '184px',
+              fontSize: '15.5px',
+              fontWeight: 'bold',
+              color: '#3b3b3b',
+            }}
+          >
+            {bill.studentName}
+          </Typography>
+
+          {/* Registration Number - positioned after "Registration Number:" label */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '280px',
+              top: '211px',
+              fontSize: '15.5px',
+              fontWeight: 'bold',
+              color: '#3b3b3b',
+            }}
+          >
+            {bill.registrationNo}
+          </Typography>
+
+          {/* Course Name - positioned after "Cource Name:" label */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '280px',
+              top: '238px',
+              fontSize: '15.5px',
+              fontWeight: 'bold',
+              color: '#3b3b3b',
+            }}
+          >
+            {bill.course}
+          </Typography>
+
+          {/* Date - positioned after "Date:" label */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '480px',
+              top: '166px',
+              fontSize: '14px',
+              color: '#3b3b3b',
+            }}
+          >
+            {new Date(bill.billDate).toLocaleDateString('en-GB')}
+          </Typography>
+
+          {/* Payment Method - positioned after "PAYMENT METHOD:" label */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '200px',
+              top: '570px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#3b3b3b',
+              textTransform: 'capitalize',
+            }}
+          >
+            {bill.paymentMethod.replace('_', ' ')}
+          </Typography>
+
+          {/* Details/Description - positioned in Details section (left side) */}
+          {bill.description && (
+            <Typography
+              sx={{
+                position: 'absolute',
+                left: '108px',
+                top: '320px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#000000',
+                maxWidth: '300px',
+                width: '300px',
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                whiteSpace: 'normal',
+                lineHeight: '1.4',
+                overflow: 'hidden',
+              }}
+            >
+              {bill.description} 
+            </Typography>
+          )}
+
+          {/* Amount/Fees - positioned in FEES section (right side) */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '440px',
+              top: '320px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#000000',
+            }}
+          >
+            ₹{bill.amount.toLocaleString()}
+          </Typography>
+
+          {/* Receipt Number - if needed in template */}
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: '280px',
+              top: '140px',
+              fontSize: '12px',
+              color: '#3b3b3b',
+            }}
+          >
+            {bill._id}
+          </Typography>
+        </Box>
+      </Box>
     </Dialog>
   );
 };

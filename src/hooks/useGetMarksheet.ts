@@ -32,12 +32,21 @@ export interface StudentData {
   signature?: string;
 }
 
+export interface CourseData {
+  _id: string;
+  name: string;
+  code?: string;
+  duration?: number;
+}
+
 export interface MarksheetData {
   _id: string;
   studentId: StudentData;
   subjects: SubjectData[];
-  courseId?: string; // Course ID associated with this marksheet
+  courseId?: string | CourseData; // Course ID or populated course object
   semester?: string; // Semester number
+  year?: string; // Academic year (for yearly courses)
+  serialNo?: string; // 6-digit serial number
   createdAt: string;
   updatedAt: string;
 }

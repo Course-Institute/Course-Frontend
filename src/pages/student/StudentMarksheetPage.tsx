@@ -63,6 +63,7 @@ const StudentMarksheetPage = () => {
   const { data: marksheet, isLoading: marksheetLoading, error } = useGetMarksheetBySemester(
     studentId,
     semesterToFetch,
+    '',
     shouldFetchMarksheet && !profileLoading
   );
   
@@ -292,46 +293,61 @@ const StudentMarksheetPage = () => {
           {/* Student Details Overlay - Only Values with Absolute Positioning */}
           <Box sx={{ position: 'relative', height: '100%', zIndex: 1 }}>
             {/* Left Column */}
-            <Box sx={{ position: 'absolute', left: '257px', top: '478px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '224px', top: '455px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.candidateName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '260px', top: '514px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '224px', top: '492px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.fatherName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '264px', top: '551px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '227px', top: '528px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.motherName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '250px', top: '588px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
-                {marksheet.studentId.course} - {marksheet.studentId.stream}
+            <Box sx={{ position: 'absolute', left: '217px', top: '563px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
+                {typeof marksheet.courseId === 'object' && marksheet.courseId?.name 
+                  ? marksheet.courseId.name 
+                  : marksheet.studentId.course}
               </Typography>
             </Box>
 
             {/* Right Column */}
-            <Box sx={{ position: 'absolute', left: '775px', top: '478px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '705px', top: '455px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.registrationNo}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '775px', top: '514px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '705px', top: '492px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {new Date(marksheet.studentId.dateOfBirth).toLocaleDateString('en-GB')}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '726px', top: '551px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: '1.2rem' }}>
+            <Box sx={{ position: 'absolute', left: '658px', top: '528px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.session}
+              </Typography>
+            </Box>
+            
+            <Box sx={{ position: 'absolute', left: '178px', top: '70px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.5rem' }}>
+                {marksheet.serialNo || ''}
+              </Typography>
+            </Box>
+            
+            {/* Semester - placed below session */}
+            <Box sx={{ position: 'absolute', left: '564px', top: '560px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
+                Semester {selectedSemester || semesterToFetch || ''}
               </Typography>
             </Box>
 
@@ -341,55 +357,114 @@ const StudentMarksheetPage = () => {
                 {marksheet.subjects.map((subject, index) => (
                   <Fragment key={index}>
                     {/* Subject Name */}
-                    <Box sx={{ position: 'absolute', left: '185px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem' }}>
+                    <Box sx={{ position: 'absolute', left: '130px', top: `${746 + index * 53}px` }}>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' ,fontSize: '0.8rem' }}>
                         {subject.subjectName}
                       </Typography>
                     </Box>
                     
                     {/* Marks */}
-                    <Box sx={{ position: 'absolute', left: '553px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '617px', top: `${746 + index * 53}px`, width: '50px' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center'}}>
                         {subject.marks}
                       </Typography>
                     </Box>
                     
                     {/* Internal */}
-                    <Box sx={{ position: 'absolute', left: '620px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '679px', top: `${746 + index * 53}px`, width: '50px' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center' }}>
                         {subject.internal}
                       </Typography>
                     </Box>
                     
                     {/* Total */}
-                    <Box sx={{ position: 'absolute', left: '688px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '746px', top: `${746 + index * 53}px`, width: '50px' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center' }}>
                         {subject.total}
                       </Typography>
                     </Box>
                     
                     {/* Min Marks */}
-                    <Box sx={{ position: 'absolute', left: '763px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '813px', top: `${746 + index * 53}px`, width: '50px' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center' }}>
                         {subject.minMarks}
                       </Typography>
                     </Box>
                     
                     {/* Max Marks */}
-                    <Box sx={{ position: 'absolute', left: '826px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '876px', top: `${746 + index * 53}px`, width: '50px' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center' }}>
                         {subject.maxMarks}
                       </Typography>
                     </Box>
                     
                     {/* Grade */}
-                    <Box sx={{ position: 'absolute', left: '910px', top: `${777 + index * 50}px` }}>
-                      <Typography variant="body2" sx={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                    <Box sx={{ position: 'absolute', left: '956px', top: `${746 + index * 53}px`, width: '100' }}>
+                      <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center' }}>
                         {subject.grade}
                       </Typography>
                     </Box>
                   </Fragment>
                 ))}
+                
+                {/* Total Row */}
+                {(() => {
+                  const totalMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.marks || 0), 0);
+                  const totalInternal = marksheet.subjects.reduce((sum, subject) => sum + (subject.internal || 0), 0);
+                  const totalTotal = marksheet.subjects.reduce((sum, subject) => sum + (subject.total || 0), 0);
+                  const totalMinMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.minMarks || 0), 0);
+                  const totalMaxMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
+                  const percentage = totalMaxMarks > 0 ? ((totalTotal / totalMaxMarks) * 100).toFixed(2) : '0.00';
+                  const totalRowTop = 736 + marksheet.subjects.length * 53;
+                  const percentageRowTop = totalRowTop + 50;
+                  
+                  return (
+                    <Fragment>
+                      {/* Total Marks */}
+                      <Box sx={{ position: 'absolute', left: '617px', top: `${totalRowTop}px`, width: '50px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {totalMarks}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Total Internal */}
+                      <Box sx={{ position: 'absolute', left: '679px', top: `${totalRowTop}px`, width: '50px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {totalInternal}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Total Total */}
+                      <Box sx={{ position: 'absolute', left: '746px', top: `${totalRowTop}px`, width: '50px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {totalTotal}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Total Min Marks */}
+                      <Box sx={{ position: 'absolute', left: '813px', top: `${totalRowTop}px`, width: '50px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {totalMinMarks}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Total Max Marks */}
+                      <Box sx={{ position: 'absolute', left: '876px', top: `${totalRowTop}px`, width: '50px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {totalMaxMarks}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Percentage Row */}
+                      {/* Percentage Value */}
+                      <Box sx={{ position: 'absolute', left: '887px', top: `${percentageRowTop}px`, width: '100px' }}>
+                        <Typography variant="body2" sx={{ fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                          {percentage}%
+                        </Typography>
+                      </Box>
+                    </Fragment>
+                  );
+                })()}
               </>
             )}
           </Box>

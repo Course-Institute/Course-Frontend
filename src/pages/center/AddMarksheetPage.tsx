@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import ApiBasedAutoComplete from '../../components/core-components/apiBasedAutoComplete';
 import { useSaveMarksheet, type SubjectData, type MarksheetFormData } from '../../hooks/useSaveMarksheet';
+import { generateSerialNumber } from '../../utils/serialNumberGenerator';
 import { useCourses } from '../../hooks/useCourses';
 import { useCourseSubjects } from '../../hooks/useCourseSubjects';
 import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
@@ -56,6 +57,7 @@ const AddMarksheetPageCenter = () => {
   const [subjects, setSubjects] = useState<SubjectData[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [semester, setSemester] = useState("");
+  const [year, setYear] = useState("");
   const [existingMarksheetId, setExistingMarksheetId] = useState<string | null>(null);
   const [currentSubject, setCurrentSubject] = useState({
     subjectName: '',
@@ -82,7 +84,8 @@ const AddMarksheetPageCenter = () => {
   // Fetch subjects based on selected course and semester
   const { subjects: courseSubjects, isLoading: isLoadingSubjects } = useCourseSubjects(
     normalizedCourseId,
-    semester
+    semester,
+    year
   );
 
   // Fetch existing marksheet for selected student and semester
@@ -90,7 +93,8 @@ const AddMarksheetPageCenter = () => {
   const { data: existingMarksheet, isLoading: isLoadingMarksheet } = useGetMarksheetBySemester(
     studentId,
     semester,
-    !!studentId && !!semester
+    year,
+    !!studentId && !!(semester || year)
   );
 
   useEffect(() => {
@@ -188,14 +192,46 @@ const AddMarksheetPageCenter = () => {
       });
     }
     setSemester(newSemester);
+    setYear("");
     setExistingMarksheetId(null);
     setSubjects([]);
     
     // Reset subject selection when semester changes
     setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
     
-    if (errors.semester) {
+    if (errors.semester || errors.year) {
       const newErrors = { ...errors };
+      delete newErrors.semester;
+      delete newErrors.year;
+      setErrors(newErrors);
+    }
+  };
+
+  /* ---------------------------------------------------------------
+                     YEAR CHANGE → RELOAD SUBJECTS
+  --------------------------------------------------------------- */
+  const handleYearChange = (newYear: string) => {
+    if (subjects.length === 0) {
+      setSelectedCourse("");
+      setCurrentSubject({
+        subjectName: "",
+        marks: "",
+        internal: "",
+        total: "",
+        minMarks: "",
+        maxMarks: "",
+      });
+    }
+    setYear(newYear);
+    setSemester("");
+    setExistingMarksheetId(null);
+    setSubjects([]);
+
+    setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
+
+    if (errors.year || errors.semester) {
+      const newErrors = { ...errors };
+      delete newErrors.year;
       delete newErrors.semester;
       setErrors(newErrors);
     }
@@ -206,6 +242,14 @@ const AddMarksheetPageCenter = () => {
     // Only process if we have a valid marksheet response and not loading
     if (!isLoadingMarksheet && existingMarksheet && existingMarksheet._id) {
       setExistingMarksheetId(existingMarksheet._id);
+      
+      if (existingMarksheet.semester) {
+        setSemester(existingMarksheet.semester.toString());
+        setYear("");
+      } else if ((existingMarksheet as any).year) {
+        setYear((existingMarksheet as any).year.toString());
+        setSemester("");
+      }
       
       // Pre-select course if it exists in marksheet
       if (existingMarksheet.courseId) {
@@ -232,15 +276,16 @@ const AddMarksheetPageCenter = () => {
         // Marksheet exists but has no subjects yet
         setSubjects([]);
       }
-    } else if (!isLoadingMarksheet && (!existingMarksheet || existingMarksheet === null) && studentId && semester) {
+    } else if (!isLoadingMarksheet && (!existingMarksheet || existingMarksheet === null) && studentId && (semester || year)) {
       // No existing marksheet found, ensure we're in create mode
       // Only reset if we don't have any subjects added yet (to avoid clearing user input)
       if (subjects.length === 0) {
         setExistingMarksheetId(null);
         setSelectedCourse(""); // Reset course when no marksheet found
+        // Keep selected semester/year so the form stays visible
       }
     }
-  }, [existingMarksheet, isLoadingMarksheet, studentId, semester]);
+  }, [existingMarksheet, isLoadingMarksheet, studentId, semester, year]);
 
   // Handle input change
   const handleInputChange = (field: string, value: string) => {
@@ -281,9 +326,13 @@ const AddMarksheetPageCenter = () => {
 
   // Handle save
   const handleSave = () => {
-    // Validate semester is selected
-    if (!semester) {
-      setErrors({ ...errors, semester: "Please select a semester" });
+    // Validate term is selected
+    if (!semester && !year) {
+      setErrors({ 
+        ...errors, 
+        semester: "Please select a semester or year",
+        year: "Please select a semester or year",
+      });
       return;
     }
 
@@ -307,12 +356,18 @@ const AddMarksheetPageCenter = () => {
     }
 
     setIsSubmitting(true);
+    
+    // Generate 6-digit serial number for new marksheets only
+    const serialNo = existingMarksheetId ? undefined : generateSerialNumber();
+    
     const data: MarksheetFormData = {
       studentId: selectedStudent.studentId || selectedStudent.id,
       subjects,
-      semester: semester.toString(),
+      semester: semester ? semester.toString() : undefined,
+      year: year ? year.toString() : undefined,
       courseId: normalizedCourseIdForSave, // Include courseId in marksheet (always a string)
       role: 'center',
+      serialNo, // Include serial number for new marksheets
     } as any;
 
     saveMarksheetMutation.mutate(data, {
@@ -329,6 +384,7 @@ const AddMarksheetPageCenter = () => {
           setSubjects([]);
           setSelectedCourse("");
           setSemester("");
+          setYear("");
           setExistingMarksheetId(null);
           setCurrentSubject({
             subjectName: '',
@@ -355,6 +411,7 @@ const AddMarksheetPageCenter = () => {
     setSubjects([]);
     setSelectedCourse("");
     setSemester("");
+    setYear("");
     setExistingMarksheetId(null);
     setCurrentSubject({
       subjectName: '',
@@ -371,6 +428,7 @@ const AddMarksheetPageCenter = () => {
 
   const totalMarks = subjects.reduce((sum, subject) => sum + subject.total, 0);
   const averageMarks = subjects.length > 0 ? totalMarks / subjects.length : 0;
+  const selectedTermLabel = semester ? `Semester ${semester}` : year ? `Year ${year}` : "";
 
   return (
     <Container maxWidth="lg" sx={{ 
@@ -472,6 +530,11 @@ const AddMarksheetPageCenter = () => {
               idKey="studentId"
               onSelect={(opt) => {
                 setSelectedStudent(opt);
+                setSubjects([]);
+                setSelectedCourse("");
+                setSemester("");
+                setYear("");
+                setExistingMarksheetId(null);
                 setErrors({});
                 showToast(`Selected student: ${opt.studentName}`, 'success');
               }}
@@ -509,7 +572,7 @@ const AddMarksheetPageCenter = () => {
         </Card>
       </Slide>
 
-      {/* Semester Selection */}
+      {/* Semester / Year Selection */}
       {selectedStudent && (
         <Slide direction="up" in timeout={900}>
           <Card sx={{ 
@@ -521,7 +584,7 @@ const AddMarksheetPageCenter = () => {
           }}>
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#1e293b' }}>
-                Semester Selection
+                Semester / Year Selection
               </Typography>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -532,7 +595,7 @@ const AddMarksheetPageCenter = () => {
                       label="Semester *"
                       onChange={(e) => handleSemesterChange(e.target.value)}
                       error={!!errors.semester}
-                      disabled={subjects.length > 0}
+                      disabled={subjects.length > 0 || !!year}
                     >
                       {[1, 2].map((s) => (
                         <MenuItem key={s} value={s}>
@@ -546,16 +609,44 @@ const AddMarksheetPageCenter = () => {
                       {errors.semester}
                     </Typography>
                   )}
-                  {subjects.length > 0 && (
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-                      Semester cannot be changed once subjects are added
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {subjects.length > 0
+                      ? 'Semester cannot be changed once subjects are added'
+                      : 'Pick semester or use yearly selection below'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Year *</InputLabel>
+                    <Select
+                      value={year}
+                      label="Year *"
+                      onChange={(e) => handleYearChange(e.target.value)}
+                      error={!!errors.year}
+                      disabled={subjects.length > 0 || !!semester}
+                    >
+                      {[1, 2, 3, 4].map((yVal) => (
+                        <MenuItem key={yVal} value={yVal}>
+                          Year {yVal}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {errors.year && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {errors.year}
                     </Typography>
                   )}
-                  {!semester && (
-                    <Typography variant="caption" color="warning.main" sx={{ mt: 0.5, ml: 1.75 }}>
-                      Note: Total marks cannot exceed 80 for center role
-                    </Typography>
-                  )}
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {subjects.length > 0
+                      ? 'Year cannot be changed once subjects are added'
+                      : 'Use year-based selection if course is yearly'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="caption" color="warning.main" sx={{ mt: 0.5, ml: 1.75, display: 'inline-block' }}>
+                    Note: Total marks cannot exceed 80 for center role
+                  </Typography>
                 </Grid>
               </Grid>
             </CardContent>
@@ -564,7 +655,7 @@ const AddMarksheetPageCenter = () => {
       )}
 
       {/* Add Subject Form */}
-      {selectedStudent && semester && (
+      {selectedStudent && (semester || year) && (
         <Slide direction="up" in timeout={900}>
           <Card sx={{ 
             mb: 4,
@@ -574,13 +665,23 @@ const AddMarksheetPageCenter = () => {
             overflow: 'hidden',
           }}>
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                 <Typography
                   variant="h6"
                   sx={{ fontWeight: 600, color: '#1e293b', display: 'flex', gap: 1, alignItems: 'center' }}
                 >
                   <AddIcon sx={{ color: '#10b981' }} /> Add Subject
                 </Typography>
+
+                {/* Display selected term (Semester or Year) */}
+                {(semester || year) && (
+                  <Chip
+                    label={semester ? `Semester ${semester}` : `Year ${year}`}
+                    size="small"
+                    color="info"
+                    sx={{ fontWeight: 600 }}
+                  />
+                )}
 
                 <Chip 
                   label={`${subjects.length}/7`} 
@@ -591,6 +692,78 @@ const AddMarksheetPageCenter = () => {
               </Box>
 
               <Grid container spacing={3} alignItems="flex-start">
+                {/* Semester / Year Selection */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Box sx={{ mb: 1 }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5, color: '#1e293b' }}>
+                      Semester / Year *
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      Select semester or year for this marksheet
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 6 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Semester</InputLabel>
+                        <Select
+                          value={semester || ""}
+                          label="Semester"
+                          onChange={(e) => handleSemesterChange(e.target.value)}
+                          error={!!errors.semester}
+                          disabled={subjects.length > 0 || !!year}
+                          MenuProps={{ disablePortal: true }}
+                          sx={{
+                            backgroundColor: '#f8fafc',
+                            borderRadius: 2,
+                          }}
+                        >
+                          <MenuItem value="">None</MenuItem>
+                          {[1, 2].map((s) => (
+                            <MenuItem key={s} value={s}>
+                              Semester {s}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Year</InputLabel>
+                        <Select
+                          value={year || ""}
+                          label="Year"
+                          onChange={(e) => handleYearChange(e.target.value)}
+                          error={!!errors.year}
+                          disabled={subjects.length > 0 || !!semester}
+                          MenuProps={{ disablePortal: true }}
+                          sx={{
+                            backgroundColor: '#f8fafc',
+                            borderRadius: 2,
+                          }}
+                        >
+                          <MenuItem value="">None</MenuItem>
+                          {[1, 2, 3, 4].map((y) => (
+                            <MenuItem key={y} value={y}>
+                              Year {y}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                  {errors.semester && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.semester}
+                    </Typography>
+                  )}
+                  {errors.year && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.year}
+                    </Typography>
+                  )}
+                </Grid>
+
                 {/* Course */}
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Box sx={{ mb: 1 }}>
@@ -649,7 +822,7 @@ const AddMarksheetPageCenter = () => {
                       Choose the subject from the selected course
                     </Typography>
                   </Box>
-                  <FormControl fullWidth disabled={!selectedCourse || !semester || isLoadingSubjects}>
+                  <FormControl fullWidth disabled={!selectedCourse || (!semester && !year) || isLoadingSubjects}>
                     <Select
                       displayEmpty
                       value={currentSubject.subjectName}
@@ -672,8 +845,8 @@ const AddMarksheetPageCenter = () => {
                       <MenuItem value="" disabled>
                         {isLoadingSubjects 
                           ? "Loading subjects..." 
-                          : !selectedCourse || !semester
-                          ? "Select Course and Semester first"
+                          : !selectedCourse || (!semester && !year)
+                          ? "Select Course and Semester/Year first"
                           : "Select Subject"}
                       </MenuItem>
                       {courseSubjects.map((sub, idx) => {
@@ -924,7 +1097,9 @@ const AddMarksheetPageCenter = () => {
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Chip label={`Semester ${semester}`} color="info" sx={{ fontWeight: 600 }} />
+                  {selectedTermLabel && (
+                    <Chip label={selectedTermLabel} color="info" sx={{ fontWeight: 600 }} />
+                  )}
                   <Chip 
                     label={`Total: ${totalMarks.toFixed(1)}`} 
                     color="primary" 

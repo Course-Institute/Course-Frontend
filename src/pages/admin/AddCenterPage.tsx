@@ -1,7 +1,8 @@
-import { Box, Typography, TextField, MenuItem, Button, Divider, Paper, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, Typography, TextField, MenuItem, Button, Divider, Paper, FormControlLabel, Checkbox, Autocomplete } from '@mui/material';
 import { useCenterForm } from '../../hooks/useCenterForm';
 import CenterFormPreviewModal from '../../components/CenterFormPreviewModal';
 import { useState } from 'react';
+import { statesAndCities } from '../../api/statesAndCitites';
 import {
   validateEmail,
   validatePhoneNumber,
@@ -14,8 +15,6 @@ import {
   validatePinCode,
   validateYear,
   validateWebsite,
-  validateIFSC,
-  validateAccountNumber,
   type ValidationResult
 } from '../../utils/validationHelpers';
 
@@ -57,7 +56,7 @@ const AddCenterPage = () => {
   const handleFileChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      if (key === 'photo' || key === 'cancelledCheque' || key === 'gstCertificate' || key === 'panCard' || key === 'addressProof' || key === 'directorIdProof' || key === 'signature') {
+      if (key === 'photo' || key === 'gstCertificate' || key === 'panCard' || key === 'addressProof' || key === 'directorIdProof' || key === 'signature') {
         updateFile(key, files[0]);
       } else {
         const fileList = Array.from(files);
@@ -141,25 +140,49 @@ const AddCenterPage = () => {
           />
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 4' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="City" 
-            value={formValues.city || ''}
-            onChange={handleChange('city', validateRequired)}
-            error={!!errors.city}
-            helperText={errors.city || helperTexts.city}
+          <Autocomplete
+            fullWidth
+            options={Object.keys(statesAndCities)}
+            value={formValues.state || null}
+            onChange={(_, newValue) => {
+              updateField('state', newValue || '', validateRequired);
+              updateField('city', '', validateRequired);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                label="State"
+                error={!!errors.state}
+                helperText={errors.state || helperTexts.state}
+                placeholder="Search or select state"
+              />
+            )}
           />
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 4' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="State" 
-            value={formValues.state || ''}
-            onChange={handleChange('state', validateRequired)}
-            error={!!errors.state}
-            helperText={errors.state || helperTexts.state}
+          <Autocomplete
+            fullWidth
+            options={
+              statesAndCities[
+                formValues.state as keyof typeof statesAndCities
+              ] || []
+            }
+            value={formValues.city || null}
+            onChange={(_, newValue) => {
+              updateField('city', newValue || '', validateRequired);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                label="City"
+                error={!!errors.city}
+                helperText={errors.city || helperTexts.city}
+                placeholder={formValues.state ? 'Search or select city' : 'Select state first'}
+              />
+            )}
+            disabled={!formValues.state}
           />
         </Box>
         <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 4' } }}>
@@ -385,93 +408,6 @@ const AddCenterPage = () => {
           {errors.infraPhotos && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
               {errors.infraPhotos}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Bank Details */}
-        <Box sx={{ gridColumn: '1 / -1' }}>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b' }}>
-            Bank Details
-          </Typography>
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Bank Name" 
-            value={formValues.bankName || ''}
-            onChange={handleChange('bankName', validateRequired)}
-            error={!!errors.bankName}
-            helperText={errors.bankName || helperTexts.bankName}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Account Holder Name" 
-            value={formValues.accountHolder || ''}
-            onChange={handleChange('accountHolder', validateRequired)}
-            error={!!errors.accountHolder}
-            helperText={errors.accountHolder || helperTexts.accountHolder}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            type="number"
-            label="Account Number" 
-            value={formValues.accountNumber || ''}
-            onChange={handleChange('accountNumber', validateAccountNumber)}
-            error={!!errors.accountNumber}
-            helperText={errors.accountNumber || helperTexts.accountNumber}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="IFSC Code" 
-            value={formValues.ifsc || ''}
-            onChange={handleChange('ifsc', validateIFSC)}
-            error={!!errors.ifsc}
-            helperText={errors.ifsc || helperTexts.ifsc}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <TextField 
-            fullWidth 
-            required
-            label="Branch Name" 
-            value={formValues.branchName || ''}
-            onChange={handleChange('branchName', validateRequired)}
-            error={!!errors.branchName}
-            helperText={errors.branchName || helperTexts.branchName}
-          />
-        </Box>
-        <Box sx={{ gridColumn: { xs: '1 / -1', md: 'span 6' } }}>
-          <Button 
-            variant="outlined" 
-            component="label" 
-            fullWidth
-            sx={{ 
-              height: '56px',
-              borderColor: errors.cancelledCheque ? '#ef4444' : undefined,
-              color: errors.cancelledCheque ? '#ef4444' : undefined
-            }}
-          >
-            {formValues.cancelledCheque ? (Array.isArray(formValues.cancelledCheque) ? `${formValues.cancelledCheque.length} file(s) selected` : formValues.cancelledCheque.name) : 'Upload Cancelled Cheque'}
-            <input hidden type="file" accept="image/*,application/pdf" onChange={handleFileChange('cancelledCheque')} />
-          </Button>
-          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-            File size should be within 200KB
-          </Typography>
-          {errors.cancelledCheque && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-              {errors.cancelledCheque}
             </Typography>
           )}
         </Box>

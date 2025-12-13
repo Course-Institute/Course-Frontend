@@ -25,11 +25,11 @@ import {
 } from '@mui/material';
 import { Search, Clear, FilterList, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { useCenterStudentsData } from '../../hooks/useCenterStudentsData';
+import { useCourses } from '../../hooks/useCourses';
 import { useToast } from '../../contexts/ToastContext';
 import Table, { type Column } from '../../components/core-components/Table';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import MarksheetPreviewDialog from '../../components/MarksheetPreviewDialog';
-import { programsData } from '../../constants/programsData';
 
 const CenterManageStudentsPage = () => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const CenterManageStudentsPage = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [filtersExpanded, setFiltersExpanded] = useState(!isMobile);
   
-  // Filter state - client-side filtering since API doesn't support filters yet
+  // Filter state - mirrored to admin filters for server-side filtering
   const [programCategory, setProgramCategory] = useState<string>('');
   const [course, setCourse] = useState<string>('');
   const [year, setYear] = useState<string>('');
@@ -53,6 +53,7 @@ const CenterManageStudentsPage = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   
   const { showToast } = useToast();
+  const { courses: backendCourses } = useCourses();
 
   useEffect(() => {
     // Get center information from localStorage
@@ -75,9 +76,19 @@ const CenterManageStudentsPage = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const combinedFilters = useMemo(() => ({
+    search: debouncedSearchTerm || undefined,
+    programCategory: programCategory || undefined,
+    course: course || undefined,
+    year: year || undefined,
+    session: session || undefined,
+    isMarksheetGenerated: isMarksheetGenerated ? isMarksheetGenerated === 'true' : undefined,
+    centerId: centerInfo?.centerId || undefined,
+  }), [debouncedSearchTerm, programCategory, course, year, session, isMarksheetGenerated, centerInfo?.centerId]);
+
   // Only call the hook when we have a valid centerId
   const { 
-    students: allStudents, 
+    students, 
     pagination,
     lastElementRef,
     tableContainerRef,
@@ -87,63 +98,33 @@ const CenterManageStudentsPage = () => {
     isLoading: studentsLoading
   } = useCenterStudentsData({ 
     centerId: centerInfo?.centerId || '', 
-    limit: 10 
+    limit: 10,
+    filters: combinedFilters,
   });
-
-  // Client-side filtering
-  const students = useMemo(() => {
-    let filtered = allStudents || [];
-
-    // Search filter
-    if (debouncedSearchTerm) {
-      const searchLower = debouncedSearchTerm.toLowerCase();
-      filtered = filtered.filter(student =>
-        student.candidateName?.toLowerCase().includes(searchLower) ||
-        student.registrationNo?.includes(searchLower) ||
-        student.emailAddress?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Course filter
-    if (course) {
-      filtered = filtered.filter(student => student.course === course);
-    }
-
-    // Year filter
-    if (year) {
-      filtered = filtered.filter(student => student.year === year);
-    }
-
-    // Session filter
-    if (session) {
-      filtered = filtered.filter(student => student.session === session);
-    }
-
-    // Marksheet status filter
-    if (isMarksheetGenerated) {
-      const isGenerated = isMarksheetGenerated === 'true';
-      filtered = filtered.filter(student => student.isMarksheetGenerated === isGenerated);
-    }
-
-    return filtered;
-  }, [allStudents, debouncedSearchTerm, course, year, session, isMarksheetGenerated]);
 
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
-    const courses = [...new Set(allStudents.map(s => s.course).filter(Boolean))];
-    const years = [...new Set(allStudents.map(s => s.year).filter(Boolean))];
-    const sessions = [...new Set(allStudents.map(s => s.session).filter(Boolean))];
-    
-    // Get all program categories from programsData
-    const programCategories = programsData.map(program => program.category);
-    
+    const studentsArray = Array.isArray(students) ? students : [];
+    const coursesArray = Array.isArray(backendCourses) ? backendCourses : [];
+
+    const coursesFromBackend = coursesArray.map(course => course.name).filter(Boolean);
+    const coursesFromStudents = studentsArray.map(s => s.course).filter(Boolean);
+    const courses = [...new Set((coursesFromBackend.length ? coursesFromBackend : coursesFromStudents))];
+
+    const years = [...new Set(studentsArray.map(s => s.year).filter(Boolean))];
+    const sessions = [...new Set(studentsArray.map(s => s.session).filter(Boolean))];
+
+    const programCategories = coursesArray
+      .map(course => course.coursesType)
+      .filter(Boolean) as string[];
+
     return { 
-      courses, 
+      courses: courses.sort(),
       years, 
       sessions, 
-      programCategories: [...new Set(programCategories)],
+      programCategories: [...new Set(programCategories)].sort(),
     };
-  }, [allStudents]);
+  }, [students, backendCourses]);
 
   // Handle program category change - filter courses based on selected category
   const handleProgramCategoryChange = (category: string) => {
@@ -153,12 +134,16 @@ const CenterManageStudentsPage = () => {
 
   // Get courses for selected program category
   const getCoursesForCategory = (category: string) => {
-    if (!category) return uniqueValues.courses;
-    const program = programsData.find(p => p.category === category);
-    if (!program) return [];
-    return program.levels.flatMap(level => 
-      level.courses.map(course => course.name)
-    );
+    const coursesArray = Array.isArray(backendCourses) ? backendCourses : [];
+    const allCourses = coursesArray.map(course => course.name);
+
+    if (!category) return allCourses.length ? allCourses : uniqueValues.courses;
+
+    const filteredCourses = coursesArray
+      .filter(course => course.coursesType === category)
+      .map(course => course.name);
+
+    return filteredCourses.length ? filteredCourses : uniqueValues.courses;
   };
 
   const handleClearFilters = () => {
@@ -212,7 +197,8 @@ const CenterManageStudentsPage = () => {
     {
       field: 'dateOfBirth',
       headerName: 'DOB',
-      width: '100px',
+      minWidth: '120px',
+      flex: 0.5,
       align: 'center',
       renderCell: (value: string) => (
         <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
@@ -223,7 +209,8 @@ const CenterManageStudentsPage = () => {
     {
       field: 'course',
       headerName: 'Course',
-      width: '120px',
+      minWidth: '200px',
+      flex: 1,
       renderCell: (value: string) => (
         <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
           {value}
@@ -255,8 +242,8 @@ const CenterManageStudentsPage = () => {
     {
       field: 'contactNumber',
       headerName: 'Contact',
-      width: '120px',
-      align: 'center',
+      minWidth: '140px',
+      flex: 0.6,
       renderCell: (value: string) => (
         <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
           {value}
@@ -266,7 +253,8 @@ const CenterManageStudentsPage = () => {
     {
       field: 'emailAddress',
       headerName: 'Email',
-      minWidth: '180px',
+      minWidth: '220px',
+      flex: 1.2,
       renderCell: (value: string) => (
         <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#64748b' }}>
           {value}
@@ -1003,21 +991,28 @@ const CenterManageStudentsPage = () => {
                       overflow: 'auto',
                       backgroundColor: '#ffffff',
                       '& .MuiTable-root': {
-                        tableLayout: 'fixed',
+                        tableLayout: 'auto',
                         width: '100%',
                       },
                       '& .MuiTableCell-root': {
                         padding: { xs: '8px 4px', sm: '12px 8px' },
+                      },
+                      '& .MuiTableHead-root .MuiTableCell-root': {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                      },
-                      '& .MuiTableHead-root .MuiTableCell-root': {
                         backgroundColor: '#f8fafc',
                         fontWeight: 600,
                         fontSize: '0.875rem',
                         color: '#374151',
                         borderBottom: '2px solid #e5e7eb',
+                      },
+                      '& .MuiTableBody-root .MuiTableCell-root': {
+                        whiteSpace: 'normal',
+                        overflow: 'visible',
+                        textOverflow: 'unset',
+                        wordBreak: 'break-word',
+                        verticalAlign: 'top',
                       },
                       '& .MuiTableBody-root .MuiTableRow-root': {
                         '&:hover': {

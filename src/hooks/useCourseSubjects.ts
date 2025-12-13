@@ -12,8 +12,8 @@ export interface CourseSubjectsResponse {
   data: CourseSubject[];
 }
 
-const fetchCourseSubjects = async (courseId: string, semester: string): Promise<string[]> => {
-  if (!courseId || !semester) {
+const fetchCourseSubjects = async (courseId: string, semester: string, year: string): Promise<string[]> => {
+  if (!courseId || (!semester && !year)) {
     return [];
   }
 
@@ -33,6 +33,7 @@ const fetchCourseSubjects = async (courseId: string, semester: string): Promise<
       params: {
         courseId: actualCourseId, // Ensure we send only the ID string
         semester,
+        year,
       },
     }
   );
@@ -41,7 +42,11 @@ const fetchCourseSubjects = async (courseId: string, semester: string): Promise<
   return response.data.data?.map((subject) => subject.name) || [];
 };
 
-export const useCourseSubjects = (courseId: string | undefined, semester: string | undefined) => {
+export const useCourseSubjects = (
+  courseId: string | undefined,
+  semester?: string | undefined,
+  year?: string | undefined
+) => {
   // Normalize courseId to always be a string (extract _id if it's an object)
   const normalizedCourseId = courseId 
     ? (typeof courseId === 'string' 
@@ -56,9 +61,9 @@ export const useCourseSubjects = (courseId: string | undefined, semester: string
     error,
     refetch,
   } = useQuery({
-    queryKey: ['courseSubjects', normalizedCourseId, semester],
-    queryFn: () => fetchCourseSubjects(normalizedCourseId || '', semester || ''),
-    enabled: !!normalizedCourseId && !!semester, // Only fetch when both are provided
+    queryKey: ['courseSubjects', normalizedCourseId, semester, year],
+    queryFn: () => fetchCourseSubjects(normalizedCourseId || '', semester || '', year || ''),
+    enabled: !!normalizedCourseId && (!!semester || !!year), // Only fetch when course and one term is provided
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
     refetchOnWindowFocus: false,

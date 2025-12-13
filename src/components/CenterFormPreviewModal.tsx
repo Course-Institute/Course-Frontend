@@ -38,13 +38,6 @@ interface CenterFormData {
   internetFacility: string;
   seatingCapacity: string;
 
-  // Bank Details
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  ifsc: string;
-  branchName: string;
-
   // Documents
   gstCertificate?: File | File[] | null;
   panCard?: File | File[] | null;
@@ -215,29 +208,6 @@ const CenterFormPreviewModal: React.FC<CenterFormPreviewModalProps> = ({
                     <Box>Seating Capacity:</Box>
                     <Box sx={{ fontWeight: 'bold' }}>{formData.seatingCapacity || ''}</Box>
                     <Box>Upload Infrastructure Photos:</Box>
-                    <Box sx={{ fontWeight: 'bold', color: 'text.secondary' }}>[File Upload]</Box>
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Bank Details */}
-              <Box sx={{ border: '1px solid #ddd', borderRadius: 1 }}>
-                <Box sx={{ backgroundColor: '#f0f0f0', p: 1, fontWeight: 'bold' }}>
-                  Bank Details
-                </Box>
-                <Box sx={{ p: 2 }}>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, fontSize: '0.9rem' }}>
-                    <Box>Bank Name:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.bankName || ''}</Box>
-                    <Box>Account Holder Name:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.accountHolder || ''}</Box>
-                    <Box>Account Number:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.accountNumber || ''}</Box>
-                    <Box>IFSC Code:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.ifsc || ''}</Box>
-                    <Box>Branch Name:</Box>
-                    <Box sx={{ fontWeight: 'bold' }}>{formData.branchName || ''}</Box>
-                    <Box>Upload Cancelled Cheque:</Box>
                     <Box sx={{ fontWeight: 'bold', color: 'text.secondary' }}>[File Upload]</Box>
                   </Box>
                 </Box>

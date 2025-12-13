@@ -132,10 +132,28 @@ export const getStudentsData = async (page: number = 1, limit: number = 10, filt
 };
 
 // Real API function to fetch students data for a specific center
-export const getCenterStudentsData = async (centerId: string, page: number = 1, limit: number = 10): Promise<StudentsResponse> => {
+export const getCenterStudentsData = async (centerId: string, page: number = 1, limit: number = 10, filters?: StudentsFilters): Promise<StudentsResponse> => {
   try {
-    console.log('Fetching students for centerId:', centerId);
-    const response = await axiosInstance.get(`/api/student/students?page=${page}&limit=${limit}&centerId=${centerId}`);
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      centerId,
+    });
+
+    if (filters) {
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.course) queryParams.append('course', filters.course);
+      if (filters.faculty) queryParams.append('faculty', filters.faculty);
+      if (filters.stream) queryParams.append('stream', filters.stream);
+      if (filters.year) queryParams.append('year', filters.year);
+      if (filters.session) queryParams.append('session', filters.session);
+      if (filters.isApprovedByAdmin !== undefined) queryParams.append('isApprovedByAdmin', filters.isApprovedByAdmin.toString());
+      if (filters.isMarksheetGenerated !== undefined) queryParams.append('isMarksheetGenerated', filters.isMarksheetGenerated.toString());
+      if (filters.isMarksheetAndCertificateApproved !== undefined) queryParams.append('isMarksheetAndCertificateApproved', filters.isMarksheetAndCertificateApproved.toString());
+      if (filters.programCategory) queryParams.append('programCategory', filters.programCategory);
+    }
+
+    const response = await axiosInstance.get(`/api/student/students?${queryParams.toString()}`);
     return response.data;
   } catch (error: any) {
     if (error.response) {

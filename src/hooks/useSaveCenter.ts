@@ -30,14 +30,6 @@ interface CenterFormData {
   seatingCapacity: string;
   infraPhotos?: File[];
 
-  // Bank Details
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  ifsc: string;
-  branchName: string;
-  cancelledCheque?: File;
-
   // Documents
   gstCertificate?: File;
   panCard?: File;
@@ -73,8 +65,6 @@ const saveCenter = async (data: CenterFormData): Promise<SaveCenterResponse> => 
         value.forEach((file, index) => {
           formData.append(`documents[${index}]`, file);
         });
-      } else if (key === 'cancelledCheque' && value instanceof File) {
-        formData.append('cancelledCheque', value);
       } else if (key === 'gstCertificate' && value instanceof File) {
         formData.append('gstCertificate', value);
       } else if (key === 'panCard' && value instanceof File) {

@@ -81,7 +81,7 @@ const CourseManagementPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState<'course' | 'subject'>('course');
   const [deleteId, setDeleteId] = useState<string>('');
-  const [deleteSubjectData, setDeleteSubjectData] = useState<{ courseId: string; semester: number } | null>(null);
+  const [deleteSubjectData, setDeleteSubjectData] = useState<{ courseId: string; semester?: number; year?: number } | null>(null);
   const [editingCourse, setEditingCourse] = useState<any>(null);
   const [editingSubject, setEditingSubject] = useState<any>(null);
 
@@ -91,12 +91,14 @@ const CourseManagementPage = () => {
     code: '',
     duration: '',
     description: '',
+    coursesType: '',
   });
 
   const [subjectForm, setSubjectForm] = useState({
     name: '',
     courseId: '',
     semester: '',
+    year: '',
     code: '',
     credits: '',
   });
@@ -107,6 +109,7 @@ const CourseManagementPage = () => {
   const [subjectSearch, setSubjectSearch] = useState('');
   const [filterCourse, setFilterCourse] = useState<string>('');
   const [filterSemester, setFilterSemester] = useState<string>('');
+  const [filterYear, setFilterYear] = useState<string>('');
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -133,10 +136,11 @@ const CourseManagementPage = () => {
         code: course.code || '',
         duration: course.duration?.toString() || '',
         description: course.description || '',
+        coursesType: course.coursesType || '',
       });
     } else {
       setEditingCourse(null);
-      setCourseForm({ name: '', code: '', duration: '', description: '' });
+      setCourseForm({ name: '', code: '', duration: '', description: '', coursesType: '' });
     }
     setFormErrors({});
     setCourseDialogOpen(true);
@@ -145,7 +149,7 @@ const CourseManagementPage = () => {
   const handleCloseCourseDialog = () => {
     setCourseDialogOpen(false);
     setEditingCourse(null);
-    setCourseForm({ name: '', code: '', duration: '', description: '' });
+    setCourseForm({ name: '', code: '', duration: '', description: '', coursesType: '' });
     setFormErrors({});
   };
 
@@ -156,12 +160,13 @@ const CourseManagementPage = () => {
         name: subject.name || '',
         courseId: subject.courseId || '',
         semester: subject.semester?.toString() || '',
+        year: subject.year?.toString() || '',
         code: subject.code || '',
         credits: subject.credits?.toString() || '',
       });
     } else {
       setEditingSubject(null);
-      setSubjectForm({ name: '', courseId: '', semester: '', code: '', credits: '' });
+      setSubjectForm({ name: '', courseId: '', semester: '', year: '', code: '', credits: '' });
     }
     setFormErrors({});
     setSubjectDialogOpen(true);
@@ -170,7 +175,7 @@ const CourseManagementPage = () => {
   const handleCloseSubjectDialog = () => {
     setSubjectDialogOpen(false);
     setEditingSubject(null);
-    setSubjectForm({ name: '', courseId: '', semester: '', code: '', credits: '' });
+    setSubjectForm({ name: '', courseId: '', semester: '', year: '', code: '', credits: '' });
     setFormErrors({});
   };
 
@@ -191,8 +196,13 @@ const CourseManagementPage = () => {
     if (!subjectForm.courseId) {
       errors.courseId = 'Course is required';
     }
-    if (!subjectForm.semester) {
-      errors.semester = 'Semester is required';
+    if (!subjectForm.semester && !subjectForm.year) {
+      errors.semester = 'Either semester or year is required';
+      errors.year = 'Either semester or year is required';
+    }
+    if (subjectForm.semester && subjectForm.year) {
+      errors.semester = 'Provide either semester or year, not both';
+      errors.year = 'Provide either semester or year, not both';
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -206,6 +216,7 @@ const CourseManagementPage = () => {
       code: courseForm.code.trim() || undefined,
       duration: courseForm.duration ? parseInt(courseForm.duration) : undefined,
       description: courseForm.description.trim() || undefined,
+      coursesType: courseForm.coursesType.trim() || undefined,
     };
 
     if (editingCourse) {
@@ -239,13 +250,19 @@ const CourseManagementPage = () => {
   const handleSaveSubject = () => {
     if (!validateSubjectForm()) return;
 
-    const subjectData = {
+    const subjectData: any = {
       name: subjectForm.name.trim(),
       courseId: subjectForm.courseId,
-      semester: parseInt(subjectForm.semester),
       code: subjectForm.code.trim() || undefined,
       credits: subjectForm.credits ? parseFloat(subjectForm.credits) : undefined,
     };
+
+    // Add semester or year (mutually exclusive)
+    if (subjectForm.semester) {
+      subjectData.semester = parseInt(subjectForm.semester);
+    } else if (subjectForm.year) {
+      subjectData.year = parseInt(subjectForm.year);
+    }
 
     if (editingSubject) {
       updateSubjectMutation.mutate(
@@ -281,10 +298,10 @@ const CourseManagementPage = () => {
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteSubject = (subjectId: string, courseId: string, semester: number) => {
+  const handleDeleteSubject = (subjectId: string, courseId: string, semester?: number, year?: number) => {
     setDeleteType('subject');
     setDeleteId(subjectId);
-    setDeleteSubjectData({ courseId, semester });
+    setDeleteSubjectData({ courseId, semester, year });
     setDeleteDialogOpen(true);
   };
 
@@ -304,7 +321,12 @@ const CourseManagementPage = () => {
     } else {
       if (deleteSubjectData) {
         deleteSubjectMutation.mutate(
-          { subjectId: deleteId, courseId: deleteSubjectData.courseId, semester: deleteSubjectData.semester },
+          { 
+            subjectId: deleteId, 
+            courseId: deleteSubjectData.courseId, 
+            semester: deleteSubjectData.semester,
+            year: deleteSubjectData.year
+          },
           {
             onSuccess: () => {
               showToast('Subject deleted successfully!', 'success');
@@ -349,7 +371,12 @@ const CourseManagementPage = () => {
 
     // Apply semester filter
     if (filterSemester) {
-      filtered = filtered.filter((subject) => subject.semester.toString() === filterSemester);
+      filtered = filtered.filter((subject) => subject.semester?.toString() === filterSemester);
+    }
+
+    // Apply year filter
+    if (filterYear) {
+      filtered = filtered.filter((subject) => subject.year?.toString() === filterYear);
     }
 
     // Apply sorting
@@ -469,6 +496,7 @@ const CourseManagementPage = () => {
                     <TableRow>
                       <TableCell sx={{ fontWeight: 600 }}>Course Name</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Code</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Course Type</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Duration (Years)</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
                       <TableCell align="right" sx={{ fontWeight: 600 }}>
@@ -481,6 +509,7 @@ const CourseManagementPage = () => {
                       <TableRow key={course._id} hover>
                         <TableCell>{course.name}</TableCell>
                         <TableCell>{course.code || '-'}</TableCell>
+                        <TableCell>{course.coursesType || '-'}</TableCell>
                         <TableCell>{course.duration || '-'}</TableCell>
                         <TableCell>{course.description || '-'}</TableCell>
                         <TableCell align="right">
@@ -584,7 +613,10 @@ const CourseManagementPage = () => {
                   <Select
                     value={filterSemester}
                     label="Filter by Semester"
-                    onChange={(e) => setFilterSemester(e.target.value)}
+                    onChange={(e) => {
+                      setFilterSemester(e.target.value);
+                      if (e.target.value) setFilterYear(''); // Clear year if semester is selected
+                    }}
                   >
                     <MenuItem value="">All Semesters</MenuItem>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -594,13 +626,39 @@ const CourseManagementPage = () => {
                     ))}
                   </Select>
                 </FormControl>
-                {(subjectSearch || filterCourse || filterSemester) && (
+                <FormControl
+                  sx={{
+                    minWidth: 150,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
+                >
+                  <InputLabel>Filter by Year</InputLabel>
+                  <Select
+                    value={filterYear}
+                    label="Filter by Year"
+                    onChange={(e) => {
+                      setFilterYear(e.target.value);
+                      if (e.target.value) setFilterSemester(''); // Clear semester if year is selected
+                    }}
+                  >
+                    <MenuItem value="">All Years</MenuItem>
+                    {[1, 2, 3, 4].map((y) => (
+                      <MenuItem key={y} value={y.toString()}>
+                        Year {y}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {(subjectSearch || filterCourse || filterSemester || filterYear) && (
                   <Button
                     variant="outlined"
                     onClick={() => {
                       setSubjectSearch('');
                       setFilterCourse('');
                       setFilterSemester('');
+                      setFilterYear('');
                     }}
                     sx={{ borderRadius: 2 }}
                   >
@@ -627,7 +685,7 @@ const CourseManagementPage = () => {
                     <TableRow>
                       <SortableTableCell field="name">Subject Name</SortableTableCell>
                       <SortableTableCell field="course">Course</SortableTableCell>
-                      <SortableTableCell field="semester">Semester</SortableTableCell>
+                      <SortableTableCell field="semester">Semester / Year</SortableTableCell>
                       <SortableTableCell field="code">Code</SortableTableCell>
                       <SortableTableCell field="credits">Credits</SortableTableCell>
                       <TableCell align="right" sx={{ fontWeight: 600 }}>
@@ -641,7 +699,13 @@ const CourseManagementPage = () => {
                         <TableCell>{subject.name}</TableCell>
                         <TableCell>{getCourseName(subject.courseId)}</TableCell>
                         <TableCell>
-                          <Chip label={`Semester ${subject.semester}`} size="small" color="primary" />
+                          {subject.semester ? (
+                            <Chip label={`Semester ${subject.semester}`} size="small" color="primary" />
+                          ) : subject.year ? (
+                            <Chip label={`Year ${subject.year}`} size="small" color="info" />
+                          ) : (
+                            <Chip label="N/A" size="small" />
+                          )}
                         </TableCell>
                         <TableCell>{subject.code || '-'}</TableCell>
                         <TableCell>{subject.credits || '-'}</TableCell>
@@ -656,7 +720,7 @@ const CourseManagementPage = () => {
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() => handleDeleteSubject(subject._id, subject.courseId, subject.semester)}
+                            onClick={() => handleDeleteSubject(subject._id, subject.courseId, subject.semester, subject.year)}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -749,6 +813,27 @@ const CourseManagementPage = () => {
                 placeholder="e.g., DNTT, PGDCA"
                 value={courseForm.code}
                 onChange={(e) => setCourseForm({ ...courseForm, code: e.target.value.toUpperCase() })}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    backgroundColor: '#f8fafc',
+                    '&:hover': {
+                      backgroundColor: '#ffffff',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#ffffff',
+                    },
+                  },
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="Course Type"
+                placeholder="e.g., Diploma, Certificate, Degree"
+                value={courseForm.coursesType}
+                onChange={(e) => setCourseForm({ ...courseForm, coursesType: e.target.value })}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
@@ -991,8 +1076,18 @@ const CourseManagementPage = () => {
                 <Select
                   value={subjectForm.semester}
                   label="Semester"
-                  onChange={(e) => setSubjectForm({ ...subjectForm, semester: e.target.value })}
+                  onChange={(e) => {
+                    const newSemester = e.target.value;
+                    setSubjectForm({ 
+                      ...subjectForm, 
+                      semester: newSemester,
+                      year: newSemester ? '' : subjectForm.year // Clear year if semester is selected
+                    });
+                  }}
+                  disabled={!!subjectForm.year}
+                  MenuProps={{ disablePortal: true }}
                 >
+                  <MenuItem value="">None</MenuItem>
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
                     <MenuItem key={sem} value={sem}>
                       Semester {sem}
@@ -1002,6 +1097,53 @@ const CourseManagementPage = () => {
                 {formErrors.semester && (
                   <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
                     {formErrors.semester}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl 
+                fullWidth 
+                required 
+                error={!!formErrors.year}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    backgroundColor: '#f8fafc',
+                    '&:hover': {
+                      backgroundColor: '#ffffff',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#ffffff',
+                    },
+                  },
+                }}
+              >
+                <InputLabel>Year</InputLabel>
+                <Select
+                  value={subjectForm.year}
+                  label="Year"
+                  onChange={(e) => {
+                    const newYear = e.target.value;
+                    setSubjectForm({ 
+                      ...subjectForm, 
+                      year: newYear,
+                      semester: newYear ? '' : subjectForm.semester // Clear semester if year is selected
+                    });
+                  }}
+                  disabled={!!subjectForm.semester}
+                  MenuProps={{ disablePortal: true }}
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {[1, 2, 3, 4].map((y) => (
+                    <MenuItem key={y} value={y}>
+                      Year {y}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formErrors.year && (
+                  <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {formErrors.year}
                   </Typography>
                 )}
               </FormControl>

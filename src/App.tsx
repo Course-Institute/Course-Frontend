@@ -39,6 +39,7 @@ import EnquiryListPage from './pages/admin/EnquiryListPage';
 import StudentMarksheetPage from './pages/student/StudentMarksheetPage';
 import ViewMarksheetPage from './pages/admin/ViewMarksheetPage';
 import CenterViewMarksheetPage from './pages/center/ViewMarksheetPage';
+import CenterProfilePage from './pages/center/CenterProfilePage';
 import CourseManagementPage from './pages/admin/CourseManagementPage';
 import EditStudentPage from './pages/admin/EditStudentPage';
 
@@ -185,6 +186,11 @@ function App() {
           <Route path="/center/view-marksheet/:marksheetId/:semester?" element={
             <CenterLayout title="VIEW MARKSHEET">
               <CenterViewMarksheetPage />
+            </CenterLayout>
+          } />
+          <Route path="/center/profile" element={
+            <CenterLayout title="CENTER PROFILE">
+              <CenterProfilePage />
             </CenterLayout>
           } />
 

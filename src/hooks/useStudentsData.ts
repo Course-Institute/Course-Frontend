@@ -1,4 +1,4 @@
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import React from 'react';
 import { getStudentsData, type Student, type StudentsFilters, deleteStudent, updateStudent } from '../api/studentsApi';
@@ -35,15 +35,35 @@ const fetchStudents = async ({
 
   try {
     const response = await getStudentsData(pageParam, pageSize, filterParams);
+    
+    // Validate response structure
+    if (!response || !response.data) {
+      throw new Error('Invalid response structure: missing data property');
+    }
+    
+    if (!Array.isArray(response.data.students)) {
+      throw new Error('Invalid response structure: students is not an array');
+    }
+    
+    if (!response.data.pagination) {
+      throw new Error('Invalid response structure: missing pagination data');
+    }
+    
     return {
-      students: response.data.students,
+      students: response.data.students || [],
       pagination: {
-        ...response.data.pagination,
         currentPage: pageParam,
+        totalPages: response.data.pagination.totalPages || 1,
+        totalCount: response.data.pagination.totalCount || 0,
+        limit: response.data.pagination.limit || pageSize,
+        hasNextPage: response.data.pagination.hasNextPage || false,
+        hasPrevPage: response.data.pagination.hasPrevPage || false,
       },
     };
-  } catch (err) {
-    throw err;
+  } catch (err: any) {
+    // Re-throw with a more descriptive error message
+    const errorMessage = err?.message || 'Failed to fetch students data. Please try again.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -57,8 +77,8 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
   const lastElementRef = useRef<HTMLTableRowElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery({
+  const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage, isLoading } =
+    useInfiniteQuery({
       queryKey: ['students', limit, filters],
       queryFn: fetchStudents,
       getNextPageParam: nextPageParam,
@@ -70,7 +90,10 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
     });
 
   const students = useMemo(() => {
-    const allStudents = data?.pages.flatMap(page => page?.students ?? []) as Student[];
+    if (!data?.pages) {
+      return [] as Student[];
+    }
+    const allStudents = data.pages.flatMap(page => page?.students ?? []) as Student[];
     return allStudents;
   }, [data, hasNextPage]);
 
@@ -103,7 +126,7 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
     'entering',
     '50px', // Trigger when 50px away from bottom (closer trigger point)
     0.1,
-    filtersKey // Pass filtersKey as resetKey to reset observer when filters change
+    `${filtersKey}-${students.length}` // Reset observer when filters change or list grows
   );
 
   return {
@@ -113,6 +136,7 @@ export const useStudentsData = (options: UseStudentsDataOptions = {}) => {
     tableContainerRef,
     error,
     isError,
+    isLoading,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,

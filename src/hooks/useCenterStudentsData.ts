@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import React from 'react';
-import { getCenterStudentsData, type Student } from '../api/studentsApi';
+import { getCenterStudentsData, type Student, type StudentsFilters } from '../api/studentsApi';
 import { useIntersectionObserver } from './useIntersectionObserver';
 
 interface UseCenterStudentsDataOptions {
   centerId: string;
   limit?: number;
+  filters?: StudentsFilters;
 }
 
 interface StudentsPage {
@@ -26,13 +27,14 @@ const fetchCenterStudents = async ({
   queryKey,
 }: {
   pageParam?: number;
-  queryKey: (string | number | undefined)[];
+  queryKey: (string | number | StudentsFilters | undefined)[];
 }): Promise<StudentsPage> => {
-  const [_key, centerId, limit] = queryKey;
+  const [_key, centerId, limit, filters] = queryKey;
   const pageSize = typeof limit === 'number' ? limit : 10;
+  const filterParams = filters as StudentsFilters | undefined;
 
   try {
-    const response = await getCenterStudentsData(centerId as string, pageParam, pageSize);
+    const response = await getCenterStudentsData(centerId as string, pageParam, pageSize, filterParams);
     return {
       students: response.data.students,
       pagination: {
@@ -51,13 +53,13 @@ const nextPageParam = (lastPage: StudentsPage): number | undefined => {
 };
 
 export const useCenterStudentsData = (options: UseCenterStudentsDataOptions) => {
-  const { centerId, limit = 10 } = options;
+  const { centerId, limit = 10, filters } = options;
   const lastElementRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const { data, error, isError, isFetchingNextPage, hasNextPage, fetchNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ['centerStudents', centerId, limit],
+      queryKey: ['centerStudents', centerId, limit, filters],
       queryFn: fetchCenterStudents,
       getNextPageParam: nextPageParam,
       initialPageParam: 1,
@@ -79,6 +81,15 @@ export const useCenterStudentsData = (options: UseCenterStudentsDataOptions) => 
     return data.pages[data.pages.length - 1]?.pagination ?? null;
   }, [data]);
 
+  // Reset scroll when center or filters change
+  const centerKey = React.useMemo(() => centerId || '', [centerId]);
+  const filtersKey = React.useMemo(() => JSON.stringify(filters || {}), [filters]);
+  React.useEffect(() => {
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop = 0;
+    }
+  }, [centerKey, filtersKey]);
+
   useIntersectionObserver(
     tableContainerRef as React.RefObject<HTMLElement>,
     lastElementRef as React.RefObject<HTMLElement>,
@@ -88,7 +99,11 @@ export const useCenterStudentsData = (options: UseCenterStudentsDataOptions) => 
       }
     },
     hasNextPage ?? false,
-    isFetchingNextPage
+    isFetchingNextPage,
+    'entering',
+    '50px',
+    0.1,
+    `${centerKey}-${filtersKey}-${students.length}` // Reset observer when center/filters or list changes
   );
 
   return {

@@ -88,42 +88,11 @@ const useIntersectionObserverCore = (
         // 2. Not currently loading
         // 3. Element is intersecting
         if (shouldTrigger && hasNext && !isLoading) {
-          // Check if user has scrolled from initial position (at least 10px to account for small movements)
-          const currentScrollTop = getScrollTop();
-          const hasScrolled = initialScrollTopRef.current !== null && 
-                             Math.abs(currentScrollTop - initialScrollTopRef.current) > 10;
-
-          // Only prevent immediate trigger on mount if element is fully visible and no scroll happened
-          if (!hasScrolled && currentScrollTop === initialScrollTopRef.current) {
-            // Check if last element is visible without scrolling
-            const rect = lastElement.getBoundingClientRect();
-            let containerRect: DOMRect;
-            
-            if (scrollableContainer === document.documentElement) {
-              containerRect = new DOMRect(0, 0, window.innerWidth, window.innerHeight);
-            } else {
-              containerRect = scrollableContainer.getBoundingClientRect();
-            }
-            
-            // If last element is fully visible in viewport and scroll position hasn't changed
-            // This means all content fits and we shouldn't trigger immediately
-            if (rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) {
-              // But if scrollHeight > clientHeight, there's more content, so allow trigger
-              const scrollHeight = scrollableContainer === document.documentElement 
-                ? Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-                : scrollableContainer.scrollHeight;
-              const clientHeight = scrollableContainer === document.documentElement
-                ? window.innerHeight
-                : scrollableContainer.clientHeight;
-              
-              if (scrollHeight <= clientHeight) {
-                return; // All content fits, don't trigger
-              }
-            }
-          }
-
           // Prevent multiple rapid triggers (debounce)
           if (!hasTriggeredRef.current) {
+            // If user hasn't scrolled and content currently fits, still allow a trigger so we can
+            // load enough pages to fill the viewport (otherwise infinite scroll never starts).
+            // Once more data is loaded, intersection observer will rely on actual scrolling.
             hasTriggeredRef.current = true;
             onIntersection();
             

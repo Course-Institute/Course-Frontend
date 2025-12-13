@@ -16,6 +16,7 @@ import {
   Logout as LogoutIcon,
   PersonAdd,
   Assignment,
+  AccountCircle,
 } from '@mui/icons-material';
 import InstituteLogo from '../InstituteLogo';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -50,6 +51,7 @@ const CenterSidebar = ({ open, onClose, drawerWidth }: CenterSidebarProps) => {
   };
 
   const menuItems = [
+    { id: 7, label: 'Profile', icon: <AccountCircle />, path: '/center/profile' },
     { id: 1, label: 'Dashboard', icon: <Dashboard />, path: '/center-dashboard' },
     { id: 2, label: 'Add Student', icon: <PersonAdd />, path: '/center/add-student' },
     { id: 3, label: 'Manage Students', icon: <People />, path: '/center/students' },

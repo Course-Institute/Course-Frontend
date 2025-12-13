@@ -243,13 +243,28 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
               ) : null}
             </Box>
 
+            {/* Center Name - Above Personal Information */}
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '143px',
+                left: '133px',
+                fontSize: '0.55rem',
+                color: '#000',
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
+            >
+              {(formData as any).centerName || (formData.center as any)?.name || ''}
+            </Typography>
+
             {/* Personal Information - Values Only */}
             <Typography
               sx={{
                 position: 'absolute',
-                top: '183px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '216px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -261,9 +276,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '183px',
-                right: '147px',
-                fontSize: '0.65rem',
+                top: '216px',
+                left: '416px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -276,9 +291,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '211px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '244px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -291,9 +306,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '211px',
-                right: '147px',
-                fontSize: '0.65rem',
+                top: '244px',
+                left: '416px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -306,9 +321,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '238px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '271px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -321,9 +336,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '241px',
-                right: '120px',
-                fontSize: '0.65rem',
+                top: '274px',
+                left: '416px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -336,9 +351,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '265px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '298px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 maxWidth: '400px',
@@ -353,9 +368,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '295px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '328px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -368,9 +383,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '295px',
-                right: '159px',
-                fontSize: '0.65rem',
+                top: '328px',
+                left: '413px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -383,9 +398,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '323px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '356px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -398,12 +413,15 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '319px',
-                right: '155px',
-                fontSize: '0.65rem',
+                top: '352px',
+                left: '410px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
+                textAlign: 'left',
+                width: '180px',
+                display: 'block',
               }}
             >
               {formData.city || ''}
@@ -413,9 +431,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '348px',
-                left: '135px',
-                fontSize: '0.65rem',
+                top: '381px',
+                left: '140px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -428,9 +446,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '345px',
-                right: '147px',
-                fontSize: '0.65rem',
+                top: '378px',
+                left: '409px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -444,9 +462,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '417px',
+                top: '457px',
                 left: '147px',
-                fontSize: '0.65rem',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -459,9 +477,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '417px',
-                right: '147px',
-                fontSize: '0.65rem',
+                top: '457px',
+                left: '410px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -475,9 +493,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '504px',
-                left: '115px',
-                fontSize: '0.65rem',
+                top: '552px',
+                left: '105px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -490,9 +508,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '500px',
-                right: '269px',
-                fontSize: '0.65rem',
+                top: '549px',
+                left: '308px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -505,9 +523,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '540px',
-                left: '115px',
-                fontSize: '0.65rem',
+                top: '589px',
+                left: '105px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 maxWidth: '400px',
@@ -522,9 +540,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '572px',
-                left: '115px',
-                fontSize: '0.65rem',
+                top: '620px',
+                left: '105px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -537,9 +555,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '572px',
-                right: '273px',
-                fontSize: '0.65rem',
+                top: '620px',
+                left: '295px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -552,9 +570,9 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Typography
               sx={{
                 position: 'absolute',
-                top: '572px',
-                right: '120px',
-                fontSize: '0.65rem',
+                top: '620px',
+                left: '440px',
+                fontSize: '0.55rem',
                 color: '#000',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -567,8 +585,8 @@ const StudentFormPreviewDialog: React.FC<StudentFormPreviewDialogProps> = ({
             <Box
               sx={{
                 position: 'absolute',
-                top: '649px',
-                left: '65px',
+                top: '710px',
+                left: '54px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,

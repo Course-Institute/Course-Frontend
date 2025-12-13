@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
@@ -42,11 +42,19 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
+  // Clear error when role changes
+  useEffect(() => {
+    setError('');
+  }, [role]);
+
   const loginMutation = useMutation<LoginResponse, Error, { email?: string; password?: string; registrationNumber?: string; dateOfBirth?: string; role: string }>(
 
     {
     mutationFn: loginUser,
     onSuccess: (data) => {
+      // Clear any previous errors
+      setError('');
+      
       // Handle successful login
       // Get user role from response
       const userRole = data.data.user.role;
@@ -84,7 +92,21 @@ const LoginPage = () => {
       }
     },
     onError: (error: any) => {
-      setError(error.message || error.response?.data?.message || 'Login failed. Please try again.');
+      // Extract error message from various possible error formats
+      // Prioritize 'error' field as it contains more specific messages
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (typeof error?.response?.data === 'string') {
+        errorMessage = error.response.data;
+      }
+      
+      setError(errorMessage);
     },
   });
 
@@ -99,6 +121,9 @@ const LoginPage = () => {
 
   const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
+    
+    // Clear any previous errors before submitting
+    setError('');
     
     // Validate based on role
     if (role.toLowerCase() === 'student') {
@@ -373,7 +398,10 @@ const LoginPage = () => {
                   <DateInput
                     label="Date of Birth"
                     value={formData.dateOfBirth}
-                    onChange={(value) => setFormData(prev => ({ ...prev, dateOfBirth: value }))}
+                    onChange={(value) => {
+                      setFormData(prev => ({ ...prev, dateOfBirth: value }));
+                      if (error) setError(''); // Clear error when user changes date
+                    }}
                     fullWidth
                     disabled={loginMutation.isPending}
                     sx={{

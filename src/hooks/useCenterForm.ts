@@ -12,8 +12,6 @@ import {
   validatePinCode,
   validateYear,
   validateWebsite,
-  validateIFSC,
-  validateAccountNumber,
   type ValidationResult
 } from '../utils/validationHelpers';
 
@@ -43,14 +41,6 @@ interface CenterFormData {
   internetFacility: string;
   seatingCapacity: string;
   infraPhotos?: File | File[] | null;
-
-  // Bank Details
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  ifsc: string;
-  branchName: string;
-  cancelledCheque?: File | File[] | null;
 
   // Documents
   gstCertificate?: File | File[] | null;
@@ -100,12 +90,6 @@ export function useCenterForm(): {
     internetFacility: '',
     seatingCapacity: '',
     infraPhotos: null,
-    bankName: '',
-    accountHolder: '',
-    accountNumber: '',
-    ifsc: '',
-    branchName: '',
-    cancelledCheque: null,
     gstCertificate: null,
     panCard: null,
     addressProof: null,
@@ -242,25 +226,6 @@ export function useCenterForm(): {
     const infraPhotosResult = validateFileField(formValues.infraPhotos);
     if (!infraPhotosResult.isValid) newErrors.infraPhotos = infraPhotosResult.error || '';
 
-    // Bank Details
-    const bankNameResult = validateRequired(formValues.bankName || '');
-    if (!bankNameResult.isValid) newErrors.bankName = bankNameResult.error || '';
-
-    const accountHolderResult = validateRequired(formValues.accountHolder || '');
-    if (!accountHolderResult.isValid) newErrors.accountHolder = accountHolderResult.error || '';
-
-    const accountNumberResult = validateAccountNumber(formValues.accountNumber || '');
-    if (!accountNumberResult.isValid) newErrors.accountNumber = accountNumberResult.error || '';
-
-    const ifscResult = validateIFSC(formValues.ifsc || '');
-    if (!ifscResult.isValid) newErrors.ifsc = ifscResult.error || '';
-
-    const branchResult = validateRequired(formValues.branchName || '');
-    if (!branchResult.isValid) newErrors.branchName = branchResult.error || '';
-
-    const chequeResult = validateFileField(formValues.cancelledCheque);
-    if (!chequeResult.isValid) newErrors.cancelledCheque = chequeResult.error || '';
-
     // Documents
     const gstResult = validateFileField(formValues.gstCertificate);
     if (!gstResult.isValid) newErrors.gstCertificate = gstResult.error || '';
@@ -318,14 +283,6 @@ export function useCenterForm(): {
       internetFacility: data.internetFacility,
       seatingCapacity: data.seatingCapacity,
       infraPhotos: Array.isArray(data.infraPhotos) ? data.infraPhotos : (data.infraPhotos ? [data.infraPhotos] : []),
-
-      // Bank Details
-      bankName: data.bankName,
-      accountHolder: data.accountHolder,
-      accountNumber: data.accountNumber,
-      ifsc: data.ifsc,
-      branchName: data.branchName,
-      cancelledCheque: Array.isArray(data.cancelledCheque) ? data.cancelledCheque[0] : (data.cancelledCheque || undefined),
 
       // Documents
       gstCertificate: Array.isArray(data.gstCertificate) ? data.gstCertificate[0] : (data.gstCertificate || undefined),

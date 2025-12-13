@@ -6,7 +6,8 @@ export interface Subject {
   name: string;
   courseId: string;
   courseName?: string;
-  semester: number;
+  semester?: number;
+  year?: number;
   code?: string;
   credits?: number;
   createdAt?: string;

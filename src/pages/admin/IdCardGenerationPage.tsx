@@ -234,7 +234,7 @@ const IdCardGenerationPage = () => {
                 <Box sx={{ 
                   position: 'absolute', 
                   left: getResponsivePosition(20), 
-                  top: getResponsivePosition(139), 
+                  top: getResponsivePosition(143.1), 
                   width: getResponsivePosition(200) 
                 }}>
                   <Typography 
@@ -257,8 +257,8 @@ const IdCardGenerationPage = () => {
                 {/* Roll No - Positioned in the "Roll No." field */}
                 <Box sx={{ 
                   position: 'absolute', 
-                  left: getResponsivePosition(20), 
-                  top: getResponsivePosition(170), 
+                  left: getResponsivePosition(15), 
+                  top: getResponsivePosition(175.4), 
                   width: getResponsivePosition(200) 
                 }}>
                   <Typography 
@@ -278,30 +278,6 @@ const IdCardGenerationPage = () => {
                   </Typography>
                 </Box>
 
-                {/* Course - Positioned in the "Course:" field */}
-                <Box sx={{ 
-                  position: 'absolute', 
-                  left: getResponsivePosition(20), 
-                  top: getResponsivePosition(197), 
-                  width: getResponsivePosition(200) 
-                }}>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      fontWeight: 'bold', 
-                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
-                      color: 'black',
-                      position: 'absolute',
-                      left: getResponsivePosition(75),
-                      top: getResponsivePosition(229),
-                      width: getResponsivePosition(200),
-                      height: getResponsivePosition(100),
-                    }}
-                  >
-                    {studentData.course}
-                  </Typography>
-                </Box>
-
                 {/* Session - Positioned in the "Session:" field */}
                 <Box sx={{ 
                   position: 'absolute', 
@@ -317,7 +293,7 @@ const IdCardGenerationPage = () => {
                       color: 'black',
                       position: 'absolute',
                       left: getResponsivePosition(75),
-                      top: getResponsivePosition(231),
+                      top: getResponsivePosition(211.5),
                       width: getResponsivePosition(200),
                       height: getResponsivePosition(100),
                     }}
@@ -326,11 +302,42 @@ const IdCardGenerationPage = () => {
                   </Typography>
                 </Box>
 
+                {/* Course - Positioned in the "Course:" field */}
+                <Box sx={{ 
+                  position: 'absolute', 
+                  left: getResponsivePosition(15), 
+                  top: getResponsivePosition(201), 
+                  width: getResponsivePosition(200) 
+                }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      fontWeight: 'bold', 
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.95rem' },
+                      color: 'black',
+                      position: 'absolute',
+                      left: getResponsivePosition(75),
+                      top: getResponsivePosition(252),
+                      width: getResponsivePosition(180),
+                      maxHeight: getResponsivePosition(40),
+                      overflow: 'hidden',
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                      lineHeight: 1.3,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                    }}
+                  >
+                    {studentData.course}
+                  </Typography>
+                </Box>
+
                 {/* DOB - Positioned in the "DOB:" field */}
                 <Box sx={{ 
                   position: 'absolute', 
                   left: getResponsivePosition(20), 
-                  top: getResponsivePosition(237), 
+                  top: getResponsivePosition(247), 
                   width: getResponsivePosition(200) 
                 }}>
                   <Typography 
@@ -356,8 +363,8 @@ const IdCardGenerationPage = () => {
                 {/* Phone - Positioned in the "Phone:" field */}
                 <Box sx={{ 
                   position: 'absolute', 
-                  left: getResponsivePosition(20), 
-                  top: getResponsivePosition(257), 
+                  left: getResponsivePosition(19), 
+                  top: getResponsivePosition(267.8), 
                   width: getResponsivePosition(200) 
                 }}>
                   <Typography 

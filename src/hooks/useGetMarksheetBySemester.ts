@@ -4,16 +4,18 @@ import type { MarksheetData } from './useGetMarksheet';
 
 export const useGetMarksheetBySemester = (
   studentId: string,
-  semester: string,
+  semester: string = '',
+  year: string = '',
   enabled: boolean = true
 ) => {
   return useQuery<MarksheetData | null>({
-    queryKey: ['marksheet', studentId, semester],
+    queryKey: ['marksheet', studentId, semester, year],
     queryFn: async () => {
       try {
         const response = await axiosInstance.post('/api/marksheet/show-marksheet', {
           studentId: studentId,
-          semester: semester
+          semester: semester,
+          year: year,
         });
         // Extract data from the wrapped response structure
         // Handle case where marksheet doesn't exist (returns null)
@@ -33,7 +35,7 @@ export const useGetMarksheetBySemester = (
         throw error;
       }
     },
-    enabled: enabled && !!studentId && !!semester,
+    enabled: enabled && !!studentId && (!!semester || !!year),
     staleTime: 30000, // 30 seconds
     retry: 1, // Only retry once on failure
   });

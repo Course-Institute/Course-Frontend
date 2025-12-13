@@ -34,8 +34,8 @@ import ConfirmationDialog from '../../components/ConfirmationDialog';
 import EditableMarksheetDialog from '../../components/EditableMarksheetDialog';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { type StudentsFilters } from '../../api/studentsApi';
-import { programsData } from '../../constants/programsData';
 import { useDeleteStudent } from '../../hooks/useStudentsData';
+import { useCourses } from '../../hooks/useCourses';
 
 const ManageStudentsPage = () => {
   const navigate = useNavigate();
@@ -72,6 +72,7 @@ const ManageStudentsPage = () => {
     tableContainerRef,
     isError, 
     error, 
+    isLoading,
     isFetchingNextPage
   } = useStudentsData({ limit: 10, filters: combinedFilters });
 
@@ -83,36 +84,42 @@ const ManageStudentsPage = () => {
 
   const { showToast } = useToast();
 
+  // Fetch courses from backend
+  const { courses: backendCourses } = useCourses();
+
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
-    const courses = [...new Set(students.map(s => s.course).filter(Boolean))];
-    const years = [...new Set(students.map(s => s.year).filter(Boolean))];
-    const sessions = [...new Set(students.map(s => s.session).filter(Boolean))];
+    // Ensure students is an array before mapping
+    const studentsArray = Array.isArray(students) ? students : [];
+    const courses = [...new Set(studentsArray.map(s => s.course).filter(Boolean))];
+    const years = [...new Set(studentsArray.map(s => s.year).filter(Boolean))];
+    const sessions = [...new Set(studentsArray.map(s => s.session).filter(Boolean))];
     
-    // Get all program categories from programsData
-    const programCategories = programsData.map(program => program.category);
+    // Ensure backendCourses is an array before mapping
+    const coursesArray = Array.isArray(backendCourses) ? backendCourses : [];
     
-    // Get all courses from programsData
-    const allCourses = programsData.flatMap(program => 
-      program.levels.flatMap(level => 
-        level.courses.map(course => course.name)
-      )
-    );
+    // Get all program categories (courseType) from backend courses
+    const programCategories = coursesArray
+      .map(course => course.coursesType)
+      .filter(Boolean) as string[];
+    
+    // Get all courses from backend
+    const allCourses = coursesArray.map(course => course.name);
     
     return { 
       courses, 
       years, 
       sessions, 
-      programCategories: [...new Set(programCategories)],
-      allCourses: [...new Set(allCourses)]
+      programCategories: [...new Set(programCategories)].sort(),
+      allCourses: [...new Set(allCourses)].sort()
     };
-  }, [students]);
+  }, [students, backendCourses]);
 
   // Filter handlers
   const handleFilterChange = (key: keyof StudentsFilters, value: string | boolean | undefined) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value || undefined,
+      [key]: value !== undefined && value !== '' ? value : undefined,
     }));
   };
 
@@ -125,14 +132,16 @@ const ManageStudentsPage = () => {
     }));
   };
 
-  // Get courses for selected program category
+  // Get courses for selected program category (courseType)
+  // If no category is selected, return all courses from backend
   const getCoursesForCategory = (category: string) => {
-    if (!category) return [];
-    const program = programsData.find(p => p.category === category);
-    if (!program) return [];
-    return program.levels.flatMap(level => 
-      level.courses.map(course => course.name)
-    );
+    const coursesArray = Array.isArray(backendCourses) ? backendCourses : [];
+    if (!category) {
+      return coursesArray.map(course => course.name);
+    }
+    return coursesArray
+      .filter(course => course.coursesType === category)
+      .map(course => course.name);
   };
 
   const handleClearFilters = () => {
@@ -183,24 +192,29 @@ const ManageStudentsPage = () => {
   };
 
   // Handle approve marksheet - opens editable dialog
-  const handleApproveMarksheetClick = (student: any, semester?: string) => {
-    // If semester is provided, use it; otherwise determine which semester to approve
-    let semesterToApprove = semester;
-    
-    if (!semesterToApprove) {
-      // Determine which semester to approve
-      // Priority: First unapproved semester, or first semester if all are approved
-      const semestersWithMarksheet: string[] = student.whichSemesterMarksheetIsGenerated || [];
-      const approvedSemesters: string[] = student.approvedSemesters || [];
-      
-      // Find first unapproved semester
-      const unapprovedSemester = semestersWithMarksheet.find((sem: string) => !approvedSemesters.includes(sem));
-      
-      // Use unapproved semester, or first semester if all are approved, or default to "1"
-      semesterToApprove = unapprovedSemester || semestersWithMarksheet[0] || '1';
+  const handleApproveMarksheetClick = (student: any, term?: string, isYear?: boolean) => {
+    // Choose terms list based on year/semester data presence or provided flag
+    const yearTerms: string[] = student.whichYearMarksheetIsGenerated || [];
+    const approvedYears: string[] = student.approvedYears || [];
+    const semTerms: string[] = student.whichSemesterMarksheetIsGenerated || [];
+    const approvedSems: string[] = student.approvedSemesters || [];
+
+    const useYear = isYear ?? (yearTerms.length > 0);
+        const terms = useYear ? yearTerms : semTerms;
+        const approvedTerms = useYear ? approvedYears : approvedSems;
+
+    let termToApprove = term;
+    if (!termToApprove) {
+            const unapproved = terms.find((t: string) => !approvedTerms.includes(t));
+            termToApprove = unapproved || terms[0] || '1';
     }
-    
-    setSelectedStudent({ ...student, semesterToApprove });
+
+    setSelectedStudent({ 
+      ...student, 
+      semesterToApprove: useYear ? undefined : termToApprove, 
+      yearToApprove: useYear ? termToApprove : undefined,
+      isYearForApproval: useYear,
+    });
     setApproveMarksheetDialogOpen(true);
   };
 
@@ -440,7 +454,7 @@ const ManageStudentsPage = () => {
                 borderRadius: 10, 
                 height: 26, 
                 px: 1.5, 
-                minWidth: 150, 
+                minWidth: 160, 
                 fontSize: 11, 
                 textTransform: 'none', 
                 whiteSpace: 'nowrap', 
@@ -448,7 +462,7 @@ const ManageStudentsPage = () => {
                 '&:hover': { background: '#4f46e5' } 
               }}
             >
-              Approve Sem {unapprovedSemesters[0]}
+              Approve Sem/Year {unapprovedSemesters[0]}
             </Button>
           );
         }
@@ -469,7 +483,7 @@ const ManageStudentsPage = () => {
                   borderRadius: 10, 
                   height: 24, 
                   px: 1.5, 
-                  minWidth: 130, 
+                  minWidth: 150, 
                   fontSize: 10, 
                   textTransform: 'none', 
                   whiteSpace: 'nowrap', 
@@ -477,7 +491,7 @@ const ManageStudentsPage = () => {
                   '&:hover': { background: '#4f46e5' } 
                 }}
               >
-                Approve Sem {sem}
+                Approve Sem/Year {sem}
               </Button>
             ))}
           </Box>
@@ -490,15 +504,24 @@ const ManageStudentsPage = () => {
       width: '200px',
       align: 'center',
       getActions: (row: any) => {
-        // Check if student has whichSemesterMarksheetIsGenerated array
         const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
+        const yearsWithMarksheet: string[] = (row as any).whichYearMarksheetIsGenerated || [];
+        const isYearBased = yearsWithMarksheet.length > 0;
+        const terms = isYearBased ? yearsWithMarksheet : semestersWithMarksheet;
+        const termLabel = isYearBased ? 'Year' : 'Semester';
+        const buildViewUrl = (term: string) => {
+          const id = row.studentId || row._id || row.id;
+          return isYearBased
+            ? `/admin/view-marksheet/${id}/${term}?year=${term}`
+            : `/admin/view-marksheet/${id}/${term}`;
+        };
         
-        if (semestersWithMarksheet.length > 0) {
+        if (terms.length > 0) {
           // If multiple semesters, show dropdown menu
-          if (semestersWithMarksheet.length > 1) {
+          if (terms.length > 1) {
             return (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-                {semestersWithMarksheet.map((sem: string) => (
+                {terms.map((sem: string) => (
                   <Button
                     key={sem}
                     size="small"
@@ -516,23 +539,24 @@ const ManageStudentsPage = () => {
                       whiteSpace: 'nowrap', 
                       background: 'white' 
                     }}
-                    onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
+                onClick={() => navigate(buildViewUrl(sem))}
                   >
-                    Semester {sem}
+                    {termLabel} {sem}
                   </Button>
                 ))}
               </Box>
             );
           } else {
             // Single semester
+            const term = terms[0];
             return (
               <Button
                 size="small"
                 variant="outlined"
-                sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
-                onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/${semestersWithMarksheet[0]}`)}
+                sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 160, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
+                onClick={() => navigate(buildViewUrl(term))}
               >
-                Show Marksheet
+                Show Marksheet ({termLabel} {term})
               </Button>
             );
           }
@@ -1117,7 +1141,22 @@ const ManageStudentsPage = () => {
                 position: 'relative',
               }}
             >
-              {students.length === 0 && !isError ? (
+              {isLoading ? (
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  flex: 1,
+                  py: 8,
+                  gap: 2,
+                }}>
+                  <CircularProgress size={40} sx={{ color: '#3b82f6' }} />
+                  <Typography variant="body1" sx={{ color: '#64748b', fontWeight: 500 }}>
+                    Loading students...
+                  </Typography>
+                </Box>
+              ) : students.length === 0 && !isError ? (
                 <Box sx={{ 
                   display: 'flex', 
                   flexDirection: 'column',
@@ -1238,6 +1277,7 @@ const ManageStudentsPage = () => {
             studentName={selectedStudent.candidateName}
             marksheetId={selectedStudent.marksheetId}
             semester={selectedStudent.semesterToApprove} // Pass semester to dialog
+            year={selectedStudent.yearToApprove}
           />
         )}
       </Container>

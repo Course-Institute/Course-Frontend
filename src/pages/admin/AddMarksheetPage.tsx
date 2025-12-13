@@ -40,6 +40,7 @@ import {
   type SubjectData,
   type MarksheetFormData,
 } from "../../hooks/useSaveMarksheet";
+import { generateSerialNumber } from "../../utils/serialNumberGenerator";
 import { useCourses } from "../../hooks/useCourses";
 import { useCourseSubjects } from "../../hooks/useCourseSubjects";
 import { useGetMarksheetBySemester } from "../../hooks/useGetMarksheetBySemester";
@@ -61,6 +62,7 @@ const AddMarksheetPageAdmin = () => {
   const [subjects, setSubjects] = useState<SubjectData[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [semester, setSemester] = useState("");
+  const [year, setYear] = useState("");
   const [existingMarksheetId, setExistingMarksheetId] = useState<string | null>(null);
 
   const [currentSubject, setCurrentSubject] = useState({
@@ -89,7 +91,8 @@ const AddMarksheetPageAdmin = () => {
   // Fetch subjects based on selected course and semester
   const { subjects: courseSubjects, isLoading: isLoadingSubjects } = useCourseSubjects(
     normalizedCourseId,
-    semester
+    semester,
+    year
   );
 
   // Fetch existing marksheet for selected student and semester
@@ -97,7 +100,8 @@ const AddMarksheetPageAdmin = () => {
   const { data: existingMarksheet, isLoading: isLoadingMarksheet } = useGetMarksheetBySemester(
     studentId,
     semester,
-    !!studentId && !!semester
+    year,
+    !!studentId && !!(semester || year)
   );
 
   /* ---------------------------------------------------------------
@@ -126,14 +130,46 @@ const AddMarksheetPageAdmin = () => {
       });
     }
     setSemester(newSemester);
+    setYear("");
     setExistingMarksheetId(null);
     setSubjects([]);
     
     // Reset subject selection when semester changes
     setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
     
-    if (errors.semester) {
+    if (errors.semester || errors.year) {
       const newErrors = { ...errors };
+      delete newErrors.semester;
+      delete newErrors.year;
+      setErrors(newErrors);
+    }
+  };
+
+  /* ---------------------------------------------------------------
+                     YEAR CHANGE → RELOAD SUBJECTS
+  --------------------------------------------------------------- */
+  const handleYearChange = (newYear: string) => {
+    if (subjects.length === 0) {
+      setSelectedCourse("");
+      setCurrentSubject({
+        subjectName: "",
+        marks: "",
+        internal: "",
+        total: "",
+        minMarks: "",
+        maxMarks: "",
+      });
+    }
+    setYear(newYear);
+    setSemester("");
+    setExistingMarksheetId(null);
+    setSubjects([]);
+
+    setCurrentSubject((prev) => ({ ...prev, subjectName: "" }));
+
+    if (errors.year || errors.semester) {
+      const newErrors = { ...errors };
+      delete newErrors.year;
       delete newErrors.semester;
       setErrors(newErrors);
     }
@@ -144,6 +180,15 @@ const AddMarksheetPageAdmin = () => {
     // Only process if we have a valid marksheet response and not loading
     if (!isLoadingMarksheet && existingMarksheet && existingMarksheet._id) {
       setExistingMarksheetId(existingMarksheet._id);
+
+      // Pre-select term (semester/year) if it exists
+      if (existingMarksheet.semester) {
+        setSemester(existingMarksheet.semester.toString());
+        setYear("");
+      } else if ((existingMarksheet as any).year) {
+        setYear((existingMarksheet as any).year.toString());
+        setSemester("");
+      }
       
       // Pre-select course if it exists in marksheet
       if (existingMarksheet.courseId) {
@@ -170,15 +215,16 @@ const AddMarksheetPageAdmin = () => {
         // Marksheet exists but has no subjects yet
         setSubjects([]);
       }
-    } else if (!isLoadingMarksheet && (!existingMarksheet || existingMarksheet === null) && studentId && semester) {
+    } else if (!isLoadingMarksheet && (!existingMarksheet || existingMarksheet === null) && studentId && (semester || year)) {
       // No existing marksheet found, ensure we're in create mode
       // Only reset if we don't have any subjects added yet (to avoid clearing user input)
       if (subjects.length === 0) {
         setExistingMarksheetId(null);
-        setSelectedCourse(""); // Reset course when no marksheet found
+        // Keep the selected term so the form remains visible; only clear course to force reselect if desired
+        setSelectedCourse("");
       }
     }
-  }, [existingMarksheet, isLoadingMarksheet, studentId, semester]);
+  }, [existingMarksheet, isLoadingMarksheet, studentId, semester, year]);
 
   /* ---------------------------------------------------------------
                          HANDLE SUBJECT INPUT
@@ -249,9 +295,13 @@ const AddMarksheetPageAdmin = () => {
                          SAVE MARKSHEET
   --------------------------------------------------------------- */
   const handleSave = () => {
-    // Validate semester is selected
-    if (!semester) {
-      setErrors({ ...errors, semester: "Please select a semester" });
+    // Validate term selection
+    if (!semester && !year) {
+      setErrors({ 
+        ...errors, 
+        semester: "Please select a semester or year",
+        year: "Please select a semester or year",
+      });
       return;
     }
 
@@ -270,13 +320,18 @@ const AddMarksheetPageAdmin = () => {
       return;
     }
 
+    // Generate 6-digit serial number for new marksheets only
+    const serialNo = existingMarksheetId ? undefined : generateSerialNumber();
+
     const data: MarksheetFormData = {
       studentId: selectedStudent.studentId || selectedStudent.id,
       subjects,
-      semester: semester.toString(),
+      semester: semester ? semester.toString() : undefined,
+      year: year ? year.toString() : undefined,
       courseId: normalizedCourseId, // Include courseId in marksheet (always a string)
       role: "admin",
       marksheetId: existingMarksheetId || undefined, // Include marksheetId if updating
+      serialNo, // Include serial number for new marksheets
     } as any;
 
     saveMarksheetMutation.mutate(data, {
@@ -292,6 +347,7 @@ const AddMarksheetPageAdmin = () => {
           setSubjects([]);
           setSelectedCourse("");
           setSemester("");
+          setYear("");
           setExistingMarksheetId(null);
 
           setCurrentSubject({
@@ -322,6 +378,7 @@ const AddMarksheetPageAdmin = () => {
     setSubjects([]);
     setSelectedCourse("");
     setSemester("");
+    setYear("");
     setExistingMarksheetId(null);
     setErrors({});
     setTableErrors({});
@@ -329,6 +386,7 @@ const AddMarksheetPageAdmin = () => {
 
   const totalMarks = subjects.reduce((sum, s) => sum + s.total, 0);
   const averageMarks = subjects.length ? totalMarks / subjects.length : 0;
+  const selectedTermLabel = semester ? `Semester ${semester}` : year ? `Year ${year}` : "";
 
   /* ------------------------------------------------------------------
                            JSX RETURN
@@ -373,6 +431,7 @@ const AddMarksheetPageAdmin = () => {
                 setSelectedStudent(opt);
                 setSubjects([]);
                 setSemester("");
+                setYear("");
                 setExistingMarksheetId(null);
                 setErrors({});
               }}
@@ -386,13 +445,13 @@ const AddMarksheetPageAdmin = () => {
         </Card>
       </Slide>
 
-      {/* ===================== SEMESTER SELECTION ===================== */}
+      {/* ===================== SEMESTER / YEAR SELECTION ===================== */}
       {selectedStudent && (
         <Slide direction="up" in timeout={900}>
           <Card sx={{ mb: 4, borderRadius: 3 }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Semester Selection
+                Semester / Year Selection
               </Typography>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -403,7 +462,8 @@ const AddMarksheetPageAdmin = () => {
                       label="Semester *"
                       onChange={(e) => handleSemesterChange(e.target.value)}
                       error={!!errors.semester}
-                      disabled={subjects.length > 0}
+                      disabled={subjects.length > 0 || !!year}
+                        MenuProps={{ disablePortal: true }}
                     >
                       {[1, 2].map((s) => (
                         <MenuItem key={s} value={s}>
@@ -417,11 +477,40 @@ const AddMarksheetPageAdmin = () => {
                       {errors.semester}
                     </Typography>
                   )}
-                  {subjects.length > 0 && (
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-                      Semester cannot be changed once subjects are added
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {subjects.length > 0
+                      ? "Semester cannot be changed once subjects are added"
+                      : "Pick semester or switch to yearly selection below"}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Year *</InputLabel>
+                    <Select
+                      value={year}
+                      label="Year *"
+                      onChange={(e) => handleYearChange(e.target.value)}
+                      error={!!errors.year}
+                      disabled={subjects.length > 0 || !!semester}
+                      MenuProps={{ disablePortal: true }}
+                    >
+                      {[1, 2, 3, 4].map((y) => (
+                        <MenuItem key={y} value={y}>
+                          Year {y}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {errors.year && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {errors.year}
                     </Typography>
                   )}
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {subjects.length > 0
+                      ? "Year cannot be changed once subjects are added"
+                      : "Use year-based selection if course is yearly"}
+                  </Typography>
                 </Grid>
               </Grid>
               
@@ -437,7 +526,7 @@ const AddMarksheetPageAdmin = () => {
               {!isLoadingMarksheet && existingMarksheet && existingMarksheet._id && (
                 <Alert severity="info" sx={{ mt: 2 }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                    Existing marksheet found for Semester {semester}
+                    Existing marksheet found for {semester ? `Semester ${semester}` : `Year ${year}`}
                   </Typography>
                   <Typography variant="caption">
                     Found {existingMarksheet.subjects?.length || 0} subject(s). You can add more subjects or modify existing ones. Clicking "Save Marksheet" will update the existing marksheet.
@@ -451,7 +540,7 @@ const AddMarksheetPageAdmin = () => {
 
       {/* ===================== ADD SUBJECT FORM ===================== */}
       {/* ===================== ADD SUBJECT (MATCH PAGE STYLES) ===================== */}
-      {selectedStudent && semester && (
+      {selectedStudent && (semester || year) && (
         <Slide direction="up" in timeout={900}>
           <Card
             sx={{
@@ -464,13 +553,23 @@ const AddMarksheetPageAdmin = () => {
           >
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
               {/* header - matches other cards */}
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2, flexWrap: "wrap", gap: 1 }}>
                 <Typography
                   variant="h6"
                   sx={{ fontWeight: 600, color: "#1e293b", display: "flex", gap: 1, alignItems: "center" }}
                 >
                   <AddIcon sx={{ color: "#10b981" }} /> Add Subject
                 </Typography>
+
+                {/* Display selected term (Semester or Year) */}
+                {(semester || year) && (
+                  <Chip
+                    label={semester ? `Semester ${semester}` : `Year ${year}`}
+                    size="small"
+                    color="info"
+                    sx={{ fontWeight: 600 }}
+                  />
+                )}
 
                 <Chip
                   label={`${subjects.length}/7`}
@@ -482,6 +581,78 @@ const AddMarksheetPageAdmin = () => {
 
               {/* content area: labels above fields like Semester card */}
               <Grid container spacing={3} alignItems="flex-start">
+                {/* Semester / Year Selection */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Box sx={{ mb: 1 }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5, color: "#1e293b" }}>
+                      Semester / Year *
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#64748b" }}>
+                      Select semester or year for this marksheet
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 6 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Semester</InputLabel>
+                        <Select
+                          value={semester || ""}
+                          label="Semester"
+                          onChange={(e) => handleSemesterChange(e.target.value)}
+                          error={!!errors.semester}
+                          disabled={subjects.length > 0 || !!year}
+                          MenuProps={{ disablePortal: true }}
+                          sx={{
+                            backgroundColor: "#f8fafc",
+                            borderRadius: 2,
+                          }}
+                        >
+                          <MenuItem value="">None</MenuItem>
+                          {[1, 2].map((s) => (
+                            <MenuItem key={s} value={s}>
+                              Semester {s}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Year</InputLabel>
+                        <Select
+                          value={year || ""}
+                          label="Year"
+                          onChange={(e) => handleYearChange(e.target.value)}
+                          error={!!errors.year}
+                          disabled={subjects.length > 0 || !!semester}
+                          MenuProps={{ disablePortal: true }}
+                          sx={{
+                            backgroundColor: "#f8fafc",
+                            borderRadius: 2,
+                          }}
+                        >
+                          <MenuItem value="">None</MenuItem>
+                          {[1, 2, 3, 4].map((y) => (
+                            <MenuItem key={y} value={y}>
+                              Year {y}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                  {errors.semester && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.semester}
+                    </Typography>
+                  )}
+                  {errors.year && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.year}
+                    </Typography>
+                  )}
+                </Grid>
+
                 {/* Course */}
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Box sx={{ mb: 1 }}>
@@ -540,7 +711,7 @@ const AddMarksheetPageAdmin = () => {
                       Choose the subject from the selected course
                     </Typography>
                   </Box>
-                  <FormControl fullWidth disabled={!selectedCourse || !semester || isLoadingSubjects}>
+                  <FormControl fullWidth disabled={!selectedCourse || (!semester && !year) || isLoadingSubjects}>
                     <Select
                       displayEmpty
                       value={currentSubject.subjectName}
@@ -563,8 +734,8 @@ const AddMarksheetPageAdmin = () => {
                       <MenuItem value="" disabled>
                         {isLoadingSubjects 
                           ? "Loading subjects..." 
-                          : !selectedCourse || !semester
-                          ? "Select Course and Semester first"
+                          : !selectedCourse || (!semester && !year)
+                          ? "Select Course and Semester/Year first"
                           : "Select Subject"}
                       </MenuItem>
                       {courseSubjects.map((sub, idx) => {
@@ -821,7 +992,9 @@ const AddMarksheetPageAdmin = () => {
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Chip label={`Semester ${semester}`} color="info" sx={{ fontWeight: 600 }} />
+                  {selectedTermLabel && (
+                    <Chip label={selectedTermLabel} color="info" sx={{ fontWeight: 600 }} />
+                  )}
                   <Chip 
                     label={`Total: ${totalMarks.toFixed(1)}`} 
                     color="primary" 

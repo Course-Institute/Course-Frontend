@@ -7,6 +7,7 @@ export interface Course {
   code?: string;
   duration?: number;
   description?: string;
+  coursesType?: string;
 }
 
 export interface CoursesResponse {

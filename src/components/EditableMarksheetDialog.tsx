@@ -32,7 +32,8 @@ interface EditableMarksheetDialogProps {
   registrationNo: string;
   studentName: string;
   marksheetId?: string;
-  semester?: string; // NEW: Semester to approve
+  semester?: string; // Semester to approve
+  year?: string; // Year to approve
 }
 
 const EditableMarksheetDialog = ({
@@ -42,15 +43,18 @@ const EditableMarksheetDialog = ({
   registrationNo,
   studentName,
   semester,
+  year,
 }: EditableMarksheetDialogProps) => {
   const [editedSubjects, setEditedSubjects] = useState<SubjectData[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   
-  // Use semester-aware hook if semester is provided, otherwise fallback to old hook
-  const semesterToUse = semester || '1'; // Default to semester 1 if not provided
+  // Use semester/year-aware hook; if year provided, omit semester
+  const semesterToUse = year ? '' : (semester || '1'); // Default to semester 1 if not provided and no year
+  const yearToUse = year || '';
   const { data: marksheet, isLoading, error } = useGetMarksheetBySemester(
     studentId,
     semesterToUse,
+    yearToUse,
     open && !!studentId
   );
   const approveMarksheetMutation = useApproveMarksheet();
@@ -92,14 +96,16 @@ const EditableMarksheetDialog = ({
   const handleSubmitAndApprove = () => {
     if (!marksheet) return;
 
-    // Get semester from marksheet or use provided semester
-    const semesterToApprove = marksheet.semester || semester || '1';
+    // Get term from marksheet or provided props
+    const semesterToApprove = year ? undefined : (marksheet.semester || semester || '1');
+    const yearToApprove = year || (marksheet as any)?.year;
 
     const approveData = {
       registrationNo,
       subjects: editedSubjects,
       marksheetId: marksheet._id,
-      semester: semesterToApprove, // Include semester in approval request
+      semester: semesterToApprove,
+      year: yearToApprove,
     };
 
     approveMarksheetMutation.mutate(approveData as any, {

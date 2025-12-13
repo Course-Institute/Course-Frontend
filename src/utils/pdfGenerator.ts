@@ -26,13 +26,6 @@ interface CenterFormData {
   internetFacility: string;
   seatingCapacity: string;
 
-  // Bank Details
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  ifsc: string;
-  branchName: string;
-
   // Documents
   gstCertificate?: File | File[] | null;
   panCard?: File | File[] | null;
@@ -202,21 +195,6 @@ export const generateCenterFormPDF = async (formData: CenterFormData): Promise<v
   addRow('Internet Facility (Yes/No):', formData.internetFacility);
   addRow('Seating Capacity:', formData.seatingCapacity);
   addRow('Upload Infrastructure Photos:', '[File Upload]');
-  
-  // Check if we need a new page
-  if (yPosition > pageHeight - 60) {
-    doc.addPage();
-    yPosition = 20;
-  }
-  
-  // Bank Details Section
-  addRow('Bank Details', '', true);
-  addRow('Bank Name:', formData.bankName);
-  addRow('Account Holder Name:', formData.accountHolder);
-  addRow('Account Number:', formData.accountNumber);
-  addRow('IFSC Code:', formData.ifsc);
-  addRow('Branch Name:', formData.branchName);
-  addRow('Upload Cancelled Cheque:', '[File Upload]');
   
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
@@ -483,16 +461,6 @@ export const generateCenterFormPreview = (formData: CenterFormData): string => {
         <tr><td>Internet Facility (Yes/No):</td><td>${formData.internetFacility || ''}</td></tr>
         <tr><td>Seating Capacity:</td><td>${formData.seatingCapacity || ''}</td></tr>
         <tr><td>Upload Infrastructure Photos:</td><td>[File Upload]</td></tr>
-      </table>
-      
-      <table class="form-table">
-        <tr><th colspan="2">Bank Details</th></tr>
-        <tr><td>Bank Name:</td><td>${formData.bankName || ''}</td></tr>
-        <tr><td>Account Holder Name:</td><td>${formData.accountHolder || ''}</td></tr>
-        <tr><td>Account Number:</td><td>${formData.accountNumber || ''}</td></tr>
-        <tr><td>IFSC Code:</td><td>${formData.ifsc || ''}</td></tr>
-        <tr><td>Branch Name:</td><td>${formData.branchName || ''}</td></tr>
-        <tr><td>Upload Cancelled Cheque:</td><td>[File Upload]</td></tr>
       </table>
       
       <table class="form-table">

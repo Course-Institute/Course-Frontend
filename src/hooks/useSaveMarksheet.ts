@@ -15,9 +15,11 @@ export interface MarksheetFormData {
   studentId: string;
   subjects: SubjectData[];
   semester?: string;
+  year?: string;
   courseId?: string; // Course ID for the marksheet
   role?: string;
   marksheetId?: string; // For updates
+  serialNo?: string; // 6-digit random serial number
 }
 
 export const useSaveMarksheet = () => {
@@ -32,8 +34,10 @@ export const useSaveMarksheet = () => {
             studentId: data.studentId,
             subjects: data.subjects,
             semester: data.semester,
+            year: data.year,
             courseId: data.courseId,
             role: data.role,
+            serialNo: data.serialNo,
           }
         );
         return response.data;

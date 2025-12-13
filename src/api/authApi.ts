@@ -69,10 +69,18 @@ export const studentLogin = async (credentials: { registrationNumber: string; da
     const response = await axiosInstance.post('/api/user/student-login', backendCredentials);
     return response.data;
   } catch (error: any) {
-    if (error.response?.data?.message) {
+    // Extract error message from various possible error formats
+    // Prioritize 'error' field as it contains more specific messages
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    } else if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
+    } else if (typeof error.response?.data === 'string') {
+      throw new Error(error.response.data);
+    } else if (error.message) {
+      throw new Error(error.message);
     }
-    throw new Error('Student login failed. Please try again.');
+    throw new Error('Invalid registration number or date of birth. Please check your credentials and try again.');
   }
 };
 
