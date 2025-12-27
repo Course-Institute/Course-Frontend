@@ -67,8 +67,17 @@ const StudentProfilePage: React.FC = () => {
       case 'profile':
         navigate('/student-dashboard');
         break;
+      case 'admitCard':
+        navigate('/student/admit-card');
+        break;
       case 'marksheet':
         navigate('/student/marksheet');
+        break;
+      case 'certificate':
+        navigate('/student/certificate');
+        break;
+      case 'migration':
+        navigate('/student/migration');
         break;
       default:
         break;

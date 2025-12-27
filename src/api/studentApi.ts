@@ -41,6 +41,9 @@ export interface StudentProfile {
   isMarksheetGenerated?: boolean;
   whichSemesterMarksheetIsGenerated?: string[];
   approvedSemesters?: string[]; // NEW: Array of approved semester numbers, e.g., ["1", "2"]
+  isAdmitCardApproved?: boolean;
+  isCertificateApproved?: boolean;
+  isMigrationApproved?: boolean;
 }
 
 export interface StudentProfileResponse {

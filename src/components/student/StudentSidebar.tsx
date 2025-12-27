@@ -11,6 +11,9 @@ import {
 import {
   Person,
   FilePresent,
+  CreditCard,
+  School,
+  Description,
 } from '@mui/icons-material';
 
 interface StudentSidebarProps {
@@ -21,7 +24,10 @@ interface StudentSidebarProps {
 const StudentSidebar: React.FC<StudentSidebarProps> = ({ activeItem, onItemClick }) => {
   const menuItems = [
     { id: 'profile', label: 'Student Profile', icon: <Person /> },
+    { id: 'admitCard', label: 'Admit Card', icon: <CreditCard /> },
     { id: 'marksheet', label: 'Marksheet', icon: <FilePresent /> },
+    { id: 'certificate', label: 'Certificate', icon: <School /> },
+    { id: 'migration', label: 'Migration Certificate', icon: <Description /> },
   ];
 
   return (

@@ -37,7 +37,13 @@ import AddMarksheetPageAdmin from './pages/admin/AddMarksheetPage';
 import AddMarksheetPageCenter from './pages/center/AddMarksheetPage';
 import EnquiryListPage from './pages/admin/EnquiryListPage';
 import StudentMarksheetPage from './pages/student/StudentMarksheetPage';
+import StudentAdmitCardPage from './pages/student/StudentAdmitCardPage';
+import StudentCertificatePage from './pages/student/StudentCertificatePage';
+import StudentMigrationCertificatePage from './pages/student/StudentMigrationCertificatePage';
 import ViewMarksheetPage from './pages/admin/ViewMarksheetPage';
+import ViewAdmitCardPage from './pages/admin/ViewAdmitCardPage';
+import ViewCertificatePage from './pages/admin/ViewCertificatePage';
+import ViewMigrationCertificatePage from './pages/admin/ViewMigrationCertificatePage';
 import CenterViewMarksheetPage from './pages/center/ViewMarksheetPage';
 import CenterProfilePage from './pages/center/CenterProfilePage';
 import CourseManagementPage from './pages/admin/CourseManagementPage';
@@ -137,6 +143,21 @@ function App() {
               <ViewMarksheetPage />
             </AdminLayout>
           } />
+          <Route path="/admin/view-admit-card/:studentId" element={
+            <AdminLayout title="VIEW ADMIT CARD">
+              <ViewAdmitCardPage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/view-certificate/:studentId" element={
+            <AdminLayout title="VIEW CERTIFICATE">
+              <ViewCertificatePage />
+            </AdminLayout>
+          } />
+          <Route path="/admin/view-migration/:studentId" element={
+            <AdminLayout title="VIEW MIGRATION CERTIFICATE">
+              <ViewMigrationCertificatePage />
+            </AdminLayout>
+          } />
           <Route path="/admin/edit-student/:id" element={
             <AdminLayout title="EDIT STUDENT">
               <EditStudentPage />
@@ -145,7 +166,10 @@ function App() {
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<StudentProfilePage />} />
+          <Route path="/student/admit-card" element={<StudentAdmitCardPage />} />
           <Route path="/student/marksheet/:semester?" element={<StudentMarksheetPage />} />
+          <Route path="/student/certificate" element={<StudentCertificatePage />} />
+          <Route path="/student/migration" element={<StudentMigrationCertificatePage />} />
 
           {/* Center Routes with Layout */}
           <Route path="/center-dashboard" element={

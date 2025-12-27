@@ -11,6 +11,7 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
 } from '@mui/material';
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
@@ -97,28 +98,40 @@ const Navbar = () => {
         {navItems.map((item) => (
           <ListItem
             key={item.id}
+            disablePadding
             onClick={() => handleNavigation(item.path)}
             sx={{
               borderRadius: 2,
               mb: 1,
-              cursor: 'pointer',
-              backgroundColor: window.location.pathname === item.path ? 'rgba(0, 81, 255, 0.1)' : 'transparent',
-              border: window.location.pathname === item.path ? '2px solid #2563eb' : '2px solid transparent',
-              '&:hover': {
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                transform: 'translateX(4px)',
-              },
-              transition: 'all 0.3s ease',
             }}
           >
-            <ListItemText
-              primary={item.label}
+            <ListItemButton
               sx={{
-                color: window.location.pathname === item.path ? '#2563eb' : '#475569',
-                fontWeight: window.location.pathname === item.path ? 'bold' : '600',
-                fontSize: '1rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                backgroundColor: window.location.pathname === item.path ? 'rgba(0, 81, 255, 0.1)' : 'transparent',
+                border: window.location.pathname === item.path ? '2px solid #2563eb' : '2px solid transparent',
+                '&:hover': {
+                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                  transform: 'translateX(4px)',
+                },
+                '&:focus': {
+                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                  outline: '2px solid #2563eb',
+                  outlineOffset: '2px',
+                },
+                transition: 'all 0.3s ease',
               }}
-            />
+            >
+              <ListItemText
+                primary={item.label}
+                sx={{
+                  color: window.location.pathname === item.path ? '#2563eb' : '#475569',
+                  fontWeight: window.location.pathname === item.path ? 'bold' : '600',
+                  fontSize: '1rem',
+                }}
+              />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
@@ -289,6 +302,7 @@ const Navbar = () => {
             Announcement:
           </Typography>
           <Typography
+            component="div"
             sx={{
               fontWeight: 600,
               fontSize: { xs: "0.875rem", md: "0.95rem" },
@@ -543,6 +557,9 @@ const Navbar = () => {
         onClose={handleDrawerToggle}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
+          disableAutoFocus: false, // Allow auto-focus on drawer open
+          disableEnforceFocus: false, // Enforce focus within drawer
+          disableRestoreFocus: false, // Restore focus when drawer closes
         }}
         sx={{
           display: { xs: "block", md: "none" },
@@ -550,7 +567,11 @@ const Navbar = () => {
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
-          <IconButton onClick={handleDrawerToggle}>
+          <IconButton 
+            onClick={handleDrawerToggle}
+            aria-label="Close drawer"
+            autoFocus
+          >
             <CloseIcon />
           </IconButton>
         </Box>

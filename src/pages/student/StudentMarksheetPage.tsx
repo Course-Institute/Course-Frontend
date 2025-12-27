@@ -105,8 +105,23 @@ const StudentMarksheetPage = () => {
       sessionStorage.setItem('hasViewedProfile', 'true');
       sessionStorage.setItem('fromMarksheet', 'true');
       navigate('/student-dashboard');
-    } else if (item === 'marksheet') {
-      navigate('/student/marksheet');
+    } else {
+      switch (item) {
+        case 'admitCard':
+          navigate('/student/admit-card');
+          break;
+        case 'marksheet':
+          navigate('/student/marksheet');
+          break;
+        case 'certificate':
+          navigate('/student/certificate');
+          break;
+        case 'migration':
+          navigate('/student/migration');
+          break;
+        default:
+          break;
+      }
     }
   };
 

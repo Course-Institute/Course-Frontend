@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -27,6 +27,9 @@ import { Search, Clear, FilterList, ExpandMore, ExpandLess, Edit, Delete } from 
 import { useStudentsData } from '../../hooks/useStudentsData';
 import { useApproveStudent } from '../../hooks/useApproveStudent';
 import { useApproveMarksheet } from '../../hooks/useApproveMarksheet';
+import { useApproveAdmitCard } from '../../hooks/useApproveAdmitCard';
+import { useApproveCertificate } from '../../hooks/useApproveCertificate';
+import { useApproveMigration } from '../../hooks/useApproveMigration';
 import { useToast } from '../../contexts/ToastContext';
 import { useQueryClient } from '@tanstack/react-query';
 import Table, { type Column } from '../../components/core-components/Table';
@@ -45,6 +48,9 @@ const ManageStudentsPage = () => {
   const [filters, setFilters] = useState<StudentsFilters>({});
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [approveMarksheetDialogOpen, setApproveMarksheetDialogOpen] = useState(false);
+  const [approveAdmitCardDialogOpen, setApproveAdmitCardDialogOpen] = useState(false);
+  const [approveCertificateDialogOpen, setApproveCertificateDialogOpen] = useState(false);
+  const [approveMigrationDialogOpen, setApproveMigrationDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [filtersExpanded, setFiltersExpanded] = useState(!isMobile);
   
@@ -79,6 +85,9 @@ const ManageStudentsPage = () => {
 
   const approveStudentMutation = useApproveStudent();
   const approveMarksheetMutation = useApproveMarksheet();
+  const approveAdmitCardMutation = useApproveAdmitCard();
+  const approveCertificateMutation = useApproveCertificate();
+  const approveMigrationMutation = useApproveMigration();
   const queryClient = useQueryClient();
   const deleteStudentMutation = useDeleteStudent();
 
@@ -223,6 +232,102 @@ const ManageStudentsPage = () => {
     setSelectedStudent(null);
   };
 
+  // Handle approve admit card
+  const handleApproveAdmitCardClick = (student: any) => {
+    setSelectedStudent(student);
+    setApproveAdmitCardDialogOpen(true);
+  };
+
+  const handleApproveAdmitCardConfirm = () => {
+    if (selectedStudent) {
+      approveAdmitCardMutation.mutate(
+        { registrationNo: selectedStudent.registrationNo },
+        {
+          onSuccess: (data: any) => {
+            showToast(data.message || 'Admit card approved successfully!', 'success');
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            setApproveAdmitCardDialogOpen(false);
+            setSelectedStudent(null);
+          },
+          onError: (error: any) => {
+            showToast(error?.message || 'Failed to approve admit card', 'error');
+            setApproveAdmitCardDialogOpen(false);
+            setSelectedStudent(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleApproveAdmitCardCancel = () => {
+    setApproveAdmitCardDialogOpen(false);
+    setSelectedStudent(null);
+  };
+
+  // Handle approve certificate
+  const handleApproveCertificateClick = (student: any) => {
+    setSelectedStudent(student);
+    setApproveCertificateDialogOpen(true);
+  };
+
+  const handleApproveCertificateConfirm = () => {
+    if (selectedStudent) {
+      approveCertificateMutation.mutate(
+        { registrationNo: selectedStudent.registrationNo },
+        {
+          onSuccess: (data: any) => {
+            showToast(data.message || 'Certificate approved successfully!', 'success');
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            setApproveCertificateDialogOpen(false);
+            setSelectedStudent(null);
+          },
+          onError: (error: any) => {
+            showToast(error?.message || 'Failed to approve certificate', 'error');
+            setApproveCertificateDialogOpen(false);
+            setSelectedStudent(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleApproveCertificateCancel = () => {
+    setApproveCertificateDialogOpen(false);
+    setSelectedStudent(null);
+  };
+
+  // Handle approve migration
+  const handleApproveMigrationClick = (student: any) => {
+    setSelectedStudent(student);
+    setApproveMigrationDialogOpen(true);
+  };
+
+  const handleApproveMigrationConfirm = () => {
+    if (selectedStudent) {
+      approveMigrationMutation.mutate(
+        { registrationNo: selectedStudent.registrationNo },
+        {
+          onSuccess: (data: any) => {
+            showToast(data.message || 'Migration certificate approved successfully!', 'success');
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            setApproveMigrationDialogOpen(false);
+            setSelectedStudent(null);
+          },
+          onError: (error: any) => {
+            showToast(error?.message || 'Failed to approve migration certificate', 'error');
+            setApproveMigrationDialogOpen(false);
+            setSelectedStudent(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleApproveMigrationCancel = () => {
+    setApproveMigrationDialogOpen(false);
+    setSelectedStudent(null);
+  };
+
   const handleEditStudent = (student: any) => {
     const id = student.studentId || student._id || student.id;
     navigate(`/admin/edit-student/${id}`);
@@ -283,11 +388,6 @@ const ManageStudentsPage = () => {
     {
       field: 'grade',
       headerName: 'Grade',
-      minWidth: '120px',
-    },
-    {
-      field: 'stream',
-      headerName: 'Stream',
       minWidth: '120px',
     },
     {
@@ -395,6 +495,69 @@ const ManageStudentsPage = () => {
       ),
     },
     {
+      field: 'admitCard',
+      headerName: 'Admit Card',
+      width: '150px',
+      align: 'center',
+      getActions: (row: any) => {
+        if (!row.isApprovedByAdmin) {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
+              Not approved
+            </Typography>
+          );
+        }
+        
+        if (row.isAdmitCardApproved) {
+          return (
+            <Button 
+              size="small" 
+              variant="outlined" 
+              disabled 
+              sx={{ 
+                color: '#8b5cf6', 
+                borderColor: '#8b5cf6', 
+                background: 'rgba(139,92,246,0.08)', 
+                borderRadius: 10, 
+                height: 26, 
+                px: 1.5, 
+                minWidth: 120, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap' 
+              }}
+            >
+              Approved
+            </Button>
+          );
+        }
+        
+        return (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => handleApproveAdmitCardClick(row)}
+            disabled={approveAdmitCardMutation.isPending}
+            sx={{ 
+              background: '#6366f1', 
+              color: '#fff', 
+              borderRadius: 10, 
+              height: 26, 
+              px: 1.5, 
+              minWidth: 120, 
+              fontSize: 11, 
+              textTransform: 'none', 
+              whiteSpace: 'nowrap', 
+              boxShadow: 'none', 
+              '&:hover': { background: '#4f46e5' } 
+            }}
+          >
+            Approve
+          </Button>
+        );
+      },
+    },
+    {
       field: 'marksheet',
       headerName: 'Marksheet',
       width: '250px',
@@ -499,84 +662,301 @@ const ManageStudentsPage = () => {
       },
     },
     {
-      field: 'view',
-      headerName: 'View',
-      width: '200px',
+      field: 'certificate',
+      headerName: 'Certificate',
+      width: '150px',
       align: 'center',
       getActions: (row: any) => {
+        if (!row.isApprovedByAdmin) {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
+              Not approved
+            </Typography>
+          );
+        }
+        
+        if (row.isCertificateApproved) {
+          return (
+            <Button 
+              size="small" 
+              variant="outlined" 
+              disabled 
+              sx={{ 
+                color: '#8b5cf6', 
+                borderColor: '#8b5cf6', 
+                background: 'rgba(139,92,246,0.08)', 
+                borderRadius: 10, 
+                height: 26, 
+                px: 1.5, 
+                minWidth: 120, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap' 
+              }}
+            >
+              Approved
+            </Button>
+          );
+        }
+        
+        return (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => handleApproveCertificateClick(row)}
+            disabled={approveCertificateMutation.isPending}
+            sx={{ 
+              background: '#6366f1', 
+              color: '#fff', 
+              borderRadius: 10, 
+              height: 26, 
+              px: 1.5, 
+              minWidth: 120, 
+              fontSize: 11, 
+              textTransform: 'none', 
+              whiteSpace: 'nowrap', 
+              boxShadow: 'none', 
+              '&:hover': { background: '#4f46e5' } 
+            }}
+          >
+            Approve
+          </Button>
+        );
+      },
+    },
+    {
+      field: 'migration',
+      headerName: 'Migration',
+      width: '150px',
+      align: 'center',
+      getActions: (row: any) => {
+        if (!row.isApprovedByAdmin) {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
+              Not approved
+            </Typography>
+          );
+        }
+        
+        if (row.isMigrationApproved) {
+          return (
+            <Button 
+              size="small" 
+              variant="outlined" 
+              disabled 
+              sx={{ 
+                color: '#8b5cf6', 
+                borderColor: '#8b5cf6', 
+                background: 'rgba(139,92,246,0.08)', 
+                borderRadius: 10, 
+                height: 26, 
+                px: 1.5, 
+                minWidth: 120, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap' 
+              }}
+            >
+              Approved
+            </Button>
+          );
+        }
+        
+        return (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => handleApproveMigrationClick(row)}
+            disabled={approveMigrationMutation.isPending}
+            sx={{ 
+              background: '#6366f1', 
+              color: '#fff', 
+              borderRadius: 10, 
+              height: 26, 
+              px: 1.5, 
+              minWidth: 120, 
+              fontSize: 11, 
+              textTransform: 'none', 
+              whiteSpace: 'nowrap', 
+              boxShadow: 'none', 
+              '&:hover': { background: '#4f46e5' } 
+            }}
+          >
+            Approve
+          </Button>
+        );
+      },
+    },
+    {
+      field: 'view',
+      headerName: 'View',
+      width: '400px',
+      align: 'center',
+      getActions: (row: any) => {
+        const studentId = row.studentId || row._id || row.id;
+        const views: React.ReactElement[] = [];
+        
+        // Admit Card View
+        if (row.isAdmitCardApproved) {
+          views.push(
+            <Button
+              key="admitCard"
+              size="small"
+              variant="outlined"
+              sx={{ 
+                color: '#6366f1', 
+                borderColor: '#6366f1', 
+                borderRadius: 10, 
+                height: 24, 
+                px: 0.75, 
+                minWidth: 'auto', 
+                fontWeight: 600, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap', 
+                background: 'white',
+                mr: 0.5
+              }}
+              onClick={() => navigate(`/admin/view-admit-card/${studentId}`)}
+            >
+              Admit Card
+            </Button>
+          );
+        }
+        
+        // Marksheet View
         const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
         const yearsWithMarksheet: string[] = (row as any).whichYearMarksheetIsGenerated || [];
         const isYearBased = yearsWithMarksheet.length > 0;
         const terms = isYearBased ? yearsWithMarksheet : semestersWithMarksheet;
         const termLabel = isYearBased ? 'Year' : 'Semester';
         const buildViewUrl = (term: string) => {
-          const id = row.studentId || row._id || row.id;
           return isYearBased
-            ? `/admin/view-marksheet/${id}/${term}?year=${term}`
-            : `/admin/view-marksheet/${id}/${term}`;
+            ? `/admin/view-marksheet/${studentId}/${term}?year=${term}`
+            : `/admin/view-marksheet/${studentId}/${term}`;
         };
         
         if (terms.length > 0) {
-          // If multiple semesters, show dropdown menu
-          if (terms.length > 1) {
-            return (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-                {terms.map((sem: string) => (
-                  <Button
-                    key={sem}
-                    size="small"
-                    variant="outlined"
-                    sx={{ 
-                      color: '#6366f1', 
-                      borderColor: '#6366f1', 
-                      borderRadius: 10, 
-                      height: 24, 
-                      px: 1, 
-                      minWidth: 120, 
-                      fontWeight: 600, 
-                      fontSize: 10, 
-                      textTransform: 'none', 
-                      whiteSpace: 'nowrap', 
-                      background: 'white' 
-                    }}
-                onClick={() => navigate(buildViewUrl(sem))}
-                  >
-                    {termLabel} {sem}
-                  </Button>
-                ))}
-              </Box>
-            );
-          } else {
-            // Single semester
-            const term = terms[0];
-            return (
+          terms.forEach((sem: string) => {
+            views.push(
               <Button
+                key={`marksheet-${sem}`}
                 size="small"
                 variant="outlined"
-                sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 160, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
-                onClick={() => navigate(buildViewUrl(term))}
+                sx={{ 
+                  color: '#6366f1', 
+                  borderColor: '#6366f1', 
+                  borderRadius: 10, 
+                  height: 24, 
+                  px: 1, 
+                  minWidth: 110, 
+                  fontWeight: 600, 
+                  fontSize: 11, 
+                  textTransform: 'none', 
+                  whiteSpace: 'nowrap', 
+                  background: 'white',
+                  mr: 0.5
+                }}
+                onClick={() => navigate(buildViewUrl(sem))}
               >
-                Show Marksheet ({termLabel} {term})
+                Marksheet ({termLabel} {sem})
               </Button>
             );
-          }
+          });
         } else if (row.isMarksheetGenerated) {
-          // Fallback for backward compatibility - default to semester 1
-          return (
+          views.push(
             <Button
+              key="marksheet"
               size="small"
               variant="outlined"
-              sx={{ color: '#6366f1', borderColor: '#6366f1', borderRadius: 10, height: 26, px: 1.5, minWidth: 136, fontWeight: 600, fontSize: 11, textTransform: 'none', whiteSpace: 'nowrap', background: 'white' }}
-              onClick={() => navigate(`/admin/view-marksheet/${row.studentId || row._id || row.id}/1`)}
+              sx={{ 
+                color: '#6366f1', 
+                borderColor: '#6366f1', 
+                borderRadius: 10, 
+                height: 24, 
+                px: 0.75, 
+                minWidth: 'auto', 
+                fontWeight: 600, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap', 
+                background: 'white',
+                mr: 0.5
+              }}
+              onClick={() => navigate(`/admin/view-marksheet/${studentId}/1`)}
             >
-              Show Marksheet
+              Marksheet
             </Button>
           );
-        } else {
+        }
+        
+        // Certificate View
+        if (row.isCertificateApproved) {
+          views.push(
+            <Button
+              key="certificate"
+              size="small"
+              variant="outlined"
+              sx={{ 
+                color: '#6366f1', 
+                borderColor: '#6366f1', 
+                borderRadius: 10, 
+                height: 24, 
+                px: 0.75, 
+                minWidth: 'auto', 
+                fontWeight: 600, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap', 
+                background: 'white',
+                mr: 0.5
+              }}
+              onClick={() => navigate(`/admin/view-certificate/${studentId}`)}
+            >
+              Certificate
+            </Button>
+          );
+        }
+        
+        // Migration Certificate View
+        if (row.isMigrationApproved) {
+          views.push(
+            <Button
+              key="migration"
+              size="small"
+              variant="outlined"
+              sx={{ 
+                color: '#6366f1', 
+                borderColor: '#6366f1', 
+                borderRadius: 10, 
+                height: 24, 
+                px: 0.75, 
+                minWidth: 'auto', 
+                fontWeight: 600, 
+                fontSize: 11, 
+                textTransform: 'none', 
+                whiteSpace: 'nowrap', 
+                background: 'white',
+                mr: 0.5
+              }}
+              onClick={() => navigate(`/admin/view-migration/${studentId}`)}
+            >
+              Migration
+            </Button>
+          );
+        }
+        
+        if (views.length === 0) {
           return (
             <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>N/A</Typography>
           );
         }
+        
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: 0.5, justifyContent: 'center', alignItems: 'center', overflowX: 'auto' }}>
+            {views}
+          </Box>
+        );
       },
     },
   ];
@@ -1280,6 +1660,45 @@ const ManageStudentsPage = () => {
             year={selectedStudent.yearToApprove}
           />
         )}
+
+        {/* Approve Admit Card Confirmation Dialog */}
+        <ConfirmationDialog
+          open={approveAdmitCardDialogOpen}
+          onClose={handleApproveAdmitCardCancel}
+          onConfirm={handleApproveAdmitCardConfirm}
+          title="Approve Admit Card"
+          message={`Are you sure you want to approve admit card for student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})?`}
+          confirmText="Approve"
+          cancelText="Cancel"
+          isLoading={approveAdmitCardMutation.isPending}
+          severity="info"
+        />
+
+        {/* Approve Certificate Confirmation Dialog */}
+        <ConfirmationDialog
+          open={approveCertificateDialogOpen}
+          onClose={handleApproveCertificateCancel}
+          onConfirm={handleApproveCertificateConfirm}
+          title="Approve Certificate"
+          message={`Are you sure you want to approve certificate for student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})?`}
+          confirmText="Approve"
+          cancelText="Cancel"
+          isLoading={approveCertificateMutation.isPending}
+          severity="info"
+        />
+
+        {/* Approve Migration Confirmation Dialog */}
+        <ConfirmationDialog
+          open={approveMigrationDialogOpen}
+          onClose={handleApproveMigrationCancel}
+          onConfirm={handleApproveMigrationConfirm}
+          title="Approve Migration Certificate"
+          message={`Are you sure you want to approve migration certificate for student ${selectedStudent?.candidateName} (${selectedStudent?.registrationNo})?`}
+          confirmText="Approve"
+          cancelText="Cancel"
+          isLoading={approveMigrationMutation.isPending}
+          severity="info"
+        />
       </Container>
     </ErrorBoundary>
   );
