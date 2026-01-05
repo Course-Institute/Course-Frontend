@@ -9,6 +9,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { useRef, useState, useEffect } from 'react';
 
 interface StudentData {
@@ -102,23 +103,37 @@ const IdCardGenerationPage = () => {
         // Additional wait to ensure everything is rendered
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        const width = idCardRef.current.offsetWidth;
+        const height = idCardRef.current.offsetHeight;
+        const scale = 2;
+        
         const canvas = await html2canvas(idCardRef.current, {
           backgroundColor: '#ffffff',
-          scale: 1,
+          scale: scale,
           useCORS: true,
           allowTaint: true,
           logging: false,
-          width: idCardRef.current.offsetWidth,
-          height: idCardRef.current.offsetHeight,
+          width: width,
+          height: height,
         });
         
-        const link = document.createElement('a');
-        link.download = `student-id-card-${studentData.candidateName.replace(/\s+/g, '-')}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Create PDF with the actual dimensions
+        const pdf = new jsPDF({
+          orientation: width > height ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [width, height],
+          compress: false,
+        });
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height, undefined, 'SLOW');
+        
+        const fileName = `student-id-card-${studentData.candidateName.replace(/\s+/g, '-')}.pdf`;
+        pdf.save(fileName);
       } catch (error) {
-        console.error('Error generating image:', error);
-        alert('Error generating ID card image. Please try again.');
+        console.error('Error generating ID card PDF:', error);
+        alert('Error generating ID card PDF. Please try again.');
       } finally {
         setIsDownloading(false);
       }
@@ -395,7 +410,7 @@ const IdCardGenerationPage = () => {
           disabled={isDownloading}
           sx={{ textTransform: 'none' }}
         >
-          {isDownloading ? 'Generating...' : 'Download ID Card'}
+          {isDownloading ? 'Generating PDF...' : 'Download ID Card (PDF)'}
         </Button>
       </Box>
     </Container>

@@ -1,7 +1,8 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Fragment, useRef, useState, useMemo } from 'react';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   Box,
   Typography,
@@ -18,26 +19,22 @@ import {
 } from '@mui/material';
 import { ArrowBack, Download } from '@mui/icons-material';
 import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
+import { useAllSubjects } from '../../hooks/useAllSubjects';
 import { getStudentDetails } from '../../api/studentsApi';
 import { useQuery } from '@tanstack/react-query';
 
 const CenterViewMarksheetPage = () => {
   const { marksheetId, semester } = useParams<{ marksheetId: string; semester?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const marksheetRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   
-  // Use semester from URL or default to "1" for backward compatibility
-  const semesterValue = semester || "1";
+  // Read optional year from query string
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const yearParam = searchParams.get('year') || '';
   
-  const { data: marksheet, isLoading, error } = useGetMarksheetBySemester(
-    marksheetId || '', 
-    semesterValue,
-    '',
-    !!marksheetId
-  );
-  
-  // Fetch student data to check approval status
+  // Fetch student data first to determine if marksheet is year-based or semester-based
   // Add refetch interval to check for approval updates
   const { data: studentData, isLoading: isLoadingStudent } = useQuery({
     queryKey: ['student', marksheetId],
@@ -73,9 +70,60 @@ const CenterViewMarksheetPage = () => {
     staleTime: 0, // Always consider data stale to refetch on focus
     refetchOnWindowFocus: true, // Refetch when window regains focus
   });
+
+  // Determine if marksheet is year-based or semester-based from student data
+  const isYearBased = useMemo(() => {
+    if (!studentData) return false;
+    const yearsWithMarksheet: string[] = (studentData as any)?.whichYearMarksheetIsGenerated || [];
+    return yearsWithMarksheet.length > 0;
+  }, [studentData]);
+
+  // Determine semester and year values based on marksheet type and URL params
+  const semesterValue = useMemo(() => {
+    // If year is provided in query string, don't send semester
+    if (yearParam) return '';
+    // If marksheet is year-based, don't send semester
+    if (isYearBased) return '';
+    // Otherwise use semester from URL or default to "1"
+    return semester || "1";
+  }, [yearParam, isYearBased, semester]);
+
+  const yearValue = useMemo(() => {
+    // If year is provided in query string, use it
+    if (yearParam) return yearParam;
+    // If marksheet is year-based and semester is provided, treat it as year
+    if (isYearBased && semester) return semester;
+    // Otherwise return empty string
+    return '';
+  }, [yearParam, isYearBased, semester]);
   
-  // Check if this semester is approved - use useMemo to ensure stable decision
-  // IMPORTANT: Centers should ONLY see marksheet template if semester is explicitly approved
+  const { data: marksheet, isLoading, error } = useGetMarksheetBySemester(
+    marksheetId || '', 
+    semesterValue,
+    yearValue,
+    !!marksheetId && !isLoadingStudent
+  );
+
+  // Fetch all subjects to get subject codes
+  const { subjects: allSubjects } = useAllSubjects();
+
+  // Match marksheet subjects with all subjects to get codes
+  const subjectsWithCodes = useMemo(() => {
+    if (!marksheet?.subjects) return [];
+    
+    return marksheet.subjects.map((subject) => {
+      const matchedSubject = allSubjects.find(
+        (s) => s.name.toLowerCase() === subject.subjectName.toLowerCase()
+      );
+      return {
+        ...subject,
+        subjectCode: matchedSubject?.code || '',
+      };
+    });
+  }, [marksheet?.subjects, allSubjects]);
+  
+  // Check if this semester/year is approved - use useMemo to ensure stable decision
+  // IMPORTANT: Centers should ONLY see marksheet template if semester/year is explicitly approved
   // Default to table view (marks only) if approval status is unclear
   const showTableOnly = useMemo(() => {
     // Wait for data to load before making decision
@@ -83,36 +131,61 @@ const CenterViewMarksheetPage = () => {
       return true; // Default to table view while loading (safer)
     }
     
+    const termToCheck = isYearBased ? yearValue : semesterValue;
     const approvedSemesters: string[] = studentData.approvedSemesters || [];
+    const approvedYears: string[] = (studentData as any)?.approvedYears || [];
     const hasApprovedSemestersField = 'approvedSemesters' in studentData;
+    const hasApprovedYearsField = 'approvedYears' in studentData;
     
     // Determine approval status - be STRICT: only show marksheet if explicitly approved
     let approved = false;
     
-    if (hasApprovedSemestersField) {
-      // New system: semester MUST be explicitly in approvedSemesters array
-      // If array is empty or semester not in array, it's NOT approved
-      // NEVER fall back to old flag if approvedSemesters field exists
-      approved = approvedSemesters.length > 0 && approvedSemesters.includes(semesterValue);
+    if (isYearBased) {
+      // Year-based marksheet
+      if (hasApprovedYearsField) {
+        // New system: year MUST be explicitly in approvedYears array
+        approved = approvedYears.length > 0 && approvedYears.includes(termToCheck);
+      } else {
+        // Old system: only use global flag if approvedYears field doesn't exist at all
+        approved = studentData.isMarksheetAndCertificateApproved || false;
+      }
+      
+      // CRITICAL: If approvedYears field exists but year is not in it, force NOT approved
+      if (hasApprovedYearsField && !approvedYears.includes(termToCheck)) {
+        approved = false;
+      }
     } else {
-      // Old system: only use global flag if approvedSemesters field doesn't exist at all
-      // This is for backward compatibility with old data that hasn't been migrated
-      // For new semesters, this should be false by default
-      approved = studentData.isMarksheetAndCertificateApproved || false;
-    }
-    
-    // CRITICAL: If approvedSemesters field exists but semester is not in it, force NOT approved
-    // This prevents showing marksheet template for unapproved semesters
-    if (hasApprovedSemestersField && !approvedSemesters.includes(semesterValue)) {
-      approved = false;
+      // Semester-based marksheet
+      if (hasApprovedSemestersField) {
+        // New system: semester MUST be explicitly in approvedSemesters array
+        // If array is empty or semester not in array, it's NOT approved
+        // NEVER fall back to old flag if approvedSemesters field exists
+        approved = approvedSemesters.length > 0 && approvedSemesters.includes(termToCheck);
+      } else {
+        // Old system: only use global flag if approvedSemesters field doesn't exist at all
+        // This is for backward compatibility with old data that hasn't been migrated
+        // For new semesters, this should be false by default
+        approved = studentData.isMarksheetAndCertificateApproved || false;
+      }
+      
+      // CRITICAL: If approvedSemesters field exists but semester is not in it, force NOT approved
+      // This prevents showing marksheet template for unapproved semesters
+      if (hasApprovedSemestersField && !approvedSemesters.includes(termToCheck)) {
+        approved = false;
+      }
     }
     
     // Debug logging - check what's happening
     console.log('Center View Marksheet Approval Check:', {
+      isYearBased,
+      termToCheck,
       semesterValue,
+      yearValue,
       hasApprovedSemestersField,
+      hasApprovedYearsField,
       approvedSemesters,
-      isInArray: approvedSemesters.includes(semesterValue),
+      approvedYears,
+      isInArray: isYearBased ? approvedYears.includes(termToCheck) : approvedSemesters.includes(termToCheck),
       isMarksheetAndCertificateApproved: studentData.isMarksheetAndCertificateApproved,
       approved,
       showTableOnly: !approved,
@@ -121,7 +194,7 @@ const CenterViewMarksheetPage = () => {
     
     // Show table if NOT approved (default to table view for safety)
     return !approved;
-  }, [isLoadingStudent, studentData, semesterValue]);
+  }, [isLoadingStudent, studentData, semesterValue, yearValue, isYearBased]);
   
   if (isLoading || isLoadingStudent) {
     return (
@@ -169,26 +242,67 @@ const CenterViewMarksheetPage = () => {
     if (marksheetRef.current && marksheet) {
       setIsDownloading(true);
       try {
+        // Wait for all images to load before capturing
+        const images = marksheetRef.current.querySelectorAll('img');
+        await Promise.all(
+          Array.from(images).map((img) => {
+            return new Promise((resolve) => {
+              if (img.complete && img.naturalWidth > 0) {
+                resolve(true);
+              } else {
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(true);
+              }
+            });
+          })
+        );
+
         // Additional wait to ensure everything is rendered
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        const width = marksheetRef.current.scrollWidth;
+        const height = marksheetRef.current.scrollHeight;
+        // Increase scale for better quality (3x for high quality, 4x for very high quality)
+        const scale = 3;
+        
         const canvas = await html2canvas(marksheetRef.current, {
           backgroundColor: '#ffffff',
-          scale: 2, // Higher scale for better quality
+          scale: scale,
           useCORS: true,
           allowTaint: true,
           logging: false,
-          windowWidth: marksheetRef.current.scrollWidth,
-          windowHeight: marksheetRef.current.scrollHeight,
+          windowWidth: width,
+          windowHeight: height,
+          removeContainer: false,
+          imageTimeout: 15000,
+          onclone: (clonedDoc) => {
+            // Ensure all fonts are loaded
+            const clonedWindow = clonedDoc.defaultView;
+            if (clonedWindow) {
+              clonedWindow.document.fonts.ready;
+            }
+          },
         });
         
-        const link = document.createElement('a');
-        link.download = `marksheet-${marksheet.studentId.registrationNo}-${marksheet.studentId.candidateName.replace(/\s+/g, '-')}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
+        // Use maximum quality PNG
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Create PDF with the actual dimensions
+        const pdf = new jsPDF({
+          orientation: width > height ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [width, height],
+          compress: false,
+        });
+        
+        // Use 'FAST' compression for better quality (SLOW can degrade quality)
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height, undefined, 'FAST');
+        
+        const fileName = `marksheet-${marksheet.studentId.registrationNo}-${marksheet.studentId.candidateName.replace(/\s+/g, '-')}.pdf`;
+        pdf.save(fileName);
       } catch (error) {
-        console.error('Error generating marksheet image:', error);
-        alert('Error generating marksheet image. Please try again.');
+        console.error('Error generating marksheet PDF:', error);
+        alert('Error generating marksheet PDF. Please try again.');
       } finally {
         setIsDownloading(false);
       }
@@ -204,7 +318,7 @@ const CenterViewMarksheetPage = () => {
             Pending Admin Approval
           </Typography>
           <Typography variant="body2">
-            This marksheet for Semester {semesterValue} is pending admin approval. 
+            This marksheet for {isYearBased ? `Year ${yearValue}` : `Semester ${semesterValue}`} is pending admin approval. 
             You can view the marks you've entered below. Once approved by admin, students will be able to view this marksheet.
           </Typography>
         </Alert>
@@ -328,7 +442,7 @@ const CenterViewMarksheetPage = () => {
             '&:hover': { backgroundColor: '#059669' },
           }}
         >
-          {isDownloading ? 'Generating...' : 'Download Marksheet'}
+          {isDownloading ? 'Generating PDF...' : 'Download Marksheet (PDF)'}
         </Button>
       </Box>
 
@@ -365,26 +479,26 @@ const CenterViewMarksheetPage = () => {
         {/* Student Details Overlay - Only Values with Absolute Positioning */}
         <Box sx={{ position: 'relative', height: '100%', zIndex: 1 }}>
           {/* Left Column */}
-          <Box sx={{ position: 'absolute', left: '224px', top: '455px' }}>
+          <Box sx={{ position: 'absolute', left: '220px', top: '454px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {marksheet.studentId.candidateName}
             </Typography>
           </Box>
           
-          <Box sx={{ position: 'absolute', left: '224px', top: '492px' }}>
+          <Box sx={{ position: 'absolute', left: '221px', top: '491px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {marksheet.studentId.fatherName}
             </Typography>
           </Box>
           
-          <Box sx={{ position: 'absolute', left: '227px', top: '528px' }}>
+          <Box sx={{ position: 'absolute', left: '227px', top: '527px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {marksheet.studentId.motherName}
             </Typography>
           </Box>
           
-          <Box sx={{ position: 'absolute', left: '217px', top: '563px' }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
+          <Box sx={{ position: 'absolute', left: '210px', top: '565px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.1rem' }}>
               {typeof marksheet.courseId === 'object' && marksheet.courseId?.name 
                 ? marksheet.courseId.name 
                 : marksheet.studentId.course}
@@ -392,19 +506,19 @@ const CenterViewMarksheetPage = () => {
           </Box>
 
           {/* Right Column */}
-          <Box sx={{ position: 'absolute', left: '705px', top: '455px' }}>
+          <Box sx={{ position: 'absolute', left: '765px', top: '455px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {marksheet.studentId.registrationNo}
             </Typography>
           </Box>
           
-          <Box sx={{ position: 'absolute', left: '705px', top: '492px' }}>
+          <Box sx={{ position: 'absolute', left: '765px', top: '491px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {new Date(marksheet.studentId.dateOfBirth).toLocaleDateString('en-GB')}
             </Typography>
           </Box>
           
-          <Box sx={{ position: 'absolute', left: '658px', top: '528px' }}>
+          <Box sx={{ position: 'absolute', left: '718px', top: '527px' }}>
             <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
               {marksheet.studentId.session}
             </Typography>
@@ -415,22 +529,29 @@ const CenterViewMarksheetPage = () => {
               {marksheet.serialNo || ''}
             </Typography>
           </Box>
-          
-          {/* Semester - placed below session */}
-          <Box sx={{ position: 'absolute', left: '564px', top: '560px' }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
-              Semester {semesterValue}
+
+          {/* Term label */}
+          <Box sx={{ position: 'absolute', left: '750px', top: '563px' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
+              {isYearBased ? `(Year ${yearValue})` : `(Semester ${semesterValue})`}
             </Typography>
           </Box>
 
           {/* Subjects Table with Absolute Positioning */}
-          {marksheet.subjects && marksheet.subjects.length > 0 && (
+          {subjectsWithCodes.length > 0 && (
             <>
-              {marksheet.subjects.map((subject, index) => (
+              {subjectsWithCodes.map((subject, index) => (
                 <Fragment key={index}>
+                  {/* Subject Code - Extract only numbers */}
+                  <Box sx={{ position: 'absolute', left: '70px', top: `${742 + index * 53}px` }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                      {subject.subjectCode ? subject.subjectCode.replace(/\D/g, '') || 'N/A' : 'N/A'}
+                    </Typography>
+                  </Box>
+                  
                   {/* Subject Name */}
-                  <Box sx={{ position: 'absolute', left: '130px', top: `${746 + index * 53}px` }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' ,fontSize: '0.8rem' }}>
+                  <Box sx={{ position: 'absolute', left: '130px', top: `${742 + index * 53}px` }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' ,fontSize: '1.1rem' }}>
                       {subject.subjectName}
                     </Typography>
                   </Box>
@@ -481,13 +602,13 @@ const CenterViewMarksheetPage = () => {
               
               {/* Total Row */}
               {(() => {
-                const totalMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.marks || 0), 0);
-                const totalInternal = marksheet.subjects.reduce((sum, subject) => sum + (subject.internal || 0), 0);
-                const totalTotal = marksheet.subjects.reduce((sum, subject) => sum + (subject.total || 0), 0);
-                const totalMinMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.minMarks || 0), 0);
-                const totalMaxMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
+                const totalMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.marks || 0), 0);
+                const totalInternal = subjectsWithCodes.reduce((sum, subject) => sum + (subject.internal || 0), 0);
+                const totalTotal = subjectsWithCodes.reduce((sum, subject) => sum + (subject.total || 0), 0);
+                const totalMinMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.minMarks || 0), 0);
+                const totalMaxMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
                 const percentage = totalMaxMarks > 0 ? ((totalTotal / totalMaxMarks) * 100).toFixed(2) : '0.00';
-                const totalRowTop = 736 + marksheet.subjects.length * 53;
+                const totalRowTop = 736 + subjectsWithCodes.length * 53;
                 const percentageRowTop = totalRowTop + 50;
                 
                 return (

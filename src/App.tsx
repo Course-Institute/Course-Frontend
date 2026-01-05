@@ -212,6 +212,21 @@ function App() {
               <CenterViewMarksheetPage />
             </CenterLayout>
           } />
+          <Route path="/center/view-admit-card/:studentId" element={
+            <CenterLayout title="VIEW ADMIT CARD">
+              <ViewAdmitCardPage />
+            </CenterLayout>
+          } />
+          <Route path="/center/view-certificate/:studentId" element={
+            <CenterLayout title="VIEW CERTIFICATE">
+              <ViewCertificatePage />
+            </CenterLayout>
+          } />
+          <Route path="/center/view-migration/:studentId" element={
+            <CenterLayout title="VIEW MIGRATION CERTIFICATE">
+              <ViewMigrationCertificatePage />
+            </CenterLayout>
+          } />
           <Route path="/center/profile" element={
             <CenterLayout title="CENTER PROFILE">
               <CenterProfilePage />

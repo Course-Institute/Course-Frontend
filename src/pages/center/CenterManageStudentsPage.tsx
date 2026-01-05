@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -325,104 +325,243 @@ const CenterManageStudentsPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: '150px',
+      minWidth: '250px',
+      width: 'auto',
       align: 'center',
       getActions: (row: any) => {
-        // Check if student has whichSemesterMarksheetIsGenerated array
+        const studentId = row.studentId || row._id || row.id;
+        const actions: React.ReactElement[] = [];
+        
+        // Check if student has whichSemesterMarksheetIsGenerated or whichYearMarksheetIsGenerated array
         const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
+        const yearsWithMarksheet: string[] = row.whichYearMarksheetIsGenerated || [];
+        const isYearBased = yearsWithMarksheet.length > 0;
+        const terms = isYearBased ? yearsWithMarksheet : semestersWithMarksheet;
+        
         const approvedSemesters: string[] = row.approvedSemesters || [];
+        const approvedYears: string[] = row.approvedYears || [];
+        const approvedTerms = isYearBased ? approvedYears : approvedSemesters;
         
-        // For backward compatibility: if approvedSemesters is empty but isMarksheetAndCertificateApproved is true,
-        // treat all semesters as approved
-        const allSemestersApproved = row.isMarksheetAndCertificateApproved && approvedSemesters.length === 0;
+        // For backward compatibility: if approvedTerms is empty but isMarksheetAndCertificateApproved is true,
+        // treat all terms as approved
+        const allTermsApproved = row.isMarksheetAndCertificateApproved && approvedTerms.length === 0;
         
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
-            {row.isMarksheetGenerated && semestersWithMarksheet.length > 0 ? (
-              semestersWithMarksheet.length > 1 ? (
-                // Multiple semesters - show all with different labels for approved/unapproved
-                semestersWithMarksheet.map((sem: string) => {
-                  const isApproved = allSemestersApproved || approvedSemesters.includes(sem);
-                  return (
-                    <Button
-                      key={sem}
-                      size="small"
-                      variant="outlined"
-                      onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
-                      sx={{
-                        borderColor: isApproved ? '#10b981' : '#3b82f6',
-                        color: isApproved ? '#10b981' : '#3b82f6',
-                        textTransform: 'none',
-                        fontSize: '0.7rem',
-                        fontWeight: 500,
-                        px: 1.5,
-                        py: 0.4,
-                        borderRadius: 2,
-                        minWidth: 100,
-                        '&:hover': {
-                          borderColor: isApproved ? '#059669' : '#2563eb',
-                          backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
-                        },
-                      }}
-                    >
-                      {isApproved ? `Sem ${sem}` : `View Marks ${sem}`}
-                    </Button>
-                  );
-                })
-              ) : (
-                // Single semester
-                (() => {
-                  const sem = semestersWithMarksheet[0];
-                  const isApproved = allSemestersApproved || approvedSemesters.includes(sem);
-                  return (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/${sem}`)}
-                      sx={{
-                        borderColor: isApproved ? '#10b981' : '#3b82f6',
-                        color: isApproved ? '#10b981' : '#3b82f6',
-                        textTransform: 'none',
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: 2,
-                        '&:hover': {
-                          borderColor: isApproved ? '#059669' : '#2563eb',
-                          backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
-                        },
-                      }}
-                    >
-                      {isApproved ? 'VIEW MARKSHEET' : 'VIEW MARKS'}
-                    </Button>
-                  );
-                })()
-              )
-            ) : row.isMarksheetGenerated ? (
-              // Fallback for backward compatibility
+        // Marksheet View Buttons
+        if (row.isMarksheetGenerated && terms.length > 0) {
+          if (terms.length > 1) {
+            // Multiple terms - show all with different labels for approved/unapproved
+            terms.forEach((term: string) => {
+              const isApproved = allTermsApproved || approvedTerms.includes(term);
+              const termLabel = isYearBased ? 'Year' : 'Sem';
+              actions.push(
+                <Button
+                  key={`marksheet-${term}`}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    if (isYearBased) {
+                      navigate(`/center/view-marksheet/${studentId}/${term}?year=${term}`);
+                    } else {
+                      navigate(`/center/view-marksheet/${studentId}/${term}`);
+                    }
+                  }}
+                  sx={{
+                    borderColor: isApproved ? '#10b981' : '#3b82f6',
+                    color: isApproved ? '#10b981' : '#3b82f6',
+                    textTransform: 'none',
+                    fontSize: '0.7rem',
+                    fontWeight: 500,
+                    px: 1.25,
+                    py: 0.4,
+                    borderRadius: 2,
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    '&:hover': {
+                      borderColor: isApproved ? '#059669' : '#2563eb',
+                      backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
+                    },
+                  }}
+                >
+                  {isApproved ? `${termLabel} ${term}` : `View Marks ${term}`}
+                </Button>
+              );
+            });
+          } else {
+            // Single term
+            const term = terms[0];
+            const isApproved = allTermsApproved || approvedTerms.includes(term);
+            actions.push(
               <Button
+                key="marksheet"
                 size="small"
                 variant="outlined"
-                onClick={() => navigate(`/center/view-marksheet/${row.studentId || row._id || row.id}/1`)}
+                onClick={() => {
+                  if (isYearBased) {
+                    navigate(`/center/view-marksheet/${studentId}/${term}?year=${term}`);
+                  } else {
+                    navigate(`/center/view-marksheet/${studentId}/${term}`);
+                  }
+                }}
                 sx={{
-                  borderColor: '#10b981',
-                  color: '#10b981',
+                  borderColor: isApproved ? '#10b981' : '#3b82f6',
+                  color: isApproved ? '#10b981' : '#3b82f6',
                   textTransform: 'none',
-                  fontSize: '0.75rem',
+                  fontSize: '0.7rem',
                   fontWeight: 500,
-                  px: 2,
-                  py: 0.5,
+                  px: 1.25,
+                  py: 0.4,
                   borderRadius: 2,
+                  minWidth: 'auto',
+                  whiteSpace: 'nowrap',
                   '&:hover': {
-                    borderColor: '#059669',
-                    backgroundColor: '#ecfdf5',
+                    borderColor: isApproved ? '#059669' : '#2563eb',
+                    backgroundColor: isApproved ? '#ecfdf5' : '#eff6ff',
                   },
                 }}
               >
-                VIEW MARKSHEET
+                {isApproved ? 'VIEW MARKSHEET' : 'VIEW MARKS'}
               </Button>
-            ) : null}
+            );
+          }
+        } else if (row.isMarksheetGenerated) {
+          // Fallback for backward compatibility
+          actions.push(
+            <Button
+              key="marksheet-fallback"
+              size="small"
+              variant="outlined"
+              onClick={() => navigate(`/center/view-marksheet/${studentId}/1`)}
+              sx={{
+                borderColor: '#10b981',
+                color: '#10b981',
+                textTransform: 'none',
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                px: 1.25,
+                py: 0.4,
+                borderRadius: 2,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  borderColor: '#059669',
+                  backgroundColor: '#ecfdf5',
+                },
+              }}
+            >
+              VIEW MARKSHEET
+            </Button>
+          );
+        }
+        
+        // Admit Card View - only if approved
+        if (row.isAdmitCardApproved) {
+          actions.push(
+            <Button
+              key="admit-card"
+              size="small"
+              variant="outlined"
+              onClick={() => navigate(`/center/view-admit-card/${studentId}`)}
+              sx={{
+                borderColor: '#6366f1',
+                color: '#6366f1',
+                textTransform: 'none',
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                px: 1.25,
+                py: 0.4,
+                borderRadius: 2,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  borderColor: '#4f46e5',
+                  backgroundColor: '#eef2ff',
+                },
+              }}
+            >
+              ADMIT CARD
+            </Button>
+          );
+        }
+        
+        // Certificate View - only if approved
+        if (row.isCertificateApproved) {
+          actions.push(
+            <Button
+              key="certificate"
+              size="small"
+              variant="outlined"
+              onClick={() => navigate(`/center/view-certificate/${studentId}`)}
+              sx={{
+                borderColor: '#6366f1',
+                color: '#6366f1',
+                textTransform: 'none',
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                px: 1.25,
+                py: 0.4,
+                borderRadius: 2,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  borderColor: '#4f46e5',
+                  backgroundColor: '#eef2ff',
+                },
+              }}
+            >
+              CERTIFICATE
+            </Button>
+          );
+        }
+        
+        // Migration Certificate View - only if approved
+        if (row.isMigrationApproved) {
+          actions.push(
+            <Button
+              key="migration"
+              size="small"
+              variant="outlined"
+              onClick={() => navigate(`/center/view-migration/${studentId}`)}
+              sx={{
+                borderColor: '#6366f1',
+                color: '#6366f1',
+                textTransform: 'none',
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                px: 1.25,
+                py: 0.4,
+                borderRadius: 2,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  borderColor: '#4f46e5',
+                  backgroundColor: '#eef2ff',
+                },
+              }}
+            >
+              MIGRATION
+            </Button>
+          );
+        }
+        
+        if (actions.length === 0) {
+          return (
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+              No actions available
+            </Typography>
+          );
+        }
+        
+        return (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'row', 
+            gap: 0.75, 
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            width: '100%',
+          }}>
+            {actions}
           </Box>
         );
       },

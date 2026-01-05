@@ -564,9 +564,12 @@ const ManageStudentsPage = () => {
       align: 'center',
       getActions: (row: any) => {
         const semestersWithMarksheet: string[] = row.whichSemesterMarksheetIsGenerated || [];
-        const approvedSemesters: string[] = row.approvedSemesters || [];
+        const yearsWithMarksheet: string[] = row.whichYearMarksheetIsGenerated || [];
+        const isYearBased = yearsWithMarksheet.length > 0;
+        const terms = isYearBased ? yearsWithMarksheet : semestersWithMarksheet;
+        const approvedTerms = isYearBased ? (row.approvedYears || []) : (row.approvedSemesters || []);
         
-        if (!row.isMarksheetGenerated || semestersWithMarksheet.length === 0) {
+        if (!row.isMarksheetGenerated || terms.length === 0) {
           return (
             <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
               Not generated
@@ -574,11 +577,11 @@ const ManageStudentsPage = () => {
           );
         }
         
-        // Find unapproved semesters
-        const unapprovedSemesters = semestersWithMarksheet.filter((sem: string) => !approvedSemesters.includes(sem));
+        // Find unapproved terms (semesters or years)
+        const unapprovedTerms = terms.filter((term: string) => !approvedTerms.includes(term));
         
-        if (unapprovedSemesters.length === 0) {
-          // All semesters approved
+        if (unapprovedTerms.length === 0) {
+          // All terms approved
           return (
             <Button 
               size="small" 
@@ -602,14 +605,14 @@ const ManageStudentsPage = () => {
           );
         }
         
-        // Show approval buttons for each unapproved semester
-        if (unapprovedSemesters.length === 1) {
-          // Single unapproved semester
+        // Show approval buttons for each unapproved term
+        if (unapprovedTerms.length === 1) {
+          // Single unapproved term
           return (
             <Button
               size="small"
               variant="contained"
-              onClick={() => handleApproveMarksheetClick(row, unapprovedSemesters[0])}
+              onClick={() => handleApproveMarksheetClick(row, unapprovedTerms[0], isYearBased)}
               disabled={approveMarksheetMutation.isPending}
               sx={{ 
                 background: '#6366f1', 
@@ -625,20 +628,20 @@ const ManageStudentsPage = () => {
                 '&:hover': { background: '#4f46e5' } 
               }}
             >
-              Approve Sem/Year {unapprovedSemesters[0]}
+              Approve {isYearBased ? 'Year' : 'Sem'} {unapprovedTerms[0]}
             </Button>
           );
         }
         
-        // Multiple unapproved semesters - show dropdown or buttons
+        // Multiple unapproved terms - show dropdown or buttons
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-            {unapprovedSemesters.map((sem: string) => (
+            {unapprovedTerms.map((term: string) => (
               <Button
-                key={sem}
+                key={term}
                 size="small"
                 variant="contained"
-                onClick={() => handleApproveMarksheetClick(row, sem)}
+                onClick={() => handleApproveMarksheetClick(row, term, isYearBased)}
                 disabled={approveMarksheetMutation.isPending}
                 sx={{ 
                   background: '#6366f1', 
@@ -654,7 +657,7 @@ const ManageStudentsPage = () => {
                   '&:hover': { background: '#4f46e5' } 
                 }}
               >
-                Approve Sem/Year {sem}
+                Approve {isYearBased ? 'Year' : 'Sem'} {term}
               </Button>
             ))}
           </Box>

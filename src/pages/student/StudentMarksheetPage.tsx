@@ -1,5 +1,6 @@
-import { Fragment, useRef, useState, useEffect } from 'react';
+import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   Box,
   Typography,
@@ -14,6 +15,7 @@ import { Download } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetMarksheetBySemester } from '../../hooks/useGetMarksheetBySemester';
 import { useStudentProfile } from '../../hooks/useStudentProfile';
+import { useAllSubjects } from '../../hooks/useAllSubjects';
 import StudentLayout from '../../components/student/StudentLayout';
 
 const StudentMarksheetPage = () => {
@@ -29,70 +31,140 @@ const StudentMarksheetPage = () => {
   // Only fetch marksheet if approved and student ID is available
   const studentId = profile?._id || '';
   
-  // Get available semesters from profile
+  // Get available semesters and years from profile
   const semestersWithMarksheet: string[] = profile?.whichSemesterMarksheetIsGenerated || [];
+  const yearsWithMarksheet: string[] = (profile as any)?.whichYearMarksheetIsGenerated || [];
   
-  // Get approved semesters - only these should be visible to students
+  // Determine if marksheets are year-based or semester-based
+  const isYearBased = yearsWithMarksheet.length > 0;
+  const terms = isYearBased ? yearsWithMarksheet : semestersWithMarksheet;
+  
+  // Get approved terms - check for approvedYears if year-based, otherwise approvedSemesters
+  const approvedYears: string[] = (profile as any)?.approvedYears || [];
   const approvedSemesters: string[] = profile?.approvedSemesters || [];
+  const approvedTerms = isYearBased ? approvedYears : approvedSemesters;
   
-  // For backward compatibility: if approvedSemesters is empty but isMarksheetAndCertificateApproved is true,
-  // treat all semesters as approved (migration scenario)
-  const allSemestersApproved = profile?.isMarksheetAndCertificateApproved && approvedSemesters.length === 0;
-  const visibleSemesters = allSemestersApproved 
-    ? semestersWithMarksheet 
-    : semestersWithMarksheet.filter(sem => approvedSemesters.includes(sem));
+  // For backward compatibility: if approvedTerms is empty but isMarksheetAndCertificateApproved is true,
+  // treat all terms as approved (migration scenario)
+  const allTermsApproved = profile?.isMarksheetAndCertificateApproved && approvedTerms.length === 0;
+  const visibleTerms = allTermsApproved 
+    ? terms 
+    : terms.filter(term => approvedTerms.includes(term));
   
-  // Set default semester if not selected and semesters are available
+  // Set default term if not selected and terms are available
   useEffect(() => {
     // If semester is in URL, use it (but only if it's approved)
-    if (semesterFromUrl && visibleSemesters.includes(semesterFromUrl)) {
+    if (semesterFromUrl && visibleTerms.includes(semesterFromUrl)) {
       setSelectedSemester(semesterFromUrl);
-    } else if (!selectedSemester && visibleSemesters.length > 0) {
-      setSelectedSemester(visibleSemesters[0]);
-    } else if (!selectedSemester && semestersWithMarksheet.length === 0 && profile?.isMarksheetGenerated && allSemestersApproved) {
+    } else if (!selectedSemester && visibleTerms.length > 0) {
+      setSelectedSemester(visibleTerms[0]);
+    } else if (!selectedSemester && terms.length === 0 && profile?.isMarksheetGenerated && allTermsApproved) {
       // Fallback for backward compatibility
       setSelectedSemester('1');
     }
-  }, [profile, semestersWithMarksheet, visibleSemesters, selectedSemester, semesterFromUrl, allSemestersApproved]);
+  }, [profile, terms, visibleTerms, selectedSemester, semesterFromUrl, allTermsApproved]);
   
-  // Use selected semester or default to first visible semester
-  const semesterToFetch = selectedSemester || (visibleSemesters.length > 0 ? visibleSemesters[0] : '');
-  const isSemesterApproved = semesterToFetch ? (allSemestersApproved || approvedSemesters.includes(semesterToFetch)) : false;
-  const shouldFetchMarksheet = isSemesterApproved && !!studentId && !!semesterToFetch;
+  // Use selected term or default to first visible term
+  const termToFetch = selectedSemester || (visibleTerms.length > 0 ? visibleTerms[0] : '');
+  const isTermApproved = termToFetch ? (allTermsApproved || approvedTerms.includes(termToFetch)) : false;
+  const shouldFetchMarksheet = isTermApproved && !!studentId && !!termToFetch;
+  
+  // Pass year or semester based on marksheet type
+  const semesterToFetch = isYearBased ? '' : termToFetch;
+  const yearToFetch = isYearBased ? termToFetch : '';
   
   const { data: marksheet, isLoading: marksheetLoading, error } = useGetMarksheetBySemester(
     studentId,
     semesterToFetch,
-    '',
+    yearToFetch,
     shouldFetchMarksheet && !profileLoading
   );
   
   const isLoading = profileLoading || marksheetLoading;
 
+  // Fetch all subjects to get subject codes
+  const { subjects: allSubjects } = useAllSubjects();
+
+  // Match marksheet subjects with all subjects to get codes
+  const subjectsWithCodes = useMemo(() => {
+    if (!marksheet?.subjects) return [];
+    
+    return marksheet.subjects.map((subject) => {
+      const matchedSubject = allSubjects.find(
+        (s) => s.name.toLowerCase() === subject.subjectName.toLowerCase()
+      );
+      return {
+        ...subject,
+        subjectCode: matchedSubject?.code || '',
+      };
+    });
+  }, [marksheet?.subjects, allSubjects]);
+
   const handleDownload = async () => {
     if (marksheetRef.current && marksheet) {
       setIsDownloading(true);
       try {
+        // Wait for all images to load before capturing
+        const images = marksheetRef.current.querySelectorAll('img');
+        await Promise.all(
+          Array.from(images).map((img) => {
+            return new Promise((resolve) => {
+              if (img.complete && img.naturalWidth > 0) {
+                resolve(true);
+              } else {
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(true); // Continue even if image fails to load
+              }
+            });
+          })
+        );
+
         // Additional wait to ensure everything is rendered
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        const width = marksheetRef.current.scrollWidth;
+        const height = marksheetRef.current.scrollHeight;
+        // Increase scale for better quality (3x for high quality, 4x for very high quality)
+        const scale = 3;
+        
         const canvas = await html2canvas(marksheetRef.current, {
           backgroundColor: '#ffffff',
-          scale: 2, // Higher scale for better quality
+          scale: scale,
           useCORS: true,
           allowTaint: true,
           logging: false,
-          windowWidth: marksheetRef.current.scrollWidth,
-          windowHeight: marksheetRef.current.scrollHeight,
+          windowWidth: width,
+          windowHeight: height,
+          removeContainer: false,
+          imageTimeout: 15000,
+          onclone: (clonedDoc) => {
+            // Ensure all fonts are loaded
+            const clonedWindow = clonedDoc.defaultView;
+            if (clonedWindow) {
+              clonedWindow.document.fonts.ready;
+            }
+          },
         });
         
-        const link = document.createElement('a');
-        link.download = `marksheet-${marksheet.studentId.registrationNo}-${marksheet.studentId.candidateName.replace(/\s+/g, '-')}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
+        // Use maximum quality PNG
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Create PDF with the actual dimensions
+        const pdf = new jsPDF({
+          orientation: width > height ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [width, height],
+          compress: false,
+        });
+        
+        // Use 'FAST' compression for better quality (SLOW can degrade quality)
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height, undefined, 'FAST');
+        
+        const fileName = `marksheet-${marksheet.studentId.registrationNo}-${marksheet.studentId.candidateName.replace(/\s+/g, '-')}.pdf`;
+        pdf.save(fileName);
       } catch (error) {
-        console.error('Error generating marksheet image:', error);
-        alert('Error generating marksheet image. Please try again.');
+        console.error('Error generating marksheet PDF:', error);
+        alert('Error generating marksheet PDF. Please try again.');
       } finally {
         setIsDownloading(false);
       }
@@ -157,8 +229,8 @@ const StudentMarksheetPage = () => {
     );
   }
 
-  // Show message if no approved semesters
-  if (!profileLoading && visibleSemesters.length === 0 && semestersWithMarksheet.length > 0) {
+  // Show message if no approved terms
+  if (!profileLoading && visibleTerms.length === 0 && terms.length > 0) {
     return (
       <StudentLayout 
         activeMenuItem="marksheet" 
@@ -175,7 +247,7 @@ const StudentMarksheetPage = () => {
   }
   
   // Show message if marksheet is not approved (backward compatibility)
-  if (!profileLoading && semestersWithMarksheet.length === 0 && !profile?.isMarksheetAndCertificateApproved) {
+  if (!profileLoading && terms.length === 0 && !profile?.isMarksheetAndCertificateApproved) {
     return (
       <StudentLayout 
         activeMenuItem="marksheet" 
@@ -191,7 +263,7 @@ const StudentMarksheetPage = () => {
     );
   }
 
-  if (!marksheet && !isLoading && isSemesterApproved) {
+  if (!marksheet && !isLoading && isTermApproved) {
     return (
       <StudentLayout 
         activeMenuItem="marksheet" 
@@ -221,24 +293,24 @@ const StudentMarksheetPage = () => {
       onMenuItemClick={handleMenuItemClick}
     >
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Semester Selection - Only show approved semesters */}
-        {visibleSemesters.length > 1 && (
+        {/* Term Selection - Only show approved terms (semesters or years) */}
+        {visibleTerms.length > 1 && (
           <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
             <Typography variant="body1" sx={{ fontWeight: 600, mr: 1 }}>
-              Select Semester:
+              Select {isYearBased ? 'Year' : 'Semester'}:
             </Typography>
-            {visibleSemesters.map((sem: string) => (
+            {visibleTerms.map((term: string) => (
               <Chip
-                key={sem}
-                label={`Semester ${sem}`}
-                onClick={() => setSelectedSemester(sem)}
-                color={selectedSemester === sem ? 'primary' : 'default'}
-                variant={selectedSemester === sem ? 'filled' : 'outlined'}
+                key={term}
+                label={`${isYearBased ? 'Year' : 'Semester'} ${term}`}
+                onClick={() => setSelectedSemester(term)}
+                color={selectedSemester === term ? 'primary' : 'default'}
+                variant={selectedSemester === term ? 'filled' : 'outlined'}
                 sx={{
                   cursor: 'pointer',
-                  fontWeight: selectedSemester === sem ? 600 : 400,
+                  fontWeight: selectedSemester === term ? 600 : 400,
                   '&:hover': {
-                    backgroundColor: selectedSemester === sem ? undefined : 'action.hover',
+                    backgroundColor: selectedSemester === term ? undefined : 'action.hover',
                   },
                 }}
               />
@@ -246,18 +318,18 @@ const StudentMarksheetPage = () => {
           </Box>
         )}
         
-        {/* Show warning if there are unapproved semesters */}
-        {semestersWithMarksheet.length > visibleSemesters.length && (
+        {/* Show warning if there are unapproved terms */}
+        {terms.length > visibleTerms.length && (
           <Alert severity="warning" sx={{ mb: 3 }}>
-            You have {semestersWithMarksheet.length - visibleSemesters.length} semester(s) pending approval. 
-            Only approved semesters are visible.
+            You have {terms.length - visibleTerms.length} {isYearBased ? 'year(s)' : 'semester(s)'} pending approval. 
+            Only approved {isYearBased ? 'years' : 'semesters'} are visible.
           </Alert>
         )}
         
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {semestersWithMarksheet.length > 0 && (
+          {terms.length > 0 && (
             <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-              {selectedSemester ? `Semester ${selectedSemester} Marksheet` : 'Marksheet'}
+              {selectedSemester ? `${isYearBased ? 'Year' : 'Semester'} ${selectedSemester} Marksheet` : 'Marksheet'}
             </Typography>
           )}
           <Button
@@ -270,7 +342,7 @@ const StudentMarksheetPage = () => {
               '&:hover': { backgroundColor: '#059669' },
             }}
           >
-            {isDownloading ? 'Generating...' : 'Download Marksheet'}
+            {isDownloading ? 'Generating PDF...' : 'Download Marksheet (PDF)'}
           </Button>
         </Box>
 
@@ -308,26 +380,26 @@ const StudentMarksheetPage = () => {
           {/* Student Details Overlay - Only Values with Absolute Positioning */}
           <Box sx={{ position: 'relative', height: '100%', zIndex: 1 }}>
             {/* Left Column */}
-            <Box sx={{ position: 'absolute', left: '224px', top: '455px' }}>
+            <Box sx={{ position: 'absolute', left: '220px', top: '454px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.candidateName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '224px', top: '492px' }}>
+            <Box sx={{ position: 'absolute', left: '221px', top: '491px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.fatherName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '227px', top: '528px' }}>
+            <Box sx={{ position: 'absolute', left: '227px', top: '527px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.motherName}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '217px', top: '563px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
+            <Box sx={{ position: 'absolute', left: '210px', top: '565px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.1rem' }}>
                 {typeof marksheet.courseId === 'object' && marksheet.courseId?.name 
                   ? marksheet.courseId.name 
                   : marksheet.studentId.course}
@@ -335,19 +407,19 @@ const StudentMarksheetPage = () => {
             </Box>
 
             {/* Right Column */}
-            <Box sx={{ position: 'absolute', left: '705px', top: '455px' }}>
+            <Box sx={{ position: 'absolute', left: '765px', top: '455px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.registrationNo}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '705px', top: '492px' }}>
+            <Box sx={{ position: 'absolute', left: '765px', top: '491px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {new Date(marksheet.studentId.dateOfBirth).toLocaleDateString('en-GB')}
               </Typography>
             </Box>
             
-            <Box sx={{ position: 'absolute', left: '658px', top: '528px' }}>
+            <Box sx={{ position: 'absolute', left: '718px', top: '527px' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
                 {marksheet.studentId.session}
               </Typography>
@@ -358,22 +430,29 @@ const StudentMarksheetPage = () => {
                 {marksheet.serialNo || ''}
               </Typography>
             </Box>
-            
-            {/* Semester - placed below session */}
-            <Box sx={{ position: 'absolute', left: '564px', top: '560px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 'bold' , fontSize: '1.3rem' }}>
-                Semester {selectedSemester || semesterToFetch || ''}
+
+            {/* Term label */}
+            <Box sx={{ position: 'absolute', left: '750px', top: '563px' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' , fontSize: '1.3rem' }}>
+                ({isYearBased ? 'Year' : 'Semester'} {selectedSemester || termToFetch || ''})
               </Typography>
             </Box>
 
             {/* Subjects Table with Absolute Positioning */}
-            {marksheet.subjects && marksheet.subjects.length > 0 && (
+            {subjectsWithCodes.length > 0 && (
               <>
-                {marksheet.subjects.map((subject, index) => (
+                {subjectsWithCodes.map((subject, index) => (
                   <Fragment key={index}>
+                    {/* Subject Code - Extract only numbers */}
+                    <Box sx={{ position: 'absolute', left: '70px', top: `${742 + index * 53}px` }}>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                        {subject.subjectCode ? subject.subjectCode.replace(/\D/g, '') || 'N/A' : 'N/A'}
+                      </Typography>
+                    </Box>
+                    
                     {/* Subject Name */}
-                    <Box sx={{ position: 'absolute', left: '130px', top: `${746 + index * 53}px` }}>
-                      <Typography variant="body2" sx={{ fontWeight: 'bold' ,fontSize: '0.8rem' }}>
+                    <Box sx={{ position: 'absolute', left: '130px', top: `${742 + index * 53}px` }}>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' ,fontSize: '1.1rem' }}>
                         {subject.subjectName}
                       </Typography>
                     </Box>
@@ -424,13 +503,13 @@ const StudentMarksheetPage = () => {
                 
                 {/* Total Row */}
                 {(() => {
-                  const totalMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.marks || 0), 0);
-                  const totalInternal = marksheet.subjects.reduce((sum, subject) => sum + (subject.internal || 0), 0);
-                  const totalTotal = marksheet.subjects.reduce((sum, subject) => sum + (subject.total || 0), 0);
-                  const totalMinMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.minMarks || 0), 0);
-                  const totalMaxMarks = marksheet.subjects.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
+                  const totalMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.marks || 0), 0);
+                  const totalInternal = subjectsWithCodes.reduce((sum, subject) => sum + (subject.internal || 0), 0);
+                  const totalTotal = subjectsWithCodes.reduce((sum, subject) => sum + (subject.total || 0), 0);
+                  const totalMinMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.minMarks || 0), 0);
+                  const totalMaxMarks = subjectsWithCodes.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
                   const percentage = totalMaxMarks > 0 ? ((totalTotal / totalMaxMarks) * 100).toFixed(2) : '0.00';
-                  const totalRowTop = 736 + marksheet.subjects.length * 53;
+                  const totalRowTop = 736 + subjectsWithCodes.length * 53;
                   const percentageRowTop = totalRowTop + 50;
                   
                   return (
